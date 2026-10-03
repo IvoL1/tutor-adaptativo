@@ -1,0 +1,13 @@
+{
+  "name": "tutor-adaptativo",
+  "displayName": "Tutor Adaptativo",
+  "description": "Sistema pessoal de estudo ao vivo e adaptativo para qualquer matéria: sondagem do nível, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada, protocolo antifrustração, integração com o cofre Obsidian (criar matéria, notas, imagens, transcrição de vídeo), hooks, subagentes e testes automáticos.",
+  "version": "3.3.0",
+  "author": {
+    "name": "Ivo"
+  },
+  "homepage": "https://github.com/IvoL1/tutor-adaptativo",
+  "repository": "https://github.com/IvoL1/tutor-adaptativo",
+  "license": "MIT",
+  "keywords": ["estudo", "aprendizagem", "tutor", "obsidian", "repetição espaçada", "português"]
+}

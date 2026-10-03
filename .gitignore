@@ -1,0 +1,11 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# ZIP gerado para upload no app Claude (anexe numa Release, não versione)
+dist/
+
+# Resultados dos testes automaticos (claude plugin eval)
+plugins/*/evals/results/
+__pycache__/
+*.pyc

@@ -1,0 +1,14 @@
+{
+  "name": "tutor-adaptativo",
+  "description": "Sistema pessoal de estudo ao vivo e adaptativo, para qualquer matéria",
+  "owner": {
+    "name": "Ivo"
+  },
+  "plugins": [
+    {
+      "name": "tutor-adaptativo",
+      "source": "./plugins/tutor-adaptativo",
+      "description": "Skill de estudo ao vivo (sondagem, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada), integração com o cofre Obsidian, hooks de retomada e diário, dois subagentes, estilo de resposta opcional e testes automáticos"
+    }
+  ]
+}
