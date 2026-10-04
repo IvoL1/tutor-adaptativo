@@ -33,7 +33,7 @@ Primeiro identifique **o modo**:
 
 Quando eu disser `"retomar"`, abrir uma matéria que já existe, ou simplesmente voltar a estudar:
 
-1. **Leia a posição.** Se a sessão abriu com o bloco `[tutor-adaptativo · cofre]` (injetado pelo hook de abertura), ele já traz a posição, as pendências e a revisão do dia de cada matéria: use-o e confirme no `progresso.md` se precisar do detalhe. Sem o bloco, rode `cofre.py resumo` ou leia `registros-da-skill/trilha.md`, `progresso.md` e `conhecimento.md` da matéria ativa — ou, sem arquivos, o **Cartão de retomada** que eu colar. **Se não houver registros nem cartão**, pergunte se eu tenho um cartão guardado; se não tiver, trate como matéria nova (Entrevista). **A posição atual vem só desses registros**, nunca de memória automática de conversas anteriores; se a memória disser uma coisa e os registros outra, os registros vencem.
+1. **Leia a posição.** Pelo MCP do Obsidian, leia `registros-da-skill/progresso.md`, `conquistas.md` e `conhecimento.md` da matéria ativa (receita "Retomar" em `references/obsidian.md`); o `trilha.md` só se precisar do contexto. Sem o MCP, leia os mesmos arquivos direto do disco — ou, sem arquivos, use o **Cartão de retomada** que eu colar. **Se não houver registros nem cartão**, pergunte se eu tenho um cartão guardado; se não tiver, trate como matéria nova (Entrevista). **A posição atual vem só desses registros**, nunca de memória automática de conversas anteriores; se a memória disser uma coisa e os registros outra, os registros vencem.
 2. **Se eu estou voltando depois de dias**, aplique a **Reentrada** (`references/pedagogia.md` → "Reentrada depois de uma pausa"): recapitule em 1–2 frases, sem cobrar, e já siga.
 3. **Revisão do dia** (`references/pedagogia.md` → "Fila de revisão espaçada (dentro do `conhecimento.md`)"): 1 a 3 quizzes dos conceitos vencidos. Se não houver nenhum, diga isso e siga.
 4. **Confirme o plano de hoje em uma pergunta de escolha** (`references/ferramentas.md` → "Perguntas com opções"): continuar do ponto em que parei (padrão, recomendado), revisar, fazer um quiz, ou outra coisa. Se eu parecer sem energia, ofereça o modo leve (`references/pedagogia.md` → "Sessão mínima viável (para manter a continuidade)").
@@ -64,9 +64,9 @@ Se eu só pedir para você explicar ou ensinar algo pontual, sem uma matéria em
    - `progresso.md` — posição, **Pendências abertas**, provas, linha do tempo da sessão.
    - `conhecimento.md` — termos novos no glossário e os intervalos de revisão (Revisão do dia e nós aprovados).
    - `conquistas.md` — Dashboard (incluindo a **data desta sessão**) e, se concluí uma parte, uma linha no changelog do que o projeto passou a fazer (`references/projetos.md` → "Changelog de conquistas (`conquistas.md`)").
-3. **Grave a nota da sessão** em `sessoes/` (template em `references/templates.md`) — o diário em que eu releio o que entendi. Com Python, `cofre.py nota` grava a nota com o frontmatter certo, acrescenta em vez de sobrescrever se já houver uma do dia e a lista em "Sessões recentes" do painel. Diagramas e imagens da sessão vão para `anexos/` com `cofre.py anexar` e entram na nota como `![[arquivo.png]]` (`references/ferramentas.md` → "Obsidian: o que a skill faz sozinha"). Sem acesso a arquivos, entregue o **Cartão de retomada** (neste arquivo → "Sem acesso a arquivos — Cartão de retomada").
+3. **Grave a nota da sessão** em `sessoes/` (template em `references/templates.md`) — o diário em que eu releio o que entendi. Pelo MCP do Obsidian, grave a nota com o frontmatter certo, acrescentando (nunca sobrescrevendo) se já houver uma do dia, e liste-a em "Sessões recentes" do painel (receita "Gravar a nota da sessão" em `references/obsidian.md`). Diagramas entram no corpo da nota como bloco mermaid ou como `![[arquivo.svg]]` em `anexos/` (`references/obsidian.md` → "Visuais e imagens"). Sem acesso a arquivos, entregue o **Cartão de retomada** (neste arquivo → "Sem acesso a arquivos — Cartão de retomada").
 4. **Atualize o mapa** no `_painel-[assunto].md`: nós firmes marcados e o `▶ próximo passo`.
-5. **Confira o cofre** com `cofre.py validar` (se houver Python) depois de criar ou alterar registros, e corrija o que ele apontar.
+5. **Confira o cofre** depois de criar ou alterar registros (`references/obsidian.md` → "Conferir o cofre") e corrija o que divergir.
 6. **Matéria de código:** verifique mudanças sem commit em `pratica/projeto/` e lembre de commitar antes de fechar (`references/programacao.md` → "Versionamento (git)").
 7. **Se a entrevista, a sondagem ou o plano não terminaram** nesta sessão, registre o que já foi levantado como **rascunho** (no `trilha.md` com a marca `rascunho`, ou no Cartão de retomada), para não refazer tudo. O rascunho só vira trilha depois do meu "ok" no plano.
 8. Diga **exatamente qual é o próximo passo** e proponha o que fazer na próxima sessão.
@@ -78,7 +78,7 @@ Se eu só pedir para você explicar ou ensinar algo pontual, sem uma matéria em
 > Desenhada para a ordem ser óbvia só de olhar: o que **eu** escrevo fica em `pratica/`; o que o Claude escreve fica nos registros e nas notas. Compatível com Obsidian (wikilinks, callouts, frontmatter) sem quebrar Markdown padrão — ver "Convenções Obsidian" em `references/templates.md`.
 
 ```
-estudos/                                ← cofre Obsidian (ou subpasta dele)
+estudos/                                ← raiz dos estudos no cofre Obsidian (subpasta dele, ou o próprio cofre)
 ├── README.md                           ← 🤖 índice geral: matérias ativas com [[links]] e status
 ├── CLAUDE.md                           ← 🚫 ponteiro curto: "este cofre usa a skill X, siga-a"
 │
@@ -88,7 +88,7 @@ estudos/                                ← cofre Obsidian (ou subpasta dele)
 │   ├── sessoes/                        ← 🤖 uma nota por sessão (o diário: o que entendi, onde travei)
 │   │   └── 2026-09-30-[tópico].md
 │   │
-│   ├── anexos/                         ← 🤖 imagens, diagramas e prints que entram nas notas (![[arquivo.png]])
+│   ├── anexos/                         ← 🤖 imagens e diagramas que entram nas notas (![[arquivo.svg]], ![[arquivo.png]])
 │   ├── fontes/                         ← 🤖 transcrições de aulas em vídeo (pista, não fonte para ensinar)
 │   ├── _sessoes-[matéria].base         ← 🤖 tabela das sessões (Base do Obsidian)
 │   ├── cartoes.md                      ← 🤖 opcional: cartões do plugin Spaced Repetition
@@ -103,13 +103,11 @@ estudos/                                ← cofre Obsidian (ou subpasta dele)
 │       ├── conhecimento.md             ←    conceitos + glossário + fila de revisão
 │       └── conquistas.md               ←    dashboard + changelog (abro nos dias difíceis)
 │
-├── [outra-matéria]/
-│   └── ...
-│
-└── .tutor/                             ← 🚫 estado dos scripts (provas em andamento); pasta oculta, o Obsidian a ignora
+└── [outra-matéria]/
+    └── ...
 ```
 
-> **Criar tudo de uma vez:** `cofre.py nova-materia "[Nome]"` cria a pasta da matéria, os quatro registros, o painel, a Base de sessões, `sessoes/`, `pratica/`, `anexos/` e `fontes/` a partir dos templates de `references/templates.md`, põe a matéria no `README.md` do cofre e valida o resultado. Nunca sobrescreve o que já existe. Sem Python, crie à mão pela árvore acima.
+> **Criar tudo de uma vez:** a receita "Criar a matéria" de `references/obsidian.md` grava, pelo MCP do Obsidian, os quatro registros, o painel, a Base de sessões e o `_leia-me.md` de `pratica/projeto/` e `pratica/treinos/`, a partir dos templates de `references/templates.md`, e põe a matéria no `README.md` do cofre. `sessoes/`, `anexos/` e `fontes/` nascem quando o primeiro arquivo é gravado neles (o MCP não cria pasta vazia). Nunca sobrescreve o que já existe.
 
 > **Por que `_painel-` em vez de `README.md` repetido:** no Obsidian, vários arquivos com o mesmo nome tornam `[[README]]` ambíguo (autocompletar inútil, grafo com nós idênticos, busca poluída). Nomes únicos resolvem isso, e o prefixo `_` faz o painel aparecer **sempre no topo** da pasta. O `README.md` sobrevive só na raiz do cofre, onde é único e a convenção tem valor.
 
@@ -121,9 +119,9 @@ estudos/                                ← cofre Obsidian (ou subpasta dele)
 
 | Pasta | Conteúdo |
 |---|---|
-| `sessoes/` | uma nota por sessão: `AAAA-MM-DD-[tópico].md` |
-| `anexos/` | imagens, diagramas e prints: `AAAA-MM-DD-[nome].png` (só o Claude grava) |
-| `fontes/` | transcrições de vídeo: `AAAA-MM-DD-[título].md` (só o Claude grava) |
+| `sessoes/` | uma nota por sessão: `AAAA-MM-DD-[tópico].md` (criada com a primeira nota) |
+| `anexos/` | imagens e diagramas: `AAAA-MM-DD-[nome].svg` ou `.png` (só o Claude grava; criada com o primeiro anexo) |
+| `fontes/` | transcrições de vídeo: `AAAA-MM-DD-[título].md` (só o Claude grava; criada com a primeira) |
 | `pratica/projeto/` | o projeto de prática (uma só pasta, cresce a trilha inteira) |
 | `pratica/treinos/t[N]-[parte]/` | exercícios soltos, uma subpasta por parte (ex.: `t1-1a/`) |
 | `registros-da-skill/` | os quatro registros — só o Claude escreve |
@@ -137,6 +135,7 @@ estudos/                                ← cofre Obsidian (ou subpasta dele)
 | `_painel-[matéria].md` · `_sessoes-[matéria].base` · `cartoes.md` (opcional) | raiz da pasta da matéria |
 | `trilha.md` · `progresso.md` · `conhecimento.md` · `conquistas.md` | `registros-da-skill/` |
 | `AAAA-MM-DD-[tópico].md` | `sessoes/` |
+| `_leia-me.md` (o único arquivo que o Claude grava em `pratica/`, na criação da matéria) | `pratica/projeto/` e `pratica/treinos/` |
 | `README.md` · `CLAUDE.md` | raiz de `estudos/` (um por cofre — sem frontmatter) |
 
 #### Seções do `progresso.md` (nomes exatos)

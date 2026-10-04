@@ -18,10 +18,8 @@ Entrada de `montar` (uma linha por item):
 """
 import datetime, json, os, pathlib, random, re, secrets, sys, tempfile, time
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import cofre  # noqa: E402
-
-STATE = cofre.estado_dir()
+# Estado das perguntas e provas em andamento: TUTOR_STATE, senão a pasta temporária (nunca dentro do cofre Obsidian).
+STATE = pathlib.Path(os.environ.get("TUTOR_STATE") or pathlib.Path(tempfile.gettempdir()) / "tutor-adaptativo")
 MIN_PROVA = 5  # abaixo disso o percentual de 80% equivale a exigir 100% (3 de 3, 4 de 4)
 PROVA_PARADA_H = 12  # prova sem atividade por mais que isso recomeça do zero
 ID_OK = re.compile(r"^q-[0-9a-f]{8}$")
@@ -120,6 +118,15 @@ def lint(d, maximo):
     return erros, avisos
 
 
+def ler_entrada(args):
+    """Texto da entrada: --arquivo CAMINHO (qualquer shell, qualquer codificação) ou o stdin. Aceita BOM, UTF-16 e CRLF."""
+    arq = _opcao(args, "--arquivo")
+    bruto = pathlib.Path(arq).expanduser().read_bytes() if arq else sys.stdin.buffer.read()
+    if bruto[:2] in (b"\xff\xfe", b"\xfe\xff"):
+        return bruto.decode("utf-16", errors="replace").replace("\r\n", "\n")
+    return bruto.decode("utf-8-sig", errors="replace").replace("\r\n", "\n")
+
+
 def _arq(nome):
     return STATE / f"{nome}.json"
 
@@ -130,7 +137,7 @@ def _salvar(nome, obj):
 
 
 def _candidatos():
-    """Onde procurar o estado: o atual (cofre) e a pasta temporária, para o quiz não se perder se a pasta de trabalho mudar no meio."""
+    """Onde procurar o estado: o atual e a pasta temporária, para o quiz não se perder se a pasta de trabalho mudar no meio."""
     tmp = pathlib.Path(tempfile.gettempdir()) / "tutor-adaptativo"
     return [STATE] + ([tmp] if tmp != STATE else [])
 
@@ -186,7 +193,7 @@ def montar(args):
     if prova and not PROVA_OK.match(prova):
         print("ERRO: nome de prova inválido (use letras, números, ponto, hífen ou sublinhado; até 40 caracteres)")
         return 2
-    d = parse(cofre.ler_entrada(args))
+    d = parse(ler_entrada(args))
     erros, avisos = lint(d, maximo)
     if erros:
         print("ERRO: não montei o quiz. Corrija e rode de novo:")

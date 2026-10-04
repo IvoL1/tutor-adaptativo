@@ -3,6 +3,45 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 4.0 — 2026-10-04
+
+**O cofre Obsidian passa a ser lido e escrito pelo MCP do Obsidian, não por Python** (mudança de comportamento)
+- Novo `references/obsidian.md`: ferramentas do `obsidian-mcp-server`, regras de segurança (ler antes de
+  escrever, nunca sobrescrever, nunca tocar em `pratica/`, nunca apagar), como achar a raiz do cofre e uma
+  receita para cada coisa que o `cofre.py` fazia: retomar, criar matéria, atualizar registros, nota da
+  sessão, visuais e imagens, transcrever, cartões, abrir, buscar e conferir o cofre. Tabela de equivalência
+  para outros dois servidores MCP do Obsidian. Plano B: arquivos diretos, depois o Cartão de retomada.
+- **Removidos:** `scripts/cofre.py` e `hooks/hooks.json` (os dois hooks, abertura e diário, rodavam o
+  `cofre.py`; um hook não chama MCP). `"retomar"` agora lê os registros pelo MCP. O diário automático
+  da conversa acabou: a nota da sessão guarda o que vale reler.
+- `quiz.py` não depende mais do `cofre.py`; o estado das perguntas e provas fica na pasta temporária
+  (ou em `TUTOR_STATE`), nunca dentro do cofre (a pasta `.tutor/` deixou de existir).
+- `fila.py` aceita `-` no lugar do arquivo: lê o texto pelo stdin e, em `registrar`, **não grava**: imprime
+  `TROCAR`/`POR`/`FIM` para o Claude aplicar com `obsidian_search_replace`. O modo com caminho continua.
+- Novos templates em `references/templates.md`: Painel inicial, `_sessoes-[matéria].base` e `_leia-me.md`
+  de `pratica/` (o MCP não cria pasta vazia, então `pratica/projeto/` e `pratica/treinos/` nascem com ele).
+  `sessoes/`, `anexos/` e `fontes/` nascem com o primeiro arquivo.
+- Comandos `"abrir"`, `"anexa"`, `"transcreve"` e `"cartões"` reescritos sobre o MCP: `"abrir"` entrega o
+  link `obsidian://`; `"anexa"` grava Mermaid no corpo ou SVG em `anexos/` (PNG só com acesso ao disco);
+  `"transcreve"` lê texto colado ou `.vtt` (e usa o `yt-dlp` se existir).
+
+**Visuais: o que faltava para a skill gerar imagens, gráficos e diagramas**
+- Novo `references/visuais-modelos.md`: tabela "qual visual para qual ideia"; modelos Mermaid conferidos no
+  analisador do Mermaid 11.17.2 (fluxo, sequência, estado, ER, classes, mapa mental, linha do tempo, git,
+  quadrante, pizza, gantt, gráfico de linha e barra); SVG pronto (reta numérica, plano cartesiano, fração,
+  teclado de piano); gráficos de função e de dados com valores calculados por código; química com `\ce{}`;
+  Canvas opcional do Obsidian; imagem de fonte confiável com crédito; regra para ilustração gerada por IA
+  (só mnemônica, nunca fato); visual interativo; e a compatibilidade com o Mermaid do Obsidian, que pode ser
+  mais antigo que o do `render.py`.
+- `references/visuais.md` agora cobre visuais numéricos, imagem de fonte confiável e interativos, e diz
+  como gravar cada tipo no cofre. O `tutor-diagramador` conhece os novos tipos, os modelos de SVG e
+  devolve só o código (quem chama grava).
+- Eval `cria-materia-por-script` virou `cria-materia-sem-python`.
+
+**Não feito, de propósito**
+- `quiz.py`, `fila.py` e `render.py` continuam em Python: são cálculo e renderização, não Obsidian.
+- Configurar o servidor MCP dentro do plugin: a chave da API do Obsidian é do Ivo; a configuração está no README.
+
 ## 3.3 — 2026-10-01
 
 **Correções (achadas numa segunda varredura, reproduzidas em teste)**

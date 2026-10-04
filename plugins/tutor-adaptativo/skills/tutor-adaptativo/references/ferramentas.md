@@ -1,6 +1,6 @@
 # Referência — Ferramentas e subagentes (com plano B)
 
-> Leia ao fazer uma pergunta com opções, aplicar um quiz, delegar pesquisa ou diagrama a um subagente, gravar arquivos, ou quando uma ferramenta não existir no ambiente.
+> Leia ao fazer uma pergunta com opções, aplicar um quiz, delegar pesquisa ou diagrama a um subagente, rodar um script, ou quando uma ferramenta não existir no ambiente. Para ler ou gravar no cofre, vá direto a `references/obsidian.md`.
 
 > **Princípio (Regra 33):** use a ferramenta quando ela existir e faça o equivalente na conversa quando não existir. **Nunca** trave por falta de ferramenta, e nunca diga "não consigo" se a conversa resolve.
 
@@ -9,13 +9,11 @@
 > **2. Quiz interativo**
 > **3. Subagentes**
 >     · Sem subagentes
-> **4. Scripts da skill (o código decide)**
+> **4. Obsidian pelo MCP**
+> **5. Scripts da skill (o código decide)**
 >     · Quiz (`quiz.py`)
 >     · Fila de revisão (`fila.py`)
->     · Cofre (`cofre.py`)
->     · Obsidian: o que a skill faz sozinha
 >     · Diagramas (`render.py`)
-> **5. Hooks automáticos (só quando instalado como plugin)**
 > **6. Arquivos: com e sem acesso**
 > **7. Formatação**
 
@@ -58,7 +56,7 @@ Diferença entre escolha e quiz: `references/avaliacao.md` → "Perguntas com re
 | `tutor-pesquisador` | Pesquisar na web e devolver um relatório curto com fontes, links e datas | Na menor dúvida sobre um fato (`references/ensino.md` → "Precisão inegociável"); ao mapear um campo novo; ao levantar fonte e versão na entrevista |
 | `tutor-diagramador` | Criar **um** diagrama correto e mínimo e verificá-lo olhando o resultado | Quando uma ideia é melhor como desenho (`references/visuais.md`) |
 
-**Como chamar:** descreva a tarefa por **completo** — o subagente roda isolado e **não conhece a conversa**. Inclua o que precisa saber, o que quer de volta e o que já foi descartado — e, para o `tutor-diagramador`, **o caminho completo da pasta `scripts/`** (do `SKILL.md`), onde ele acha o `render.py`. Se a skill foi instalada como plugin, o nome aparece com o prefixo do plugin (`tutor-adaptativo:tutor-pesquisador`); a descrição do subagente basta para o Claude escolher certo.
+**Como chamar:** descreva a tarefa por **completo** — o subagente roda isolado e **não conhece a conversa**. Inclua o que precisa saber, o que quer de volta e o que já foi descartado — e, para o `tutor-diagramador`, **o caminho completo da pasta `scripts/`** (do `SKILL.md`), onde ele acha o `render.py`. O subagente devolve o **código** do visual; quem grava no cofre é você, pelo MCP do Obsidian (`references/obsidian.md`). Se a skill foi instalada como plugin, o nome aparece com o prefixo do plugin (`tutor-adaptativo:tutor-pesquisador`); a descrição do subagente basta para o Claude escolher certo.
 
 **Nunca confie cegamente no retorno:** o pesquisador devolve veredito e fonte; leia a fonte quando a afirmação for central para a aula. Se o subagente voltar sem achar fonte oficial, o fato é **não verificável** e **não entra na aula**.
 
@@ -68,11 +66,29 @@ Quando os subagentes não existirem no ambiente (app do claude.ai, instalação 
 - **Pesquisa:** use a busca e a leitura de páginas da web, se existirem, seguindo a mesma hierarquia de fontes (`references/pedagogia.md` → "Fontes e versão — regra permanente"). Sem acesso à web, **diga que não conseguiu verificar** e marque o fato como não verificado na aula — nunca ensine de memória como se fosse certo.
 - **Diagramas:** escreva você mesmo um bloco mermaid simples (`references/visuais.md` → "Como fazer").
 
+## Obsidian pelo MCP
+
+**O que é:** o cofre de estudos é lido e escrito pelas ferramentas do **MCP do Obsidian** (`obsidian_read_note`, `obsidian_update_note`, `obsidian_search_replace`, `obsidian_list_notes`, `obsidian_global_search`, `obsidian_manage_frontmatter`, `obsidian_manage_tags`). Não há mais script de cofre: o que o antigo `cofre.py` fazia agora é receita, em `references/obsidian.md`:
+
+| Antes (`cofre.py`) | Agora |
+|---|---|
+| `resumo` (hook de abertura) | receita "Retomar": ler `progresso.md`, `conquistas.md` e `conhecimento.md` ao dizer `"retomar"` |
+| `nova-materia` | receita "Criar a matéria" (templates em `references/templates.md`) |
+| `nota` | receita "Gravar a nota da sessão" |
+| `anexar` | receita "Visuais e imagens": Mermaid no corpo, SVG como texto em `anexos/`; PNG só com acesso ao disco |
+| `transcrever` | receita "Transcrever um vídeo" (lê `.vtt` ou texto colado, limpa e grava em `fontes/`) |
+| `cartoes` | receita "Cartões" |
+| `abrir` | link `obsidian://open?…` para clicar |
+| `validar` | lista "Conferir o cofre" |
+| `diario` (hook `Stop`) | removido: a nota da sessão já guarda o que vale reler |
+
+**Plano B:** sem o MCP, arquivos diretos (`Read`/`Write`/`Edit`) com as mesmas regras; sem acesso a arquivos, o Cartão de retomada (`references/obsidian.md` → "Sem o MCP"). **Nunca apague nem sobrescreva** arquivo meu; **nunca escreva em `pratica/`** (regras de segurança em `references/obsidian.md`).
+
 ## Scripts da skill (o código decide)
 
-**O que são:** scripts em Python que fazem o que **não deve depender de eu obedecer a uma instrução**: sorteio, verificação, contas, datas e renderização. O Claude os chama pelo Bash. Ficam na pasta `scripts/`, ao lado do `SKILL.md` (o `SKILL.md` mostra o caminho completo; use-o no lugar de `<pasta>` abaixo).
+**O que são:** scripts em Python que fazem o que **não deve depender de eu obedecer a uma instrução**: sorteio, verificação, contas, datas e renderização. O Claude os chama pelo Bash. Ficam na pasta `scripts/`, ao lado do `SKILL.md` (o `SKILL.md` mostra o caminho completo; use-o no lugar de `<pasta>` abaixo). **Nenhum deles toca o cofre:** ler e gravar notas é com o MCP do Obsidian.
 
-**Requisito:** Python 3.8+ no PATH (`python` ou `python3`; use o que existir). Só o `transcrever` precisa de mais uma coisa: o `yt-dlp`. Sem Python, ou se um script falhar: **faça à mão pelo plano B de cada seção e diga que foi à mão** — a skill nunca trava por isso. Para conferir que tudo está certo: `python <pasta>/selftest.py` (deve dizer que todas as verificações passaram).
+**Requisito:** Python 3.8+ no PATH (`python` ou `python3`; use o que existir). Só o `render.py` ainda precisa de um navegador (Chrome ou Edge) e de rede. Sem Python, ou se um script falhar: **faça à mão pelo plano B de cada seção e diga que foi à mão** — a skill nunca trava por isso. Para conferir que tudo está certo: `python <pasta>/selftest.py` (deve dizer que todas as verificações passaram).
 
 ### Quiz (`quiz.py`)
 
@@ -96,58 +112,33 @@ Linhas: `P:` pergunta, `C:` contexto, `T:` conceito testado, `+` certa, `-` erra
 1. `montar` devolve `ID`, as **opções já sorteadas** (com "Não sei" no fim) e `AVISOS`. **Se houver aviso, refaça a pergunta e rode de novo.** Nunca mostre a certa: o script nem a imprime.
 2. Mostre as opções **exatamente na ordem devolvida** (pergunta com opções; em prova e sondagem, junto com a confiança).
 3. Com a resposta: `python "<pasta>/quiz.py" corrigir ID NÚMERO --confianca verde|amarela|vermelha` (ou `nao-sei`; em seleção múltipla, `1,3`). Ele devolve `RESULTADO` (acerto, erro ou lacuna), a `CLASSE` (erro confiante, acerto frágil), a `CERTA`, o `EQUIVOCO_REVELADO` e a `EXPLICACAO`. **Use esse resultado como está**; não corrija de cabeça.
-4. Ao fim da prova: `python "<pasta>/quiz.py" placar p1 --topico T1 --parte 1a --fechar`. Devolve o **percentual, a decisão (aprovado, reforço seletivo ou completo) e o bloco pronto para o `progresso.md`**; a conta e os limites de 80% e 50% são do código. **Sempre feche com `--fechar`** (senão a prova continua aberta e uma nova tentativa se soma à anterior); a **reprova usa outro nome** (`p1-reprova`). Se a prova tiver menos de 5 questões, o script avisa que o resultado é provisório. Uma prova parada por mais de 12 h recomeça do zero sozinha. Onde fica o estado: dentro do cofre, em `.tutor/estado/` (pasta oculta); fora de um cofre, na pasta temporária.
+4. Ao fim da prova: `python "<pasta>/quiz.py" placar p1 --topico T1 --parte 1a --fechar`. Devolve o **percentual, a decisão (aprovado, reforço seletivo ou completo) e o bloco pronto para o `progresso.md`** (que você acrescenta pelo MCP); a conta e os limites de 80% e 50% são do código. **Sempre feche com `--fechar`** (senão a prova continua aberta e uma nova tentativa se soma à anterior); a **reprova usa outro nome** (`p1-reprova`). Se a prova tiver menos de 5 questões, o script avisa que o resultado é provisório. Uma prova parada por mais de 12 h recomeça do zero sozinha. O estado das perguntas e provas em andamento fica na pasta temporária do sistema (ou em `TUTOR_STATE`), **nunca dentro do cofre**.
 
 ### Fila de revisão (`fila.py`)
 
+O arquivo vive no cofre e é lido pelo MCP; o script recebe o texto pelo **stdin** (`-` no lugar do arquivo). Cole a seção `## Fila de revisão espaçada` do `conhecimento.md` (ou o arquivo todo):
+
 ```bash
-python "<pasta>/fila.py" vencidos "<matéria>/registros-da-skill/conhecimento.md"
-python "<pasta>/fila.py" registrar "<...>/conhecimento.md" --conceito "git commit" --resultado novo --parte "T1 / 1a"
+python "<pasta>/fila.py" vencidos - --max 3 <<'EOF'
+## Fila de revisão espaçada
+| Conceito | Tópico/Parte | Aprendido em | Intervalo atual | Próxima revisão | Status |
+|---|---|---|---|---|---|
+| git commit | T1 / 1a | 2026-10-01 | 3d | 2026-10-04 | ativo |
+EOF
 ```
 
-`vencidos` lista até 3 conceitos da Revisão do dia (o resto continua vencido). `registrar` aceita `--resultado novo|acerto|acerto-fragil|erro|erro-confiante` e atualiza intervalo, data e status (1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado; erro volta para 1d; **acerto frágil** — acertei, mas com 🔴 — repete o mesmo intervalo, sem avançar). Plano B: a tabela de `references/pedagogia.md` → "Fila de revisão espaçada (dentro do `conhecimento.md`)".
-
-### Cofre (`cofre.py`)
-
-- `cofre.py resumo`: posição, pendências abertas e revisão do dia de cada matéria (é o que o hook de abertura injeta sozinho).
-- `cofre.py validar`: confere nomes de pastas, arquivos e seções contra `references/sessao.md` → "Nomes canônicos (pastas, arquivos e seções)"; rode depois de criar ou alterar registros.
-- `cofre.py status`: uma linha curta (`estudo: matéria: N p/ revisar`), vazia fora de um cofre ou sem nada vencido; serve para a linha de status do Claude Code (ver README).
-- `cofre.py achar`: mostra onde o cofre foi encontrado (opção `--cofre`, variável `TUTOR_COFRE`, arquivo `~/.claude/tutor-adaptativo.json` com `{"cofre": "..."}`, ou subindo a partir da pasta atual).
-
-### Obsidian: o que a skill faz sozinha
-
-Estes comandos do `cofre.py` fazem, por código, o que o Obsidian precisa para o cofre ficar organizado **sem eu mexer em nada**. Todos escrevem arquivos Markdown direto na pasta do cofre, então **funcionam com o Obsidian aberto ou fechado**.
-
-- **Criar a matéria:** `cofre.py nova-materia "Nome da matéria"` cria a pasta (nome sem acento, com hifens), os quatro registros, o painel, `sessoes/`, `pratica/projeto/`, `pratica/treinos/` e `anexos/` a partir dos templates, põe a matéria no `README.md` do cofre e valida. Roda 1 vez, depois do meu "ok" no plano; repetir não altera nada.
-- **Gravar a nota da sessão:** `cofre.py nota "matéria" "título" --topico t1 --resumo "a ideia que encaixou"`, com o corpo no stdin ou em `--arquivo caminho.md` (preferível no PowerShell). Cria `sessoes/AAAA-MM-DD-título.md` com frontmatter (`tipo`, `materia`, `data`, `topico`, `tags`), acrescenta se já houver nota do dia e lista a nota em "Sessões recentes" do painel (as 8 mais recentes; o que eu escrevi à mão ali nunca é apagado).
-- **Imagens e visuais:**
-  - `cofre.py anexar "matéria" caminho/da/imagem.png --nome "descrição"` copia o arquivo para `anexos/` (nunca sobrescreve) e devolve `EMBED: ![[arquivo.png]]` para colar na nota. Aceita png, jpg, gif, webp, svg e pdf.
-  - `cofre.py anexar "matéria" --area-de-transferencia` pega a **imagem que eu copiei** (print com Win+Shift+S, por exemplo) e a salva em `anexos/`. Testado no Windows; no macOS precisa do `pngpaste` e no Linux de `wl-paste` ou `xclip`.
-  - **Diagramas:** gere o PNG com `render.py` (abaixo) e passe-o por `anexar`. Para diagramas simples, o bloco ```` ```mermaid ```` na própria nota já renderiza no Obsidian; o PNG é para quando eu quiser a imagem fixa ou o Mermaid do Obsidian divergir.
-- **Transcrever uma aula em vídeo:** `cofre.py transcrever "matéria" "https://youtube.com/watch?v=..."` baixa só a **legenda** (nunca o vídeo) com o `yt-dlp` e grava `fontes/AAAA-MM-DD-título.md` com frontmatter (`tipo: fonte`, `url`, `origem`), marcas de tempo `**[mm:ss]**` a cada minuto e um aviso: **transcrição é pista, não fonte para ensinar** (Regra 8; `references/pedagogia.md` → "Fontes e versão"). Prefere a legenda original do vídeo; aceita também um `.vtt` ou `.srt` local. Requer `python -m pip install --user yt-dlp` (e o Node, se existir, para o YouTube). O link vai só ao YouTube. Se o vídeo não tiver legenda, o comando diz isso; transcrever o áudio exigiria o Whisper e o ffmpeg, que não fazem parte do sistema.
-- **Base de sessões:** cada matéria nasce com `_sessoes-[matéria].base`, uma tabela nativa do Obsidian (recurso Bases) que lista as notas de `sessoes/` pelo frontmatter, e o painel já aponta para ela. É o recurso nativo Bases do Obsidian (precisa estar ligado em Plugins do núcleo); se a tabela não abrir, as notas continuam valendo.
-- **Cartões para o Obsidian (opcional):** `cofre.py cartoes "matéria"` (linhas `pergunta :: resposta` no stdin ou em `--arquivo`) acrescenta cartões a `cartoes.md` no formato do plugin Spaced Repetition (`pergunta::resposta`, etiqueta `#flashcards/[matéria]`), sem repetir. **Só use se eu tiver instalado o plugin e pedir `"cartões"`.** A fila do `fila.py` continua sendo a única fonte de verdade da Revisão do dia: o que eu revisar pelo plugin não é registrado na fila.
-- **Abrir no Obsidian:** `cofre.py abrir "matéria" [sessoes/arquivo.md]` abre a nota (ou o painel) por `obsidian://open`. O nome do cofre no Obsidian precisa ser o da pasta (confira em Gerenciar cofres); `--imprimir` só mostra o link.
-- **Transcrição automática** da conversa: o hook de diário (abaixo), desligado por padrão.
-
-**Opcional, na interface do Obsidian (não mexo nos seus arquivos de configuração):** em Configurações → Arquivos e links → "Local padrão para novos anexos", escolha a opção que preferir para imagens que **eu** colar direto numa nota. O Obsidian também tem uma CLI oficial (a partir da versão 1.12, ativada em Configurações → Geral) e um esquema `obsidian://` com `new` e `search`; a skill não depende deles, porque escrever os arquivos direto já resolve.
+- `vencidos` lista até 3 conceitos da Revisão do dia (o resto continua vencido).
+- `registrar - --conceito "git commit" --resultado acerto` (mesma seção no stdin) aceita `--resultado novo|acerto|acerto-fragil|erro|erro-confiante` e `--parte "T1 / 1a"` no `novo`. Intervalos: 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado; erro volta para 1d; **acerto frágil** (acertei, mas com 🔴) repete o mesmo intervalo, sem avançar. **No modo `-` ele não grava nada:** imprime `TROCAR:` (a linha como está na nota), `POR:` (a linha nova) e `FIM`. Aplique com `obsidian_search_replace`. Conceito novo: o `TROCAR` é a linha de exemplo (`| — | … |`) ou a última linha da tabela, e o `POR` já traz a nova linha logo depois dela.
+- `mostrar -` imprime a fila. Com um caminho no lugar do `-`, o script lê e grava o arquivo direto no disco (útil só fora do cofre).
+- Plano B: a tabela de `references/pedagogia.md` → "Fila de revisão espaçada (dentro do `conhecimento.md`)".
 
 ### Diagramas (`render.py`)
 
-`python "<pasta>/render.py" mermaid entrada.mmd saida.png` (ou `svg`) usa o Chrome ou o Edge que já estão instalados. Ele **valida a sintaxe e devolve a mensagem exata do erro** (linha e ponto), e só gera o PNG quando está válido; aí você **olha** a imagem. Precisa de rede para carregar o Mermaid 11.17.2 (versão fixa, com verificação de integridade; ou `--mermaid-js` com um arquivo local). Para guardar a imagem na matéria: `cofre.py anexar "matéria" saida.png` e cole o `EMBED` na nota. Sem navegador: só verificação por leitura, e diga isso. `render.py detectar` mostra o que está disponível.
-
-## Hooks automáticos (só quando instalado como plugin)
-
-Dois hooks acompanham o plugin; eles **rodam código na sua máquina**, por isso ficam descritos aqui e no README:
-
-- **Abertura da sessão (`SessionStart`):** se a pasta atual (ou uma das 4 acima) for um cofre, injeta o resumo de `cofre.py resumo` — posição, pendências e revisão do dia. Fora de um cofre, **não faz nada** (sai em menos de 1 segundo, sem saída). Com esse bloco na abertura, `"retomar"` já começa sabendo onde você parou.
-- **Fim de cada resposta (`Stop`), desligado por padrão:** espelha a conversa em `[matéria]/sessoes/AAAA-MM-DD-auto.md`, em callouts do Obsidian, como o `md-log` do `learn`. Só grava se você **ligar** (`TUTOR_LOG=1` no ambiente, ou um arquivo vazio `.tutor-log` na raiz do cofre), só em cofre, e só em conversas em que esta skill foi usada. Para desligar, apague o `.tutor-log`.
-
-Os dois procuram `python` e, se não houver, `python3`; sem nenhum dos dois, ficam em silêncio e a skill segue pelo plano B. Rodam pelo shell (Git Bash no Windows).
+`python "<pasta>/render.py" mermaid entrada.mmd saida.png` (ou `svg`) usa o Chrome ou o Edge que já estão instalados. Ele **valida a sintaxe e devolve a mensagem exata do erro** (linha e ponto), e só gera o PNG quando está válido; aí você **olha** a imagem. Precisa de rede para carregar o Mermaid 11.17.2 (versão fixa, com verificação de integridade; ou `--mermaid-js` com um arquivo local). O que vai para a nota é o **código validado** (bloco mermaid ou SVG); o PNG só vai ao cofre se houver acesso ao disco (`references/obsidian.md` → "Visuais e imagens"). Sem navegador: só verificação por leitura, e diga isso. `render.py detectar` mostra o que está disponível. **Atenção:** o Mermaid que o Obsidian embute pode ser mais antigo que o 11.17.2; tipos novos (`xychart-beta`, `block-beta`, `architecture-beta`…) podem não aparecer no Obsidian mesmo validando aqui (`references/visuais-modelos.md`).
 
 ## Arquivos: com e sem acesso
 
-- **Com acesso** (Claude Code, aba Code do app de desktop): crie e atualize a estrutura e os registros de `references/sessao.md` → "Estrutura de pastas", e grave a nota da sessão ao fim de cada sessão. É o que faz o papel de espelhar a conversa num arquivo para eu ler no Obsidian — por padrão **só o que vale reler**, não a transcrição. Quem quiser a transcrição automática liga o hook de diário (ver "Hooks automáticos (só quando instalado como plugin)").
+- **Com acesso** (o MCP do Obsidian conectado, ou o disco aberto no Claude Code): crie e atualize a estrutura e os registros de `references/sessao.md` → "Estrutura de pastas" e grave a nota da sessão ao fim de cada sessão, seguindo `references/obsidian.md`. É o que espelha a conversa num arquivo para eu ler no Obsidian — **só o que vale reler**, não a transcrição.
 - **Sem acesso** (chat do claude.ai): não há onde gravar. Entregue o **Cartão de retomada** (`references/sessao.md` → "Sem acesso a arquivos — Cartão de retomada").
 
 Nos dois casos, **nunca apague nem sobrescreva** arquivos meus em `pratica/`. Antes de atualizar um registro, leia a versão atual.

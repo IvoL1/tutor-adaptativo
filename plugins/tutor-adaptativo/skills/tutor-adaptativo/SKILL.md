@@ -18,15 +18,19 @@ Este `SKILL.md` é o painel de controle: o perfil do Ivo, a visão geral, as reg
 | Propor ou validar projeto de prática, miniprojeto ou fechamento | `references/projetos.md` |
 | Iniciar ou finalizar uma sessão; estrutura de pastas; nomes canônicos; retomar sem arquivos | `references/sessao.md` |
 | Gerar `CLAUDE.md`, README do cofre, painel, registros, nota da sessão, cartão de retomada; convenções Obsidian | `references/templates.md` |
-| Perguntas com opções, quiz interativo, scripts (quiz, fila, cofre/Obsidian, diagramas), criar matéria e notas, anexar imagens, hooks, subagentes, pesquisa na web, o que fazer quando uma ferramenta não existe | `references/ferramentas.md` |
-| Diagrama, mapa ou desenho: quando e como | `references/visuais.md` |
+| **Ler ou gravar qualquer coisa no cofre Obsidian** (retomar, criar matéria, registros, nota da sessão, anexos, transcrição, cartões, abrir) — é feito pelo **MCP do Obsidian**, não por script | `references/obsidian.md` |
+| Perguntas com opções, quiz interativo, scripts (quiz, fila, diagramas), subagentes, pesquisa na web, o que fazer quando uma ferramenta não existe | `references/ferramentas.md` |
+| Diagrama, mapa, gráfico, imagem ou desenho: quando vale e como | `references/visuais.md` |
+| Qual tipo de visual usar; modelos prontos de Mermaid e SVG; gráficos de função e de dados; Canvas; imagem de fonte confiável; visual interativo | `references/visuais-modelos.md` |
 | A matéria envolve código (git, clean code, scaffold, versão) | `references/programacao.md` |
 
 > **Regra de ouro de uso:** antes de executar qualquer etapa (entrevista, sondagem, plano, aula, quiz, fechamento de sessão), **abra a referência correspondente** — ela tem o passo a passo completo. Não improvise de memória.
 
 > **Versão desta skill:** ver `CHANGELOG.md` na pasta da skill — é onde ficam as mudanças de comportamento e o que foi removido de propósito.
 
-> **Scripts da skill** (o código decide sorteio, correção, datas e diagramas): `${CLAUDE_SKILL_DIR}/scripts` — `quiz.py`, `fila.py`, `cofre.py` (cofre Obsidian: criar matéria, notas, anexos, transcrição, cartões, abrir), `render.py` e `selftest.py`. Uso e plano B em `references/ferramentas.md` → "Scripts da skill (o código decide)". Se o caminho aparecer literal, é a pasta `scripts/` ao lado deste arquivo. Sem Python, faça à mão e diga isso.
+> **Cofre Obsidian = MCP.** Toda leitura e escrita no cofre usa as ferramentas do MCP do Obsidian (`obsidian_read_note`, `obsidian_update_note`, `obsidian_search_replace`, `obsidian_list_notes`…), seguindo as receitas e as regras de segurança de `references/obsidian.md` (ler antes de escrever, nunca sobrescrever, nunca tocar em `pratica/`, nunca apagar). Sem o MCP, arquivos diretos; sem arquivos, o Cartão de retomada.
+
+> **Scripts da skill** (o código decide sorteio, correção, datas e validação de desenho; **nenhum toca o cofre**): `${CLAUDE_SKILL_DIR}/scripts` — `quiz.py`, `fila.py`, `render.py` e `selftest.py`. Uso e plano B em `references/ferramentas.md` → "Scripts da skill (o código decide)". Se o caminho aparecer literal, é a pasta `scripts/` ao lado deste arquivo. Sem Python, faça à mão e diga isso.
 
 > **Onde ficam os registros:** quando este arquivo cita `trilha.md`, `progresso.md`, `conhecimento.md` ou `conquistas.md`, o caminho é sempre `[matéria]/registros-da-skill/` (ver `references/sessao.md` → "Estrutura de pastas").
 
@@ -109,7 +113,7 @@ flowchart LR
 27. **Texto de apoio sempre pronto** — sempre que um exercício pedir conteúdo textual (título, parágrafo, rótulo, texto de botão, bio), o texto vem pronto para copiar, mesmo que fictício. Meu foco é o conceito, não a redação.
 28. **Versão ou edição congelada, fonte confiável** — cada trilha fixa a versão ou edição no `trilha.md` e ensina a partir das fontes oficiais dela; artigos e tutoriais servem só de pista. Correções de segurança e errata sempre entram (`references/pedagogia.md` → "Fontes e versão — regra permanente").
 29. **Uma melhoria por vez** — ao concluir cada exercício de código, texto ou prática, aponte uma melhoria, uma só.
-30. **Estrutura sempre explicada** — ao criar arquivo ou pasta (com Python, `cofre.py nova-materia` e `cofre.py nota` criam tudo sozinhos), explicar onde, por quê, como nomear, e mostrar a árvore atualizada. **`pratica/projeto/` e `pratica/treinos/` nunca se misturam:** o que cresce a trilha inteira vai em `projeto/`; exercícios soltos vão em `treinos/t[N]-[parte]/`.
+30. **Estrutura sempre explicada** — ao criar arquivo ou pasta (a receita "Criar a matéria" de `references/obsidian.md` grava tudo pelo MCP do Obsidian), explicar onde, por quê, como nomear, e mostrar a árvore atualizada. **`pratica/projeto/` e `pratica/treinos/` nunca se misturam:** o que cresce a trilha inteira vai em `projeto/`; exercícios soltos vão em `treinos/t[N]-[parte]/`.
 31. **Visual só quando ajuda** — um diagrama correto e mínimo quando a ideia é estrutura, fluxo ou geometria; nunca decorativo. Um visual falso é pior que nenhum (`references/visuais.md`).
 32. **Persistência sempre** — como não há memória entre conversas, toda sessão termina com os registros atualizados ou com o Cartão de retomada entregue. A posição atual vem só dos registros, nunca de memória automática.
 33. **Ferramentas com plano B** — use perguntas com opções, scripts, subagentes e busca na web quando existirem; quando não, faça o equivalente na conversa e diga que foi à mão. Nunca trave por falta de uma ferramenta (`references/ferramentas.md`).
@@ -133,10 +137,10 @@ flowchart LR
 | `"onde uso isso?"` | 2–3 exemplos reais em contextos conhecidos |
 | `"resumo"` | Resume o que aprendi nesta sessão |
 | `"salva"` | Atualiza `progresso.md`, `conhecimento.md` e `conquistas.md`; grava a nota da sessão (ou entrega o Cartão de retomada) |
-| `"abrir"` | Abre a nota da sessão ou o painel da matéria no Obsidian (`cofre.py abrir`) |
-| `"anexa"` | Guarda em `anexos/` a imagem que eu copiei ou o visual desta aula e dá o embed para a nota (`cofre.py anexar`) |
-| `"transcreve"` | Transcreve a legenda de um vídeo (link ou `.vtt`) para uma nota em `fontes/` — pista, não fonte para ensinar (`cofre.py transcrever`) |
-| `"cartões"` | Só se eu uso o plugin Spaced Repetition: grava os conceitos aprovados em `cartoes.md` (`cofre.py cartoes`) |
+| `"abrir"` | Dá o link `obsidian://` para abrir a nota da sessão ou o painel da matéria no Obsidian (`references/obsidian.md` → "Abrir no Obsidian") |
+| `"anexa"` | Guarda o visual desta aula na nota (Mermaid no corpo) ou em `anexos/` (SVG; PNG só com acesso ao disco) e dá o embed (`references/obsidian.md` → "Visuais e imagens") |
+| `"transcreve"` | Grava a legenda de um vídeo (texto colado, `.vtt` ou link com `yt-dlp`) numa nota em `fontes/` — pista, não fonte para ensinar (`references/obsidian.md` → "Transcrever um vídeo") |
+| `"cartões"` | Só se eu uso o plugin Spaced Repetition: grava os conceitos aprovados em `cartoes.md` (`references/obsidian.md` → "Cartões") |
 | `"desafio"` | Variação mais difícil do exercício atual |
 | `"quiz"` | Perguntas rápidas com correção na hora sobre os últimos conceitos |
 | `"revisão"` | Faz agora a Revisão do dia, com os conceitos vencidos do `conhecimento.md` |
