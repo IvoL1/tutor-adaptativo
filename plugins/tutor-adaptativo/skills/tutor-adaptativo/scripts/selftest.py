@@ -142,19 +142,45 @@ def testa_fila():
 
 
 def testa_fila_stdin():
-    """Modo '-': o texto vem do stdin (nota lida pelo MCP do Obsidian) e 'registrar' devolve a troca em vez de gravar."""
+    """Modo '-': o texto vem do stdin (nota lida pelo MCP do Obsidian) e 'registrar' devolve a seção atualizada em vez de gravar."""
     ent = "# c\n\n" + TABELA + "\n## Outra\n"
     cod, saida = rodar(fila.main, ["registrar", "-", "--conceito", "git commit", "--resultado", "novo", "--parte", "T1 / 1a", "--hoje", "2026-10-01"], ent)
-    ok(cod == 0 and "TROCAR:\n| — | — | — | — | — | ativo |\nPOR:\n| git commit | T1 / 1a | 2026-10-01 | 1d | 2026-10-02 | ativo |\nFIM" in saida, "stdin: conceito novo troca a linha de exemplo")
+    ok(cod == 0 and saida.startswith("SECAO: Fila de revisão espaçada\nCONTEUDO:\n> nota\n") and "| git commit | T1 / 1a" in saida and "2026-10-02" in saida and "—" not in saida.split("FIM")[0], "stdin: conceito novo gera a seção sem a linha de exemplo")
+    ok("## Outra" not in saida and saida.split("FIM")[0].count("\n| ") >= 1, "stdin: a seção devolvida não vaza o resto do arquivo")
     com_linha = ent.replace("| — | — | — | — | — | ativo |", "| git commit | T1 / 1a | 2026-10-01 | 1d | 2026-10-02 | ativo |")
     cod, saida = rodar(fila.main, ["registrar", "-", "--conceito", "git push", "--resultado", "novo", "--hoje", "2026-10-01"], com_linha)
-    ok(cod == 0 and "POR:\n| git commit | T1 / 1a | 2026-10-01 | 1d | 2026-10-02 | ativo |\n| git push |" in saida, "stdin: conceito novo entra depois da última linha")
+    corpo = saida.split("FIM")[0]
+    ok(cod == 0 and "git commit" in corpo and "git push" in corpo and corpo.index("git commit") < corpo.index("git push"), "stdin: conceito novo entra depois dos existentes")
     cod, saida = rodar(fila.main, ["registrar", "-", "--conceito", "Git Commit", "--resultado", "acerto", "--hoje", "2026-10-02"], com_linha)
-    ok(cod == 0 and "TROCAR:\n| git commit | T1 / 1a | 2026-10-01 | 1d | 2026-10-02 | ativo |\nPOR:\n| git commit | T1 / 1a | 2026-10-01 | 3d | 2026-10-05 | ativo |" in saida, "stdin: acerto troca só a linha do conceito")
+    ok(cod == 0 and "| 3d" in saida and "2026-10-05" in saida, "stdin: acerto avança o intervalo")
     cod, saida = rodar(fila.main, ["vencidos", "-", "--hoje", "2026-10-02"], com_linha)
     ok(cod == 0 and "VENCIDOS: 1" in saida and "git commit" in saida, "stdin: vencidos lê o texto colado")
     ok(rodar(fila.main, ["registrar", "-", "--conceito", "x", "--resultado", "acerto", "--hoje", "2026-10-02"], com_linha)[0] == 2, "stdin: acerto em conceito desconhecido é erro")
     ok(rodar(fila.main, ["vencidos", "-"], "sem tabela nenhuma\n")[0] == 2, "stdin: texto sem a seção da fila dá erro limpo")
+    ult = rodar(fila.main, ["registrar", "-", "--conceito", "z", "--resultado", "novo", "--hoje", "2026-10-01"], "## Fila de revisão espaçada\n" + TABELA.split("\n", 1)[1])
+    ok(ult[0] == 0 and "| z " in ult[1], "stdin: seção que é o fim do arquivo (sem '## ' depois) também funciona")
+
+
+def testa_png():
+    """render.py: recorte de PNG só com a biblioteca padrão (o navegador entrega uma janela maior que a imagem)."""
+    import struct, zlib
+    render = importlib.import_module("render")
+    def png(w, h, cor):
+        bpp = 3 if cor == 2 else 4
+        linhas = b"".join(b"\x00" + bytes((x * 7 + y * 13) % 256 for x in range(w * bpp)) for y in range(h))
+        ch = lambda tp, c: struct.pack(">I", len(c)) + tp + c + struct.pack(">I", zlib.crc32(tp + c) & 0xffffffff)
+        return b"\x89PNG\r\n\x1a\n" + ch(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, cor, 0, 0, 0)) + ch(b"IDAT", zlib.compress(linhas)) + ch(b"IEND", b"")
+    for cor in (2, 6):
+        f = TMP / f"c{cor}.png"
+        f.write_bytes(png(20, 30, cor))
+        ok(render._recortar_png(f, 12, 18) == (12, 18), f"recorte: devolve o tamanho final (cor {cor})")
+        d = f.read_bytes()
+        ok(struct.unpack(">II", d[16:24]) == (12, 18), f"recorte: o IHDR do arquivo novo diz 12x18 (cor {cor})")
+        bpp = 3 if cor == 2 else 4
+        bruto = zlib.decompress(b"".join(d[d.index(b"IDAT") + 4:d.index(b"IDAT") + 4 + struct.unpack(">I", d[d.index(b"IDAT") - 4:d.index(b"IDAT")])[0]] for _ in [0]))
+        esperado = b"".join(b"\x00" + bytes((x * 7 + y * 13) % 256 for x in range(12 * bpp)) for y in range(18))
+        ok(bruto == esperado, f"recorte: os pixels que ficam são os do canto superior esquerdo (cor {cor})")
+    ok(render._recortar_png(TMP / "nao-existe.png", 5, 5) is None, "recorte: arquivo inexistente não quebra")
 
 
 def testa_entrada():
@@ -183,7 +209,7 @@ def testa_entrada():
 
 
 if __name__ == "__main__":
-    for t in (testa_quiz, testa_fila, testa_fila_stdin, testa_entrada):
+    for t in (testa_quiz, testa_fila, testa_fila_stdin, testa_png, testa_entrada):
         try:
             t()
         except Exception as e:  # um erro inesperado também conta como falha

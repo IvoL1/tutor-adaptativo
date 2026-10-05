@@ -68,14 +68,14 @@ Quando os subagentes não existirem no ambiente (app do claude.ai, instalação 
 
 ## Obsidian pelo MCP
 
-**O que é:** o cofre de estudos é lido e escrito pelas ferramentas do **MCP do Obsidian** (`obsidian_read_note`, `obsidian_update_note`, `obsidian_search_replace`, `obsidian_list_notes`, `obsidian_global_search`, `obsidian_manage_frontmatter`, `obsidian_manage_tags`). Não há mais script de cofre: o que o antigo `cofre.py` fazia agora é receita, em `references/obsidian.md`:
+**O que é:** o cofre de estudos é lido e escrito pelas ferramentas do **MCP do Obsidian** (`obsidian_get_file_contents`, `obsidian_batch_get_file_contents`, `obsidian_put_content`, `obsidian_append_content`, `obsidian_patch_content`, `obsidian_list_files_in_dir`, `obsidian_simple_search`… são 15 no `mcp-obsidian`). Não há mais script de cofre: o que o antigo `cofre.py` fazia agora é receita, em `references/obsidian.md`:
 
 | Antes (`cofre.py`) | Agora |
 |---|---|
 | `resumo` (hook de abertura) | receita "Retomar": ler `progresso.md`, `conquistas.md` e `conhecimento.md` ao dizer `"retomar"` |
 | `nova-materia` | receita "Criar a matéria" (templates em `references/templates.md`) |
 | `nota` | receita "Gravar a nota da sessão" |
-| `anexar` | receita "Visuais e imagens": Mermaid no corpo, SVG como texto em `anexos/`; PNG só com acesso ao disco |
+| `anexar` | receita "Visuais e imagens": Mermaid no corpo, SVG como texto em `anexos/`; PNG por `cp` quando o cofre está no disco da mesma máquina |
 | `transcrever` | receita "Transcrever um vídeo" (lê `.vtt` ou texto colado, limpa e grava em `fontes/`) |
 | `cartoes` | receita "Cartões" |
 | `abrir` | link `obsidian://open?…` para clicar |
@@ -128,13 +128,13 @@ EOF
 ```
 
 - `vencidos` lista até 3 conceitos da Revisão do dia (o resto continua vencido).
-- `registrar - --conceito "git commit" --resultado acerto` (mesma seção no stdin) aceita `--resultado novo|acerto|acerto-fragil|erro|erro-confiante` e `--parte "T1 / 1a"` no `novo`. Intervalos: 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado; erro volta para 1d; **acerto frágil** (acertei, mas com 🔴) repete o mesmo intervalo, sem avançar. **No modo `-` ele não grava nada:** imprime `TROCAR:` (a linha como está na nota), `POR:` (a linha nova) e `FIM`. Aplique com `obsidian_search_replace`. Conceito novo: o `TROCAR` é a linha de exemplo (`| — | … |`) ou a última linha da tabela, e o `POR` já traz a nova linha logo depois dela.
+- `registrar - --conceito "git commit" --resultado acerto` (mesma seção no stdin) aceita `--resultado novo|acerto|acerto-fragil|erro|erro-confiante` e `--parte "T1 / 1a"` no `novo`. Intervalos: 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado; erro volta para 1d; **acerto frágil** (acertei, mas com 🔴) repete o mesmo intervalo, sem avançar. **No modo `-` ele não grava nada:** imprime `SECAO:` (o nome do cabeçalho), `CONTEUDO:` (a seção inteira já atualizada, com a tabela recalculada) e `FIM`. Aplique com **uma** chamada `obsidian_patch_content` (`operation=replace`, `target_type=heading`, `target=` o valor de `SECAO`, `content=` o `CONTEUDO` mais uma linha em branco) e releia a seção.
 - `mostrar -` imprime a fila. Com um caminho no lugar do `-`, o script lê e grava o arquivo direto no disco (útil só fora do cofre).
 - Plano B: a tabela de `references/pedagogia.md` → "Fila de revisão espaçada (dentro do `conhecimento.md`)".
 
 ### Diagramas (`render.py`)
 
-`python "<pasta>/render.py" mermaid entrada.mmd saida.png` (ou `svg`) usa o Chrome ou o Edge que já estão instalados. Ele **valida a sintaxe e devolve a mensagem exata do erro** (linha e ponto), e só gera o PNG quando está válido; aí você **olha** a imagem. Precisa de rede para carregar o Mermaid 11.17.2 (versão fixa, com verificação de integridade; ou `--mermaid-js` com um arquivo local). O que vai para a nota é o **código validado** (bloco mermaid ou SVG); o PNG só vai ao cofre se houver acesso ao disco (`references/obsidian.md` → "Visuais e imagens"). Sem navegador: só verificação por leitura, e diga isso. `render.py detectar` mostra o que está disponível. **Atenção:** o Mermaid que o Obsidian embute pode ser mais antigo que o 11.17.2; tipos novos (`xychart-beta`, `block-beta`, `architecture-beta`…) podem não aparecer no Obsidian mesmo validando aqui (`references/visuais-modelos.md`).
+`python "<pasta>/render.py" mermaid entrada.mmd saida.png` (ou `svg`) usa o Chrome ou o Edge que já estão instalados. Ele **valida a sintaxe e devolve a mensagem exata do erro** (linha e ponto), e só gera o PNG quando está válido; aí você **olha** a imagem. Precisa de rede para carregar o Mermaid 11.17.2 (versão fixa, com verificação de integridade; ou `--mermaid-js` com um arquivo local). O que vai para a nota é o **código validado** (bloco mermaid ou SVG); o PNG só vai ao cofre se houver acesso ao disco (`references/obsidian.md` → "Visuais e imagens"). Sem navegador: só verificação por leitura, e diga isso. `render.py detectar` mostra o que está disponível. **Atenção:** o Obsidian embute o Mermaid 11.4.1, mais antigo que o 11.17.2 do `render.py`. Para validar contra ele, passe `--mermaid-js` com o `mermaid.min.js` dessa versão (`references/visuais-modelos.md` → "Compatibilidade com o Obsidian"). `--mermaid-js` com arquivo local funciona offline. O `render.py` corrige sozinho a janela do navegador (no Linux ela vem ~88 px menor) e recorta o PNG no tamanho exato.
 
 ## Arquivos: com e sem acesso
 

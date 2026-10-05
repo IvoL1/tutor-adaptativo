@@ -83,8 +83,8 @@ Sorteio, verificação, contas, datas e renderização ficam em scripts Python (
 | Script | O que faz por código |
 |---|---|
 | `quiz.py` | sorteia a posição da certa (nunca a mesma duas vezes seguidas), **acusa alternativa que se entrega pela forma** (tamanho, "porque", negrito assimétrico, "todas as anteriores"), corrige, revela o equívoco da errada escolhida e calcula o percentual e a decisão da prova (80% e 50%), avisa quando a amostra é pequena |
-| `fila.py` | repetição espaçada: intervalos 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado, e as datas; acerto frágil não avança. Lê o texto da nota pelo stdin e devolve a troca a aplicar (`TROCAR`/`POR`), sem gravar |
-| `render.py` | valida Mermaid/SVG e gera PNG com o Chrome ou o Edge já instalados, **devolvendo a mensagem exata de erro de sintaxe** |
+| `fila.py` | repetição espaçada: intervalos 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado, e as datas; acerto frágil não avança. Lê o texto da nota pelo stdin e devolve a seção da fila já atualizada (`SECAO`/`CONTEUDO`), sem gravar |
+| `render.py` | valida Mermaid/SVG e gera PNG com o Chrome ou o Edge já instalados, **devolvendo a mensagem exata de erro de sintaxe**; aceita `--mermaid-js` com a versão do Obsidian (11.4.1) e entrega a imagem no tamanho exato |
 
 `python plugins/tutor-adaptativo/skills/tutor-adaptativo/scripts/selftest.py` roda as verificações (sem rede e sem tocar nos seus arquivos). Sem Python, a skill funciona igual: cada seção de `references/ferramentas.md` tem um plano B à mão.
 
@@ -92,34 +92,36 @@ Sorteio, verificação, contas, datas e renderização ficam em scripts Python (
 
 ## Obsidian MCP (o cofre é lido e escrito por ele)
 
-A skill usa o **MCP do Obsidian** para tudo que toca o cofre: `obsidian_read_note`, `obsidian_update_note`, `obsidian_search_replace`, `obsidian_list_notes`, `obsidian_global_search`, `obsidian_manage_frontmatter` e `obsidian_manage_tags` (servidor [`obsidian-mcp-server`](https://github.com/cyanheads/obsidian-mcp-server)). As receitas e as regras de segurança estão em [`references/obsidian.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/obsidian.md); servidores parecidos (`mcp-obsidian`, `obsidian-mcp`) têm tabela de equivalência lá.
+A skill usa o **MCP do Obsidian** para tudo que toca o cofre. Foi escrita e conferida para o servidor [`mcp-obsidian`](https://pypi.org/project/mcp-obsidian/) (15 ferramentas: `obsidian_get_file_contents`, `obsidian_batch_get_file_contents`, `obsidian_put_content`, `obsidian_append_content`, `obsidian_patch_content`, `obsidian_list_files_in_dir`, `obsidian_simple_search`…). As receitas e as regras de segurança estão em [`references/obsidian.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/obsidian.md); outros servidores têm tabela de equivalência lá.
+
+Com esse servidor **não há busca-e-troca de texto**: as edições vão por `append`, por troca do corpo de uma seção (`patch` por cabeçalho) ou por ler e regravar o arquivo inteiro, sempre só em arquivo do Claude e sempre conferindo a releitura.
 
 ### Configurar (uma vez, por você)
 
-1. No Obsidian: Configurações → Plugins da comunidade → instale e ative o **Local REST API** e copie a chave de API que ele mostra. O plugin precisa estar ativo (o Obsidian aberto) para o MCP funcionar.
-2. No Claude Code, registre o servidor (a chave é sua; **não** a coloque neste repositório):
+1. No Obsidian: Configurações → Plugins da comunidade → instale e ative o **Local REST API** e copie a chave de API que ele mostra. O plugin precisa estar ativo (o Obsidian aberto) para o MCP funcionar. A porta padrão dele é 27124 (HTTPS com certificado próprio; o servidor já aceita isso).
+2. Tenha o [`uv`](https://docs.astral.sh/uv/) instalado (o `uvx` roda o servidor) e, no Claude Code, registre-o (a chave é sua; **não** a coloque neste repositório):
 
 ```bash
-claude mcp add obsidian --env OBSIDIAN_API_KEY=SUA_CHAVE --env OBSIDIAN_BASE_URL=http://127.0.0.1:27123 --env OBSIDIAN_VERIFY_SSL=false -- npx -y obsidian-mcp-server
+claude mcp add obsidian -e OBSIDIAN_API_KEY=SUA_CHAVE -e OBSIDIAN_HOST=127.0.0.1 -e OBSIDIAN_PORT=27124 -- uvx mcp-obsidian
 ```
 
-Confira os nomes das variáveis e a porta no README do servidor, que muda de versão para versão. `claude mcp list` mostra se conectou. No app de desktop do Claude, adicione o mesmo servidor ao arquivo de configuração de MCP (servidores locais não funcionam no claude.ai pelo navegador).
+Essas variáveis (`OBSIDIAN_API_KEY`, `OBSIDIAN_HOST`, `OBSIDIAN_PORT`, e `OBSIDIAN_PROTOCOL=http` se você usar a porta sem HTTPS) foram conferidas no código do `mcp-obsidian` 0.2.3, que sobe e lista as 15 ferramentas. `claude mcp list` mostra se conectou. No app de desktop do Claude, adicione o mesmo servidor ao arquivo de configuração de MCP (servidores locais não funcionam no claude.ai pelo navegador).
 
 ### O que o Claude faz por você
 
 | O que você quer | Como (o Claude faz sozinho; você só pede) |
 |---|---|
-| Retomar | `"retomar"`: lê `progresso.md`, `conquistas.md` e `conhecimento.md` da matéria e faz a Revisão do dia (as datas vêm do `fila.py`) |
+| Retomar | `"retomar"`: lê `progresso.md`, `conquistas.md` e `conhecimento.md` da matéria numa chamada só e faz a Revisão do dia (as datas vêm do `fila.py`) |
 | Começar uma matéria com tudo no lugar | depois do seu "ok" no plano, grava os 4 registros, painel, Base de sessões e `pratica/`, e põe no `README.md`. Nunca sobrescreve |
 | Anotar a sessão | cria `sessoes/AAAA-MM-DD-título.md` com frontmatter, acrescenta se já houver nota do dia e lista no painel |
-| Diagrama ou gráfico | bloco Mermaid na própria nota; SVG como arquivo em `anexos/`; PNG só se o Claude alcançar a pasta do cofre no disco |
+| Diagrama ou gráfico | bloco Mermaid na própria nota; SVG como arquivo em `anexos/`; PNG copiado para `anexos/` se o Claude rodar na mesma máquina do Obsidian (acha a pasta do cofre no `obsidian.json` do Obsidian) |
 | Colar um print | cole direto na nota no Obsidian (o MCP grava texto, e o Claude não vê a sua área de transferência) |
 | Abrir a nota no Obsidian | `"abrir"`: o Claude entrega o link `obsidian://open?…` para você clicar |
 | Estudar a partir de um vídeo | `"transcreve"`: cole a legenda, indique um `.vtt`/`.srt` ou dê o link (com o `yt-dlp` instalado, baixa só a legenda). Grava em `fontes/` com aviso: **transcrição é pista, não fonte para ensinar** |
 | Ver todas as sessões numa tabela | cada matéria nasce com `_sessoes-[matéria].base` (Bases do Obsidian, recurso nativo) ligada ao painel |
 | Revisar no celular (opcional) | `"cartões"`: grava `cartoes.md` no formato do plugin **Spaced Repetition** (`pergunta::resposta`). A fila do `fila.py` continua sendo a única fonte da Revisão do dia |
 
-**Regras de segurança** (valem sempre): o Claude lê antes de escrever, nunca sobrescreve arquivo que existe (edita por troca exata ou acréscimo), nunca escreve em `pratica/` (é seu) e nunca apaga. Sem o MCP, a skill usa arquivos diretos; sem acesso a arquivos, entrega o **Cartão de retomada**.
+**Regras de segurança** (valem sempre): o Claude lê antes de escrever, só regrava arquivo que é dele (registros, painel, notas) logo depois de ler e conferindo a releitura, nunca escreve em `pratica/` (é seu) e nunca apaga. Sem o MCP, a skill usa arquivos diretos; sem acesso a arquivos, entrega o **Cartão de retomada**.
 
 **O que mudou na 4.0:** saíram o `cofre.py` e os dois hooks (abertura da sessão e diário automático), porque dependiam de script e um hook não chama MCP. Em troca, a abertura é feita no `"retomar"`, e a nota da sessão guarda o que vale reler.
 
@@ -139,7 +141,7 @@ A skill desenha só quando ajuda (Regra 31) e **confere antes de mostrar**. O qu
 - **Canvas do Obsidian** (opcional) para um mapa que você arrasta;
 - **Imagem de fonte confiável** (com crédito), regra para ilustração gerada e **visual interativo** quando a ideia só se entende mexendo.
 
-Limite honesto: o Mermaid embutido no Obsidian pode estar atrás do que o `render.py` valida; tipos `-beta` podem não aparecer na sua versão, e a skill avisa para você conferir.
+Limite honesto: o Obsidian embute o Mermaid 11.4.1 (o `render.py` usa o 11.17.2 por padrão). Todos os modelos foram testados nas duas versões, mas a skill não vê a nota renderizada no Obsidian: em tipos `-beta` ela avisa para você conferir. No `quadrantChart`, rótulos sem acento.
 
 ## Dicas para o dia a dia
 
@@ -149,7 +151,7 @@ Limite honesto: o Mermaid embutido no Obsidian pode estar atrás do que o `rende
 
 ## Testes automáticos
 
-`plugins/tutor-adaptativo/evals/` tem 9 casos para o `claude plugin eval` (entrevista, dúvida curta, retomar sem registros, dica sem entregar a resposta, frustração, sondagem, quiz por script, criar a matéria por script e "não sequestrar tarefa de código"). Rodam com e sem o plugin para medir o que ele acrescenta. Comandos e custo em [`evals/README.md`](plugins/tutor-adaptativo/evals/README.md). Eles usam a sua cota, então não rodam sozinhos.
+`plugins/tutor-adaptativo/evals/` tem 9 casos para o `claude plugin eval` (entrevista, dúvida curta, retomar sem registros, dica sem entregar a resposta, frustração, sondagem, quiz por script, criar a matéria sem MCP nem cofre (não inventa) e "não sequestrar tarefa de código"). Rodam com e sem o plugin para medir o que ele acrescenta. Comandos e custo em [`evals/README.md`](plugins/tutor-adaptativo/evals/README.md). Eles usam a sua cota, então não rodam sozinhos.
 
 ## Sobre ser pessoal
 

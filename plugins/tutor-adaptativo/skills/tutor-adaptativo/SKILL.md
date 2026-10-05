@@ -28,7 +28,7 @@ Este `SKILL.md` é o painel de controle: o perfil do Ivo, a visão geral, as reg
 
 > **Versão desta skill:** ver `CHANGELOG.md` na pasta da skill — é onde ficam as mudanças de comportamento e o que foi removido de propósito.
 
-> **Cofre Obsidian = MCP.** Toda leitura e escrita no cofre usa as ferramentas do MCP do Obsidian (`obsidian_read_note`, `obsidian_update_note`, `obsidian_search_replace`, `obsidian_list_notes`…), seguindo as receitas e as regras de segurança de `references/obsidian.md` (ler antes de escrever, nunca sobrescrever, nunca tocar em `pratica/`, nunca apagar). Sem o MCP, arquivos diretos; sem arquivos, o Cartão de retomada.
+> **Cofre Obsidian = MCP.** Toda leitura e escrita no cofre usa as ferramentas do MCP do Obsidian (`obsidian_get_file_contents`, `obsidian_put_content`, `obsidian_append_content`, `obsidian_patch_content`…), seguindo as receitas e as regras de segurança de `references/obsidian.md` (ler antes de escrever, sobrescrever só arquivo do Claude logo após ler, nunca tocar em `pratica/`, nunca apagar). Sem o MCP, arquivos diretos; sem arquivos, o Cartão de retomada.
 
 > **Scripts da skill** (o código decide sorteio, correção, datas e validação de desenho; **nenhum toca o cofre**): `${CLAUDE_SKILL_DIR}/scripts` — `quiz.py`, `fila.py`, `render.py` e `selftest.py`. Uso e plano B em `references/ferramentas.md` → "Scripts da skill (o código decide)". Se o caminho aparecer literal, é a pasta `scripts/` ao lado deste arquivo. Sem Python, faça à mão e diga isso.
 

@@ -2,7 +2,7 @@
   "name": "tutor-adaptativo",
   "displayName": "Tutor Adaptativo",
   "description": "Sistema pessoal de estudo ao vivo e adaptativo para qualquer matéria: sondagem do nível, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada, protocolo antifrustração, integração com o cofre Obsidian pelo MCP (criar matéria, registros, notas da sessão, visuais, transcrição de vídeo), catálogo de visuais (Mermaid, SVG, gráficos), subagentes e testes automáticos.",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "author": {
     "name": "Ivo"
   },

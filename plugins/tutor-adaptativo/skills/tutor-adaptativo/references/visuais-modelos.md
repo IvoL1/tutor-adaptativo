@@ -1,6 +1,6 @@
 # Referência — Modelos de visuais (catálogo, SVG pronto, gráficos, canvas)
 
-> Leia depois de `references/visuais.md` decidir que **vale** desenhar, e antes de escolher o tipo de visual ou de escrever o código dele. Os modelos abaixo foram conferidos: os blocos Mermaid passaram no analisador do Mermaid 11.17.2 e os SVG são XML válido que renderiza.
+> Leia depois de `references/visuais.md` decidir que **vale** desenhar, e antes de escolher o tipo de visual ou de escrever o código dele. Os modelos abaixo foram conferidos: os blocos Mermaid passaram no analisador do Mermaid **11.4.1** (a versão que o Obsidian embute, segundo o fórum dele) e do 11.17.2 (o do `render.py`), e os SVG são XML válido que renderiza.
 
 > **Nesta referência:**
 > **1. Qual visual para qual ideia**
@@ -127,11 +127,11 @@ quadrantChart
   x-axis Pouco treinado --> Muito treinado
   y-axis Pouco importante --> Muito importante
   quadrant-1 Manter
-  quadrant-2 Treinar já
+  quadrant-2 Treinar agora
   quadrant-3 Deixar para depois
-  quadrant-4 Já firme
-  Funções: [0.3, 0.8]
-  Laços: [0.8, 0.7]
+  quadrant-4 Ja firme
+  Funcoes: [0.3, 0.8]
+  Lacos: [0.8, 0.7]
 ```
 ````
 
@@ -153,6 +153,8 @@ gantt
   Tópico 2 :after a1, 7d
 ```
 ````
+
+**`quadrantChart`: só ASCII nos rótulos dos quadrantes e dos pontos.** O analisador do Mermaid 11.4.1 (o do Obsidian) recusa acento e cedilha ali (`já`, `Funções` dão erro de sintaxe); título e eixos aceitam acento. Nos demais tipos testados, acento funciona.
 
 **Estado de domínio no mapa de dependências** (o do painel): nós firmes em verde, o resto cinza, com `classDef` (modelo em `references/templates.md` → painel).
 
@@ -316,6 +318,7 @@ Os `id` são únicos; `color` é `"1"` a `"6"` (4 = verde, 1 = vermelho); a seta
 
 ## Compatibilidade com o Obsidian
 
-- O Mermaid que o Obsidian embute **costuma estar uma ou mais versões atrás** do que o `render.py` valida (11.17.2). Os tipos estáveis da seção 2 funcionam. Os recentes — `xychart-beta`, `block-beta`, `architecture-beta`, `packet-beta`, `kanban` — podem aparecer como erro em versões antigas do Obsidian, mesmo validando aqui. Eu **não consigo ver a nota renderizada no Obsidian**: por isso, quando usar um tipo `-beta`, diga ao Ivo para conferir na nota e tenha a alternativa pronta (SVG ou tabela).
-- Outra diferença: o Obsidian aplica o tema claro/escuro por conta própria. Evite cores fixas de texto em Mermaid; use `classDef` só com preenchimento claro (como no painel) e `color:#000` junto.
+- O Obsidian embute o **Mermaid 11.4.1** (informação do fórum do Obsidian; pode mudar quando o Obsidian atualizar), enquanto o `render.py` valida com o 11.17.2. **Testei todos os modelos da seção 2 nas duas versões**: todos passam no analisador de ambas, inclusive os tipos `-beta` (`xychart-beta`, `block-beta`, `architecture-beta`, `packet-beta`) e `kanban`. A única diferença achada é a do `quadrantChart` (ASCII). Mas **analisar não é desenhar**: o layout dos tipos novos pode sair diferente, e eu **não consigo ver a nota renderizada no Obsidian**. Em tipo `-beta`, diga ao Ivo para conferir na nota e tenha a alternativa pronta (SVG ou tabela).
+- Para validar contra a versão do Obsidian, use `python "<pasta>/render.py" mermaid entrada.mmd saida.png --mermaid-js mermaid-11.4.1.min.js` (o arquivo sai de `npm pack mermaid@11.4.1`, em `package/dist/mermaid.min.js`). Sem isso, o `render.py` usa o 11.17.2.
+- O Obsidian aplica o tema claro/escuro por conta própria. Evite cores fixas de texto em Mermaid; use `classDef` só com preenchimento claro (como no painel) e `color:#000` junto.
 - Nome do arquivo de anexo: sem acento, minúsculo, com hifens; embed `![[arquivo.svg|500]]` limita a largura.

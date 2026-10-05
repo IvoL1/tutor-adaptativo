@@ -9,7 +9,8 @@
 
 ARQUIVO é o conhecimento.md da matéria. Com "-" o texto vem do stdin (o cofre Obsidian é lido e gravado pelo MCP, não por
 este script): basta colar a seção "## Fila de revisão espaçada" (ou o arquivo todo). Nesse modo "registrar" não grava nada:
-imprime TROCAR / POR / FIM, que o Claude aplica na nota com a ferramenta de busca e troca do MCP. A tabela fica sob "## Fila de revisão espaçada"
+imprime SECAO / CONTEUDO / FIM, onde CONTEUDO é a seção inteira já atualizada, para o Claude gravar com
+obsidian_patch_content (operation=replace, target_type=heading, target=SECAO). A tabela fica sob "## Fila de revisão espaçada"
 e tem as colunas: Conceito | Tópico/Parte | Aprendido em | Intervalo atual | Próxima revisão | Status.
 Intervalos: 1d 3d 7d 16d 35d 60d 120d e depois arquivado. Erro volta para 1d.
 acerto-fragil (acertou com confiança baixa) repete o mesmo intervalo, sem avançar.
@@ -72,11 +73,25 @@ def carregar(caminho, texto=None):
     return linhas, ini, fim, rows
 
 
-def salvar(caminho, linhas, ini, fim, rows):
+def novas_linhas(linhas, ini, fim, rows):
     larg = [max(len(CAB[k]), *(len(r[k]) for r in rows)) if rows else len(CAB[k]) for k in range(6)]
     fmt = lambda c: "| " + " | ".join(c[k].ljust(larg[k]) for k in range(6)) + " |"
     tabela = [fmt(CAB), "|" + "|".join("-" * (w + 2) for w in larg) + "|"] + [fmt(r) for r in rows]
-    pathlib.Path(caminho).write_text("\n".join(linhas[:ini] + tabela + linhas[fim:]), encoding="utf-8", newline="\n")
+    return linhas[:ini] + tabela + linhas[fim:]
+
+
+def secao(linhas):
+    """Corpo da seção da fila (da linha depois do título até antes do próximo '## '), sem linhas vazias no fim."""
+    t = next(i for i, l in enumerate(linhas) if l.startswith(TITULO))
+    fim = next((i for i in range(t + 1, len(linhas)) if linhas[i].startswith("## ")), len(linhas))
+    corpo = linhas[t + 1:fim]
+    while corpo and not corpo[-1].strip():
+        corpo.pop()
+    return linhas[t].lstrip("# ").strip(), corpo
+
+
+def salvar(caminho, linhas, ini, fim, rows):
+    pathlib.Path(caminho).write_text("\n".join(novas_linhas(linhas, ini, fim, rows)), encoding="utf-8", newline="\n")
 
 
 def _data(txt):
@@ -139,8 +154,6 @@ def main(argv):
             print("ERRO: informe --conceito e --resultado novo|acerto|acerto-fragil|erro|erro-confiante")
             return 2
         linhas, ini, fim, rows = carregar(caminho, texto)
-        brutas = linhas[ini + 2:fim]
-        bruta = next((b for b in brutas if _celulas(b)[0].lower() == conceito.lower()), None)
         linha = next((r for r in rows if r[0].lower() == conceito.lower()), None)
         if linha is None:
             if resultado in ("acerto", "acerto-fragil"):
@@ -154,14 +167,8 @@ def main(argv):
                 linha[1] = _opcao(args, "--parte")
         linha[3], linha[4], linha[5] = proximo_estado(linha[3], resultado, hoje)
         if texto is not None:
-            nova = "| " + " | ".join(linha) + " |"
-            if bruta is not None:
-                troca, por = bruta, nova
-            elif all(_placeholder(_celulas(b)) for b in brutas):
-                troca, por = brutas[0], nova
-            else:
-                troca, por = brutas[-1], brutas[-1] + "\n" + nova
-            print(f"TROCAR:\n{troca}\nPOR:\n{por}\nFIM")
+            alvo, corpo = secao(novas_linhas(linhas, ini, fim, rows))
+            print(f"SECAO: {alvo}\nCONTEUDO:\n" + "\n".join(corpo) + "\n\nFIM")
             print(f"OK: {linha[0]} -> intervalo {linha[3]}, próxima revisão {linha[4]}, status {linha[5]}")
             return 0
         salvar(caminho, linhas, ini, fim, rows)

@@ -3,11 +3,36 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 4.1 — 2026-10-05
+
+**Servidor certo, conferido no código** (a 4.0 foi escrita para o `obsidian-mcp-server`; o do Ivo é o `mcp-obsidian`, 15 ferramentas)
+- `references/obsidian.md` reescrito sobre as ferramentas reais (`obsidian_put_content`, `obsidian_append_content`,
+  `obsidian_patch_content`, `obsidian_batch_get_file_contents`, `obsidian_list_files_in_dir`…). Esse servidor **não tem
+  busca-e-troca**: nova "regra de ouro" para editar (criar, acrescentar, trocar o corpo de uma seção por cabeçalho,
+  campo do frontmatter, ou ler e regravar o arquivo inteiro só quando é do Claude), com releitura obrigatória.
+  Existência de arquivo se checa por `list_files_in_dir` (pasta inexistente dá erro 40400).
+- `"retomar"` lê os três registros numa chamada só (`batch_get_file_contents`).
+- `fila.py registrar -` devolve a seção da fila inteira (`SECAO`/`CONTEUDO`/`FIM`) para uma única chamada `patch_content`.
+- PNG volta a ser possível quando o Claude roda na mesma máquina do Obsidian: a pasta do cofre sai do `obsidian.json` do Obsidian e a
+  imagem vai por `cp`.
+- README: comando de instalação do `mcp-obsidian` (`uvx`, `OBSIDIAN_API_KEY/HOST/PORT`), conferido subindo o servidor.
+
+**Visuais conferidos contra o Mermaid do Obsidian (11.4.1)**
+- Todos os modelos passam no analisador do 11.4.1 e do 11.17.2. Achado: `quadrantChart` não aceita acento nos rótulos no 11.4.1.
+
+**`render.py`** corrigido (arquivo local do Mermaid, janela do Linux, recorte exato do PNG; ver 4.0) e testado no `selftest.py` (66 verificações).
+
+**Evals rodados de verdade** (`claude plugin eval`): 7 de 9 casos passam. `sondagem-nao-vale-nota` oscila também na 3.3 (a skill
+entrevista antes de sondar matéria nova, Regra 3, e o eval espera a sondagem direta) e `quiz-com-ferramenta` falha em parte das rodadas
+tanto na 3.3 (0/3) quanto aqui (1/3). O eval da criação de matéria foi refeito para o caso sem MCP.
+
 ## 4.0 — 2026-10-04
 
 **O cofre Obsidian passa a ser lido e escrito pelo MCP do Obsidian, não por Python** (mudança de comportamento)
-- Novo `references/obsidian.md`: ferramentas do `obsidian-mcp-server`, regras de segurança (ler antes de
-  escrever, nunca sobrescrever, nunca tocar em `pratica/`, nunca apagar), como achar a raiz do cofre e uma
+- Novo `references/obsidian.md`: as 15 ferramentas do `mcp-obsidian` (conferidas no código do servidor),
+  uma regra de ouro para editar (sem busca-e-troca: `append`, `patch` por cabeçalho ou ler e regravar),
+  regras de segurança (ler antes de escrever, regravar só arquivo do Claude, nunca tocar em `pratica/`,
+  nunca apagar), como achar a raiz do cofre (e a pasta no disco, via `obsidian.json`) e uma
   receita para cada coisa que o `cofre.py` fazia: retomar, criar matéria, atualizar registros, nota da
   sessão, visuais e imagens, transcrever, cartões, abrir, buscar e conferir o cofre. Tabela de equivalência
   para outros dois servidores MCP do Obsidian. Plano B: arquivos diretos, depois o Cartão de retomada.
@@ -17,7 +42,8 @@
 - `quiz.py` não depende mais do `cofre.py`; o estado das perguntas e provas fica na pasta temporária
   (ou em `TUTOR_STATE`), nunca dentro do cofre (a pasta `.tutor/` deixou de existir).
 - `fila.py` aceita `-` no lugar do arquivo: lê o texto pelo stdin e, em `registrar`, **não grava**: imprime
-  `TROCAR`/`POR`/`FIM` para o Claude aplicar com `obsidian_search_replace`. O modo com caminho continua.
+  `SECAO`/`CONTEUDO`/`FIM` (a seção da fila inteira, já atualizada) para uma chamada `obsidian_patch_content`.
+  O modo com caminho continua.
 - Novos templates em `references/templates.md`: Painel inicial, `_sessoes-[matéria].base` e `_leia-me.md`
   de `pratica/` (o MCP não cria pasta vazia, então `pratica/projeto/` e `pratica/treinos/` nascem com ele).
   `sessoes/`, `anexos/` e `fontes/` nascem com o primeiro arquivo.
@@ -36,11 +62,18 @@
 - `references/visuais.md` agora cobre visuais numéricos, imagem de fonte confiável e interativos, e diz
   como gravar cada tipo no cofre. O `tutor-diagramador` conhece os novos tipos, os modelos de SVG e
   devolve só o código (quem chama grava).
-- Eval `cria-materia-por-script` virou `cria-materia-sem-python`.
+- Eval `cria-materia-por-script` virou `cria-materia-sem-mcp`: sem MCP, sem cofre e sem plano na conversa, a skill não inventa, diz o que falta e não roda script de cofre.
 
 **Não feito, de propósito**
 - `quiz.py`, `fila.py` e `render.py` continuam em Python: são cálculo e renderização, não Obsidian.
 - Configurar o servidor MCP dentro do plugin: a chave da API do Obsidian é do Ivo; a configuração está no README.
+- Restaurar a injeção automática da posição ao abrir a sessão: hooks `mcp_tool` não rodam no `SessionStart` de
+  abertura (só depois de `/clear` ou compactação) e um hook não saberia qual matéria ler. O `"retomar"` faz isso numa chamada só.
+
+**Correções no `render.py`**
+- `--mermaid-js` com arquivo local nunca funcionou (a página `http://` não carrega `file://`); agora o arquivo é servido pelo servidor local.
+- No Linux o `--headless=new` entrega uma janela ~88 px menor que a pedida: imagens saíam cortadas ou em branco. Agora o script mede a
+  folga, pede a janela maior e recorta o PNG no tamanho exato (recorte em Python puro, testado no `selftest.py`). Como root, usa `--no-sandbox`.
 
 ## 3.3 — 2026-10-01
 

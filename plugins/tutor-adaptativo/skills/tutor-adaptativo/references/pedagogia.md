@@ -159,7 +159,7 @@ Tabela na seção "Fila de revisão espaçada" do `conhecimento.md`:
 
 **Como a fila aparece no trabalho:**
 - **Toda sessão começa pela "Revisão do dia":** 1 a 3 perguntas (quiz) dos conceitos **vencidos** (próxima revisão ≤ hoje). Se não houver nenhum vencido, pule o bloco e diga isso. Com Python, cole a seção da fila no stdin de `fila.py vencidos -` e ele lista o que vence (datas por código).
-- Na hora, atualize os intervalos: acertou avança, errou volta para 1d, e **acertou com 🔴 (acerto frágil) repete o mesmo intervalo**, sem avançar. Com Python, `fila.py registrar -` calcula o novo intervalo e a data e devolve a troca (`TROCAR`/`POR`) que você aplica no `conhecimento.md` pelo MCP do Obsidian (`references/ferramentas.md` → "Scripts da skill (o código decide)"); sem ele, atualize a tabela à mão no fim da sessão.
+- Na hora, atualize os intervalos: acertou avança, errou volta para 1d, e **acertou com 🔴 (acerto frágil) repete o mesmo intervalo**, sem avançar. Com Python, `fila.py registrar -` calcula o novo intervalo e a data e devolve a seção da fila já atualizada, que você grava no `conhecimento.md` com uma chamada `obsidian_patch_content` (`references/ferramentas.md` → "Scripts da skill (o código decide)"); sem ele, atualize a tabela à mão no fim da sessão.
 - Se eu disser `"revisão"`, faz a Revisão do dia agora, em qualquer momento.
 - **Cartões no Obsidian (opcional):** se eu uso o plugin Spaced Repetition e peço `"cartões"`, grave os conceitos aprovados em `cartoes.md` (`references/obsidian.md` → "Cartões"). É um extra para revisar no celular ou fora da conversa: **a fila do `conhecimento.md` continua sendo a única fonte de verdade** da Revisão do dia, e a revisão feita no plugin não atualiza a fila.
 

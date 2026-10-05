@@ -45,7 +45,7 @@ Este cofre usa a skill **tutor-adaptativo**. Siga-a para tudo
 - Ignore memórias automáticas de sessões antigas sobre estudos; se conflitarem
   com os registros, os registros vencem.
 - Leia e grave neste cofre pelo MCP do Obsidian, seguindo `references/obsidian.md` da skill:
-  ler antes de escrever, nunca sobrescrever, nunca mexer em `pratica/`, nunca apagar.
+  ler antes de escrever, sobrescrever só arquivo do Claude logo depois de ler, nunca mexer em `pratica/`, nunca apagar.
 
 ## Como aprendo (vale para qualquer matéria)
 - Interesses para analogias e exemplos: [jogos, filmes, séries...]
