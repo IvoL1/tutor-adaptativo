@@ -8,6 +8,9 @@
 >     · Template: `CLAUDE.md` (raiz do cofre — ponteiro, gerado 1x)
 >     · Template: `README.md` (raiz do cofre — índice geral, gerado com a primeira matéria)
 >     · Template: `_painel-[matéria].md` (o mapa e o painel da matéria — atualizado ao fim de cada sessão)
+>     · Template: Painel inicial (o começo honesto de uma matéria recém-criada)
+>     · Template: `_sessoes-[matéria].base` (tabela nativa das sessões)
+>     · Template: `_leia-me.md` de `pratica/`
 >     · Template: `trilha.md`
 >     · Template: `progresso.md`
 >     · Template: `conhecimento.md`
@@ -24,7 +27,7 @@
 - **Diagramas em mermaid:** um bloco ```` ```mermaid ```` renderiza nativo no Obsidian e no GitHub (`references/visuais.md`).
 - **Matemática em LaTeX:** `$f(x)$` em linha e `$$` em bloco próprio — o Obsidian renderiza nativamente. Sempre que houver notação matemática, escreva em LaTeX, e não em aproximação de texto simples.
 - **Nomes de arquivo:** minúsculos, com hifens, autoexplicativos (`2026-09-30-funcoes.md`, nunca `nota1.md`).
-- **Imagens e diagramas** ficam em `[matéria]/anexos/` e entram na nota com `![[arquivo.png]]` (largura opcional: `![[arquivo.png|500]]`); o `cofre.py anexar` grava o arquivo e devolve esse embed pronto.
+- **Imagens e diagramas** ficam em `[matéria]/anexos/` e entram na nota com `![[arquivo.png]]` (largura opcional: `![[arquivo.png|500]]`); como gravar (Mermaid no corpo, SVG como texto, PNG só com acesso ao disco) está em `references/obsidian.md` → "Visuais e imagens".
 - **Wikilinks entre matérias:** nomes como `conquistas` e `progresso` existem em toda matéria, então um `[[conquistas]]` solto fica ambíguo. Use o caminho completo a partir do cofre com apelido: `[[ingles/registros-da-skill/conquistas|conquistas]]`. Só os nomes únicos (`_painel-[matéria]`, notas de `sessoes/`) podem ir sem caminho.
 
 ## Templates
@@ -41,6 +44,8 @@ Este cofre usa a skill **tutor-adaptativo**. Siga-a para tudo
   Esses arquivos são a única fonte de verdade sobre onde parei.
 - Ignore memórias automáticas de sessões antigas sobre estudos; se conflitarem
   com os registros, os registros vencem.
+- Leia e grave neste cofre pelo MCP do Obsidian, seguindo `references/obsidian.md` da skill:
+  ler antes de escrever, sobrescrever só arquivo do Claude logo depois de ler, nunca mexer em `pratica/`, nunca apagar.
 
 ## Como aprendo (vale para qualquer matéria)
 - Interesses para analogias e exemplos: [jogos, filmes, séries...]
@@ -115,6 +120,94 @@ graph TD
 > Abro [[[matéria]/registros-da-skill/conquistas|conquistas]] e vejo o quanto já andei.
 ````
 
+### Template: Painel inicial (o começo honesto de uma matéria recém-criada)
+
+> É o `_painel-[matéria].md` do momento da criação, antes de haver trilha: sem trilha de exemplo, sem sessão de mentira e com um mapa mínimo. Depois do plano aprovado, o painel passa ao template acima, por trocas cirúrgicas.
+
+````markdown
+---
+tipo: indice
+materia: [matéria]
+tags: [materia]
+---
+# 📚 [Matéria]
+
+> [!info] ▶ Próximo passo
+> Fazer a entrevista e a sondagem; o plano aprovado vira a trilha aqui
+
+## Mapa de dependências
+> O mapa aprovado na Fase 2 do plano aparece aqui.
+
+```mermaid
+graph TD
+  A[entrevista] --> B[sondagem] --> C[plano aprovado]
+```
+
+## Trilha
+- [ ] (a trilha aparece aqui depois do plano aprovado)
+
+## Sessões recentes
+> Tabela com todas: [[_sessoes-[matéria].base|todas as sessões]]
+- (nenhuma sessão ainda)
+
+## Onde mexo e onde não mexo
+- ✍️ **Mexo:** `pratica/`
+- 🚫 **Não mexo:** `registros-da-skill/` (ler pode — editar não) · `sessoes/` · painel
+
+> [!success] Nos dias difíceis
+> Abro [[[matéria]/registros-da-skill/conquistas|conquistas]] e vejo o quanto já andei.
+````
+
+### Template: `_sessoes-[matéria].base` (tabela nativa das sessões)
+
+> Recurso **Bases** do Obsidian (plugin do núcleo). Lista as notas de `sessoes/` pelo frontmatter. Troque `[caminho da matéria]` pelo caminho da pasta da matéria a partir da raiz do cofre. Se a ferramenta recusar a extensão `.base`, a matéria funciona sem ela.
+
+```yaml
+filters:
+  and:
+    - file.inFolder("[caminho da matéria]/sessoes")
+
+formulas: {}
+
+properties:
+  file.name:
+    displayName: "Sessão"
+  note.data:
+    displayName: "Data"
+  note.topico:
+    displayName: "Tópico"
+
+views:
+  - type: table
+    name: "Sessões"
+    order:
+      - file.name
+      - note.data
+      - note.topico
+    summaries: {}
+```
+
+> Exemplo: com a raiz de estudos em `estudos/` e a matéria `ingles`, fica `file.inFolder("estudos/ingles/sessoes")`. Com a raiz de estudos sendo o próprio cofre, `file.inFolder("ingles/sessoes")`.
+
+### Template: `_leia-me.md` de `pratica/`
+
+> Um para `pratica/projeto/` e outro para `pratica/treinos/`. É o que faz a pasta existir (o MCP não cria pasta vazia) e já diz de quem ela é.
+
+```markdown
+---
+tipo: indice
+materia: [matéria]
+tags: [materia]
+---
+# ✍️ [projeto de prática | treinos] — [Matéria]
+
+> [!info] Esta pasta é minha
+> Aqui eu escrevo e guardo o que faço. O Claude lê, revisa e sugere, mas não edita nem apaga nada aqui.
+
+- **`projeto/`:** o projeto de prática, que cresce a trilha inteira.
+- **`treinos/`:** exercícios soltos, uma subpasta por parte (`t1-1a/`, `t1-1b/`…).
+```
+
 ### Template: `trilha.md`
 > Gerado depois da entrevista, da sondagem e do meu "ok" no plano. Não preencha à mão — o Claude gera a partir das respostas.
 
@@ -129,7 +222,7 @@ graph TD
 - **Orçamento de tempo por sessão:** [30min/1h/2h] — usado para dimensionar cada sessão (Regra 24)
 - Prazo (se houver):
 - **Ambiente e recursos:** [computador/SO/editor, instrumento, materiais…] — evita instruções que não batem com o meu ambiente
-- **Caminho do cofre:** [caminho completo da pasta `estudos/` no disco, ou "sem acesso a arquivos"]
+- **Raiz dos estudos no cofre:** [caminho da pasta de estudos a partir da raiz do cofre Obsidian, ex.: `estudos/`; e, se o Claude alcança o disco, a pasta do cofre; ou "sem acesso a arquivos"]
 - **Bagagem relacionada:** [o que já domino de parecido + tempo, ou "nenhuma"] — usar para analogias em vez de ensinar do zero o que é transferível
 - **Interesses pessoais (para analogias e exemplos):** [hobbies, áreas de interesse — ou "nenhum informado"]
 - Fonte de referência: [URL, livro, norma…]

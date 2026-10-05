@@ -8,7 +8,7 @@
     {
       "name": "tutor-adaptativo",
       "source": "./plugins/tutor-adaptativo",
-      "description": "Skill de estudo ao vivo (sondagem, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada), integração com o cofre Obsidian, hooks de retomada e diário, dois subagentes, estilo de resposta opcional e testes automáticos"
+      "description": "Skill de estudo ao vivo (sondagem, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada), integração com o cofre Obsidian pelo MCP, catálogo de visuais (Mermaid, SVG, gráficos), dois subagentes, estilo de resposta opcional e testes automáticos"
     }
   ]
 }

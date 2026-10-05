@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Autoteste dos scripts do tutor-adaptativo (quiz, fila, cofre). Não usa rede nem navegador.
+"""Autoteste dos scripts do tutor-adaptativo (quiz e fila). Não usa rede nem navegador.
 
     python selftest.py        # sai com 0 se tudo passa, 1 se algo falha
 """
@@ -11,7 +11,7 @@ TMP = pathlib.Path(tempfile.mkdtemp(prefix="tutor-selftest-"))
 atexit.register(shutil.rmtree, TMP, ignore_errors=True)  # não deixa pasta temporária para trás
 os.environ["TUTOR_STATE"] = str(TMP / "estado")
 sys.path.insert(0, str(AQUI))
-quiz, fila, cofre = (importlib.import_module(n) for n in ("quiz", "fila", "cofre"))
+quiz, fila = (importlib.import_module(n) for n in ("quiz", "fila"))
 falhas, total = [], 0
 
 
@@ -141,108 +141,55 @@ def testa_fila():
     ok(all(r[0] != "—" for r in fila.carregar(f)[3]), "linha de exemplo é removida")
 
 
-def testa_cofre():
-    cv = TMP / "estudos"
-    m = cv / "ingles"
-    for d in ("registros-da-skill", "sessoes", "pratica/projeto", "pratica/treinos"):
-        (m / d).mkdir(parents=True)
-    (cv / "CLAUDE.md").write_text("usa a skill tutor-adaptativo", encoding="utf-8")
-    (m / "_painel-ingles.md").write_text("# p", encoding="utf-8")
-    reg = m / "registros-da-skill"
-    (reg / "trilha.md").write_text("# t\n\n**Status:** rascunho\n", encoding="utf-8")
-    (reg / "progresso.md").write_text("\n\n".join(cofre.SECOES_PROGRESSO[:1] + ["- Tópico 1 / Parte 1a"]) + "\n\n## Pendências abertas\n| Conceito | Onde | Quando | Status |\n|---|---|---|---|\n| modais | ex 2 | 2026-10-01 | aberto |\n\n## Histórico de provas\n\n## Checkpoints\n\n## Linha do tempo (sessões)\n", encoding="utf-8")
-    (reg / "conquistas.md").write_text("- **Última sessão:** 2026-09-29\n", encoding="utf-8")
-    (reg / "conhecimento.md").write_text("# c\n\n" + TABELA, encoding="utf-8")
-    rodar(fila.main, ["registrar", str(reg / "conhecimento.md"), "--conceito", "to be", "--resultado", "novo", "--hoje", "2026-09-01"])
-    ok(cofre.achar(explicito=str(cv)) == cv.resolve(), "achar por caminho explícito")
-    sub = m / "pratica"
-    ok(cofre.achar(cwd=str(sub)) == cv.resolve(), "achar subindo a partir de uma subpasta")
-    txt = cofre.resumo(cv)
-    ok("ingles" in txt and "Tópico 1" in txt and "Pendências abertas: 1" in txt and "to be" in txt, "resumo traz posição, pendência e revisão")
-    ok(cofre.validar(cv) == [], "cofre bem formado valida")
-    (reg / "progresso.md").write_text("vazio", encoding="utf-8")
-    ok(any("Posição atual" in p for p in cofre.validar(cv)), "validar pega seção faltando")
-    # hook de diário: só grava com opt-in e com a skill usada
-    tr = TMP / "transcricao.jsonl"
-    tr.write_text(json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "name": "Skill", "input": {"skill": "tutor-adaptativo"}}]}}) + "\n"
-                  + json.dumps({"type": "user", "message": {"role": "user", "content": "o que é um loop?"}}) + "\n", encoding="utf-8")
-    ent = json.dumps({"cwd": str(cv), "session_id": "s1", "transcript_path": str(tr), "last_assistant_message": "Um loop repete passos."})
-    os.environ.pop("TUTOR_LOG", None)
-    rodar(cofre.main, ["diario", "--hook"], ent)
-    ok(not list((m / "sessoes").glob("*-auto.md")), "sem opt-in não grava nada")
-    os.environ["TUTOR_LOG"] = "1"
-    rodar(cofre.main, ["diario", "--hook"], ent)
-    arq = list((m / "sessoes").glob("*-auto.md"))
-    ok(len(arq) == 1 and "[!quote]" in arq[0].read_text(encoding="utf-8") and "Um loop repete" in arq[0].read_text(encoding="utf-8"), "com opt-in grava a pergunta e a resposta")
-    rodar(cofre.main, ["diario", "--hook"], ent)
-    ok(arq[0].read_text(encoding="utf-8").count("Um loop repete") == 1, "não duplica a mesma rodada")
-    os.environ.pop("TUTOR_LOG", None)
-    codigo, saida = rodar(cofre.main, ["resumo", "--hook", "--cofre", str(cv)])
-    ok(json.loads(saida)["hookSpecificOutput"]["hookEventName"] == "SessionStart", "resumo --hook gera JSON de SessionStart")
-    testa_obsidian()
+def testa_fila_stdin():
+    """Modo '-': o texto vem do stdin (nota lida pelo MCP do Obsidian) e 'registrar' devolve a seção atualizada em vez de gravar."""
+    ent = "# c\n\n" + TABELA + "\n## Outra\n"
+    cod, saida = rodar(fila.main, ["registrar", "-", "--conceito", "git commit", "--resultado", "novo", "--parte", "T1 / 1a", "--hoje", "2026-10-01"], ent)
+    ok(cod == 0 and saida.startswith("SECAO: Fila de revisão espaçada\nCONTEUDO:\n> nota\n") and "| git commit | T1 / 1a" in saida and "2026-10-02" in saida and "—" not in saida.split("FIM")[0], "stdin: conceito novo gera a seção sem a linha de exemplo")
+    ok("## Outra" not in saida and saida.split("FIM")[0].count("\n| ") >= 1, "stdin: a seção devolvida não vaza o resto do arquivo")
+    com_linha = ent.replace("| — | — | — | — | — | ativo |", "| git commit | T1 / 1a | 2026-10-01 | 1d | 2026-10-02 | ativo |")
+    cod, saida = rodar(fila.main, ["registrar", "-", "--conceito", "git push", "--resultado", "novo", "--hoje", "2026-10-01"], com_linha)
+    corpo = saida.split("FIM")[0]
+    ok(cod == 0 and "git commit" in corpo and "git push" in corpo and corpo.index("git commit") < corpo.index("git push"), "stdin: conceito novo entra depois dos existentes")
+    cod, saida = rodar(fila.main, ["registrar", "-", "--conceito", "Git Commit", "--resultado", "acerto", "--hoje", "2026-10-02"], com_linha)
+    ok(cod == 0 and "| 3d" in saida and "2026-10-05" in saida, "stdin: acerto avança o intervalo")
+    cod, saida = rodar(fila.main, ["vencidos", "-", "--hoje", "2026-10-02"], com_linha)
+    ok(cod == 0 and "VENCIDOS: 1" in saida and "git commit" in saida, "stdin: vencidos lê o texto colado")
+    ok(rodar(fila.main, ["registrar", "-", "--conceito", "x", "--resultado", "acerto", "--hoje", "2026-10-02"], com_linha)[0] == 2, "stdin: acerto em conceito desconhecido é erro")
+    ok(rodar(fila.main, ["vencidos", "-"], "sem tabela nenhuma\n")[0] == 2, "stdin: texto sem a seção da fila dá erro limpo")
+    ult = rodar(fila.main, ["registrar", "-", "--conceito", "z", "--resultado", "novo", "--hoje", "2026-10-01"], "## Fila de revisão espaçada\n" + TABELA.split("\n", 1)[1])
+    ok(ult[0] == 0 and "| z " in ult[1], "stdin: seção que é o fim do arquivo (sem '## ' depois) também funciona")
 
 
-def testa_obsidian():
-    c2 = TMP / "novo-cofre"
-    c2.mkdir()
-    pasta, msgs = cofre.nova_materia(c2, "Matemática Básica")
-    ok(pasta == c2 / "matematica-basica" and cofre.validar(c2) == [], "nova-materia cria uma matéria que passa na validação")
-    ok((c2 / "matematica-basica" / "anexos").is_dir() and (c2 / "CLAUDE.md").is_file(), "nova-materia cria anexos/ e o CLAUDE.md do cofre")
-    leit = (c2 / "README.md").read_text(encoding="utf-8")
-    ok("[[_painel-matematica-basica|Matemática Básica]]" in leit and "[matéria]" not in leit, "README do cofre ganha a matéria, sem linha-modelo")
-    painel = (c2 / "matematica-basica" / "_painel-matematica-basica.md").read_text(encoding="utf-8")
-    ok("5/5" not in painel and "[x]" not in painel and "[Matéria]" not in painel, "painel novo não traz exemplos que parecem progresso")
-    antes = {p: p.read_bytes() for p in c2.rglob("*") if p.is_file()}
-    cofre.nova_materia(c2, "Matemática Básica")
-    ok(antes == {p: p.read_bytes() for p in c2.rglob("*") if p.is_file()}, "nova-materia repetida não altera nada (idempotente)")
-    c4 = TMP / "cofre4"
-    c4.mkdir()
-    (c4 / "README.md").write_text("## Matérias ativas\n- (nenhuma ainda: diga o assunto)\n\n## Matérias concluídas\n- (nenhuma)\n", encoding="utf-8", newline="\n")
-    cofre.nova_materia(c4, "Inglês")
-    leit2 = (c4 / "README.md").read_text(encoding="utf-8")
-    ok("[[_painel-ingles|Inglês]]" in leit2 and "nenhuma ainda" not in leit2 and "- (nenhuma)" in leit2, "o marcador '(nenhuma ainda)' some quando entra a primeira matéria")
-    arq, erro = cofre.nota_sessao(c2, "matematica basica", "Frações!", "## O que vimos\n- frações", "t1", "frações são divisões")
-    ok(erro is None and arq.name.endswith("-fracoes.md") and "topico: t1" in arq.read_text(encoding="utf-8"), "nota da sessão: nome, frontmatter e tópico")
-    painel = (c2 / "matematica-basica" / "_painel-matematica-basica.md").read_text(encoding="utf-8")
-    ok(f"[[{arq.stem}]] — frações são divisões" in painel and "nenhuma sessão ainda" not in painel, "nota da sessão entra em Sessões recentes do painel")
-    cofre.nota_sessao(c2, "matematica-basica", "Frações!", "mais um trecho")
-    ok(arq.read_text(encoding="utf-8").count("mais um trecho") == 1 and "Acrescentado" in arq.read_text(encoding="utf-8"), "segunda nota do dia acrescenta em vez de sobrescrever")
-    ok(cofre.nota_sessao(c2, "inexistente", "x", "y")[1] is not None, "nota em matéria inexistente dá erro")
-    img = TMP / "foto.png"
-    img.write_bytes(b"\x89PNG\r\n\x1a\n" + b"0" * 20)
-    d1, _ = cofre.anexar(c2, "matematica-basica", str(img), "Meu Desenho")
-    d2, _ = cofre.anexar(c2, "matematica-basica", str(img), "Meu Desenho")
-    ok(d1.parent.name == "anexos" and d1 != d2 and d1.exists() and d2.exists(), "anexar copia para anexos/ sem sobrescrever")
-    ok(cofre.anexar(c2, "matematica-basica", str(TMP / "x.exe"))[1] is not None, "anexar recusa arquivo inexistente ou extensão não aceita")
-    ok(cofre.uri_obsidian(c2, pathlib.Path("matematica-basica/_painel-matematica-basica.md")) == "obsidian://open?vault=novo-cofre&file=matematica-basica%2F_painel-matematica-basica", "URI do Obsidian: cofre e arquivo codificados")
-    # diário: conversa que só cita a skill não conta; uma chamada real conta, mesmo chegando depois (leitura incremental)
-    tr = TMP / "cita.jsonl"
-    tr.write_text(json.dumps({"type": "user", "message": {"role": "user", "content": "o skill tutor-adaptativo está certo?"}}) + chr(10), encoding="utf-8")
-    ok(cofre._skill_usada("s-cita", str(tr)) is False, "diário: citar a skill na conversa não conta como uso")
-    with open(tr, "a", encoding="utf-8") as f:
-        f.write(json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "name": "Skill", "input": {"skill": "tutor-adaptativo:tutor-adaptativo"}}]}}) + chr(10))
-    ok(cofre._skill_usada("s-cita", str(tr)) is True, "diário: chamada real da skill (mesmo com prefixo do plugin) conta")
-    velho, velho_cwd = os.environ.pop("TUTOR_STATE"), os.getcwd()
-    try:
-        os.chdir(c2)
-        ok(cofre.estado_dir() == c2.resolve() / ".tutor" / "estado", "o estado vive em .tutor/estado dentro do cofre")
-    finally:
-        os.chdir(velho_cwd)
-        os.environ["TUTOR_STATE"] = velho
+def testa_png():
+    """render.py: recorte de PNG só com a biblioteca padrão (o navegador entrega uma janela maior que a imagem)."""
+    import struct, zlib
+    render = importlib.import_module("render")
+    def png(w, h, cor):
+        bpp = 3 if cor == 2 else 4
+        linhas = b"".join(b"\x00" + bytes((x * 7 + y * 13) % 256 for x in range(w * bpp)) for y in range(h))
+        ch = lambda tp, c: struct.pack(">I", len(c)) + tp + c + struct.pack(">I", zlib.crc32(tp + c) & 0xffffffff)
+        return b"\x89PNG\r\n\x1a\n" + ch(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, cor, 0, 0, 0)) + ch(b"IDAT", zlib.compress(linhas)) + ch(b"IEND", b"")
+    for cor in (2, 6):
+        f = TMP / f"c{cor}.png"
+        f.write_bytes(png(20, 30, cor))
+        ok(render._recortar_png(f, 12, 18) == (12, 18), f"recorte: devolve o tamanho final (cor {cor})")
+        d = f.read_bytes()
+        ok(struct.unpack(">II", d[16:24]) == (12, 18), f"recorte: o IHDR do arquivo novo diz 12x18 (cor {cor})")
+        bpp = 3 if cor == 2 else 4
+        bruto = zlib.decompress(b"".join(d[d.index(b"IDAT") + 4:d.index(b"IDAT") + 4 + struct.unpack(">I", d[d.index(b"IDAT") - 4:d.index(b"IDAT")])[0]] for _ in [0]))
+        esperado = b"".join(b"\x00" + bytes((x * 7 + y * 13) % 256 for x in range(12 * bpp)) for y in range(18))
+        ok(bruto == esperado, f"recorte: os pixels que ficam são os do canto superior esquerdo (cor {cor})")
+    ok(render._recortar_png(TMP / "nao-existe.png", 5, 5) is None, "recorte: arquivo inexistente não quebra")
 
 
-VTT = ("WEBVTT\nKind: captions\nLanguage: en\n\n00:00:01.000 --> 00:00:03.000 align:start position:0%\nhello <00:00:01.500><c>world</c>\n\n"
-       "00:00:03.000 --> 00:00:05.000\nhello world\nthis is a test\n\n00:01:10.000 --> 00:01:12.000\nthis is a test\nsecond block &amp; more\n")
-
-
-def testa_novidades():
+def testa_entrada():
     # entrada: BOM, UTF-16 (PowerShell), CRLF e --arquivo
-    saida = io.StringIO()
     def com_stdin(b):
         velho = sys.stdin
         sys.stdin = io.TextIOWrapper(io.BytesIO(b), encoding="utf-8")
         try:
-            return cofre.ler_entrada([])
+            return quiz.ler_entrada([])
         finally:
             sys.stdin = velho
     ok(com_stdin(b"\xef\xbb\xbfP: x\r\n+ a\r\n") == "P: x\n+ a\n", "entrada: BOM do UTF-8 e CRLF são tratados")
@@ -251,50 +198,18 @@ def testa_novidades():
     arq.write_bytes(BOM.encode("utf-8"))
     cod, saida = rodar(quiz.main, ["montar", "--arquivo", str(arq)])
     ok(cod == 0 and "ID: q-" in saida, "quiz.py montar --arquivo funciona")
-    # o quiz montado fora do cofre ainda é achado depois que o estado muda de pasta
+    # o quiz montado é achado mesmo se a pasta de estado mudar entre montar e corrigir
     antigo = quiz.STATE
     quiz.STATE = pathlib.Path(tempfile.gettempdir()) / "tutor-adaptativo"
     cod, saida = rodar(quiz.main, ["montar"], BOM)
     qid = next(l.split(": ")[1] for l in saida.splitlines() if l.startswith("ID: "))
-    quiz.STATE = TMP / "outro-cofre" / ".tutor" / "estado"
+    quiz.STATE = TMP / "outra-pasta" / "estado"
     ok("RESULTADO:" in rodar(quiz.main, ["corrigir", qid, "1"])[1], "o quiz é achado mesmo se a pasta de estado mudou no meio")
     quiz.STATE = antigo
-    # nomes de matéria
-    c3 = TMP / "cofre3"
-    c3.mkdir()
-    ok(cofre.nova_materia(c3, "CON")[0] is None and not (c3 / "con").exists(), "nome reservado do Windows é recusado")
-    pasta, _ = cofre.nova_materia(c3, "Lógica [1] | básica " + "x" * 300)
-    ok(pasta is not None and len(pasta.name) <= 60 and "|" not in (c3 / "README.md").read_text(encoding="utf-8").split("Matérias ativas")[1].split("##")[0].split("]]")[0].split("|", 1)[1], "nome gigante e com | ou [ vira slug curto e wikilink sem quebra")
-    pasta, _ = cofre.nova_materia(c3, "Matemática")
-    ok((pasta / "_sessoes-matematica.base").is_file() and 'file.inFolder("matematica/sessoes")' in (pasta / "_sessoes-matematica.base").read_text(encoding="utf-8"), "nova-materia cria a Base de sessões do Obsidian")
-    ok((pasta / "fontes").is_dir() and "_sessoes-matematica.base" in (pasta / "_painel-matematica.md").read_text(encoding="utf-8"), "nova-materia cria fontes/ e liga a Base no painel")
-    # nota preserva o que o Ivo escreveu à mão no painel
-    painel = pasta / "_painel-matematica.md"
-    painel.write_text(painel.read_text(encoding="utf-8").replace("- (nenhuma sessão ainda)", "- (nenhuma sessão ainda)\nMinha anotação: rever frações\n"), encoding="utf-8", newline="\n")
-    cofre.nota_sessao(c3, "matematica", "Primeira", "a\r\nb", "t1", "r1")
-    texto = painel.read_text(encoding="utf-8")
-    ok("Minha anotação: rever frações" in texto and "Tabela com todas" in texto and "nenhuma sessão ainda" not in texto, "nota não apaga linhas escritas à mão em Sessões recentes")
-    ok(b"\r" not in next((pasta / "sessoes").glob("*.md")).read_bytes(), "nota grava só com LF")
-    # transcrição de legenda
-    txt = cofre.vtt_para_texto(VTT)
-    ok(txt.count("hello world") == 1 and txt.count("this is a test") == 1 and "**[00:01]** hello world this is a test" in txt and "**[01:10]** second block & more" in txt, "vtt: tira tags e repetições e agrupa por minuto")
-    vtt = TMP / "aula.vtt"
-    vtt.write_text(VTT, encoding="utf-8")
-    nota, info = cofre.transcrever(c3, "matematica", str(vtt), titulo="Aula 1: Frações")
-    conteudo = nota.read_text(encoding="utf-8")
-    ok(nota.parent.name == "fontes" and "tipo: fonte" in conteudo and "pista" in conteudo and "hello world" in conteudo, "transcrever grava a nota em fontes/ com aviso de pista")
-    ok(cofre.transcrever(c3, "matematica", str(TMP / "x.txt"))[0] is None and cofre.transcrever(c3, "matematica", "ftp://x")[0] is None, "transcrever recusa fonte que não é link nem .vtt/.srt")
-    ok(cofre.url_limpa("https://www.youtube.com/watch?v=abc123&list=LL&index=1&t=924s") == "https://www.youtube.com/watch?v=abc123" and cofre.url_limpa("https://youtu.be/abc123?si=zzz&t=5") == "https://youtu.be/abc123", "o link guardado na nota perde lista, índice, tempo e rastreio")
-    # cartões para o plugin Spaced Repetition
-    cartoes, erro, n = cofre.cartoes(c3, "matematica", "O que é 1/2? :: metade\nO que é um pipe? :: liga saída a entrada\n")
-    ct = cartoes.read_text(encoding="utf-8")
-    ok(n == 2 and "O que é 1/2?::metade" in ct and "#flashcards/matematica" in ct, "cartões: formato Pergunta::Resposta com a etiqueta do baralho")
-    ok(cofre.cartoes(c3, "matematica", "O que é 1/2? :: metade\n")[2] == 0, "cartões: não repete cartão")
-    ok(cofre.cartoes(c3, "matematica", "sem separador\n")[1] is not None, "cartões: linha sem ' :: ' é recusada")
 
 
 if __name__ == "__main__":
-    for t in (testa_quiz, testa_fila, testa_cofre, testa_novidades):
+    for t in (testa_quiz, testa_fila, testa_fila_stdin, testa_png, testa_entrada):
         try:
             t()
         except Exception as e:  # um erro inesperado também conta como falha

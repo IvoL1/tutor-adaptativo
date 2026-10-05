@@ -13,8 +13,8 @@ claude plugin eval . --trust-plugin --runs 1 --ablation none
 # só os essenciais
 claude plugin eval . --trust-plugin --tag essencial
 
-# casos que usam scripts (precisam liberar o Bash)
-claude plugin eval . --trust-plugin --tag ferramentas --allow-tools Bash
+# casos que usam scripts ou gravam no cofre (precisam liberar Bash e escrita; com o MCP do Obsidian ligado, ele é usado no lugar dos arquivos diretos)
+claude plugin eval . --trust-plugin --tag ferramentas --allow-tools Bash,Write,Edit
 ```
 
 Execute a partir de `plugins/tutor-adaptativo/`. Os resultados ficam em `evals/results/` (não versionar).

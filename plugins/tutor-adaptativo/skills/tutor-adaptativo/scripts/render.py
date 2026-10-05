@@ -10,8 +10,10 @@ Responde com uma linha JSON: {"ok": true, "png": ..., "largura": ..., "altura": 
 Mermaid 11.17.2 é carregado de cdn.jsdelivr.net, com versão fixa e SRI (precisa de rede); use --mermaid-js com um arquivo local para funcionar offline.
 Se o Mermaid acusar erro, "erro" traz a mensagem exata de sintaxe e nenhum PNG é criado.
 Funciona com Edge e Chrome: o resultado volta por um servidor local efêmero (127.0.0.1), não por pipes.
+O tamanho da imagem é corrigido pelo que o navegador realmente entrega (no Linux a janela "headless=new" vem ~88 px mais baixa que a pedida).
+Como root (contêiner), o navegador sobe com --no-sandbox.
 """
-import html, http.server, json, os, pathlib, re, shutil, subprocess, sys, tempfile, threading, time, urllib.parse
+import html, http.server, json, os, pathlib, re, shutil, struct, subprocess, sys, tempfile, threading, time, urllib.parse, zlib
 import xml.etree.ElementTree as ET
 
 CDN = "https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js"  # versão exata + SRI: o navegador recusa um arquivo adulterado
@@ -62,7 +64,10 @@ def _matar(p):
 def _lancar(nav, url, perfil, extra):
     """Abre o navegador sem pipes (pipes herdados pelos filhos travam no Windows)."""
     cmd = [nav, "--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-first-run", "--no-default-browser-check",
-           "--force-device-scale-factor=1", f"--user-data-dir={perfil}"] + extra + [url]
+           "--force-device-scale-factor=1", f"--user-data-dir={perfil}"]
+    if hasattr(os, "geteuid") and os.geteuid() == 0:  # root (contêiner): o sandbox do Chrome não sobe; o conteúdo é local ou tem SRI
+        cmd.append("--no-sandbox")
+    cmd += extra + [url]
     return subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
@@ -112,7 +117,7 @@ def _png_ok(p):
     return pathlib.Path(p).is_file() and pathlib.Path(p).stat().st_size > 1000
 
 
-def _servidor(pagina):
+def _servidor(pagina, js_bytes=None):
     est = {"ev": threading.Event(), "res": {}}
 
     class H(http.server.BaseHTTPRequestHandler):
@@ -130,6 +135,8 @@ def _servidor(pagina):
             u = urllib.parse.urlparse(self.path)
             if u.path == "/":
                 self._enviar(pagina.encode("utf-8"), "text/html; charset=utf-8")
+            elif u.path == "/m.js" and js_bytes is not None:  # Mermaid local: uma página http não pode carregar file://
+                self._enviar(js_bytes, "application/javascript; charset=utf-8")
             elif u.path == "/espera":  # segura o evento load até a página avisar que terminou de desenhar
                 est["ev"].wait(25)
                 self._enviar(GIF, "image/gif")
@@ -143,6 +150,77 @@ def _servidor(pagina):
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv, est
+
+
+def _recortar_png(caminho, w, h):
+    """Recorta o PNG para w x h (canto superior esquerdo), só com a biblioteca padrão. Devolve (largura, altura) finais.
+    Aceita PNG de 8 bits, RGB ou RGBA, sem entrelaçamento (o que o Chrome e o Edge geram); em qualquer outro caso deixa o arquivo como está."""
+    caminho = pathlib.Path(caminho)
+    try:
+        dados = caminho.read_bytes()
+        if dados[:8] != b"\x89PNG\r\n\x1a\n":
+            return None
+        pos, idat, ihdr = 8, [], None
+        while pos < len(dados):
+            n, tipo = struct.unpack(">I4s", dados[pos:pos + 8])
+            corpo = dados[pos + 8:pos + 8 + n]
+            if tipo == b"IHDR":
+                ihdr = struct.unpack(">IIBBBBB", corpo)
+            elif tipo == b"IDAT":
+                idat.append(corpo)
+            pos += 12 + n
+        W, H, prof, cor, _, _, entrel = ihdr
+        if prof != 8 or cor not in (2, 6) or entrel:
+            return None
+        if W <= w and H <= h:
+            return W, H
+        w, h = min(w, W), min(h, H)
+        bpp = 3 if cor == 2 else 4
+        stride = W * bpp
+        bruto = zlib.decompress(b"".join(idat))
+        linhas, ant = [], bytearray(stride)
+        for y in range(H):
+            f, lin = bruto[y * (stride + 1)], bytearray(bruto[y * (stride + 1) + 1:(y + 1) * (stride + 1)])
+            for i in range(stride):
+                a = lin[i - bpp] if i >= bpp else 0
+                b, c = ant[i], (ant[i - bpp] if i >= bpp else 0)
+                if f == 1:
+                    lin[i] = (lin[i] + a) & 255
+                elif f == 2:
+                    lin[i] = (lin[i] + b) & 255
+                elif f == 3:
+                    lin[i] = (lin[i] + ((a + b) >> 1)) & 255
+                elif f == 4:
+                    pa, pb, pc = abs(b - c), abs(a - c), abs(a + b - 2 * c)
+                    lin[i] = (lin[i] + (a if pa <= pb and pa <= pc else b if pb <= pc else c)) & 255
+            linhas.append(lin)
+            ant = lin
+            if y + 1 == h:
+                break
+        novo = b"".join(b"\x00" + bytes(l[:w * bpp]) for l in linhas)
+        def chunk(tp, c):
+            return struct.pack(">I", len(c)) + tp + c + struct.pack(">I", zlib.crc32(tp + c) & 0xffffffff)
+        saida = (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, cor, 0, 0, 0))
+                 + chunk(b"IDAT", zlib.compress(novo, 9)) + chunk(b"IEND", b""))
+        caminho.write_bytes(saida)
+        return w, h
+    except (OSError, ValueError, struct.error, zlib.error, IndexError, TypeError):
+        return None
+
+
+def _folga(nav):
+    """Quanto a janela real vem menor que a pedida: (dx, dy). Zero onde o navegador respeita --window-size."""
+    pagina = ('<!doctype html><meta charset="utf-8"><body><script>'
+              'new Image().src="/r?w="+innerWidth+"&h="+innerHeight;</script>')
+    srv, est = _servidor(pagina)
+    try:
+        _sessao(nav, f"http://127.0.0.1:{srv.server_address[1]}/", ["--window-size=800,600"], espera=est["ev"], timeout=20)
+        r = est["res"]
+        return max(0, 800 - int(r.get("w", 800))), max(0, 600 - int(r.get("h", 600)))
+    except (ValueError, OSError):
+        return 0, 0
+    finally:
+        srv.shutdown()
 
 
 def _pagina_mermaid(codigo, js):
@@ -167,13 +245,18 @@ def mermaid(entrada, saida, js):
             r = subprocess.run([mmdc, "-i", str(entrada), "-o", str(saida)], capture_output=True, text=True, timeout=120)
             return {"ok": r.returncode == 0 and _png_ok(saida), "png": str(saida), "renderizador": "mmdc", "erro": r.stderr[-400:] if r.returncode else ""}
         return {"ok": False, "erro": "sem navegador (Edge/Chrome) nem mmdc; só dá para verificar por leitura"}
+    js_bytes = None
     if js and not re.match(r"https?://", js):
-        js = pathlib.Path(js).resolve().as_uri()
-    srv, est = _servidor(_pagina_mermaid(codigo, js))
+        arq_js = pathlib.Path(js).expanduser()
+        if not arq_js.is_file():
+            return {"ok": False, "erro": f"--mermaid-js: o arquivo '{js}' não existe"}
+        js_bytes, js = arq_js.read_bytes(), "/m.js"
+    dx, dy = _folga(nav)
+    srv, est = _servidor(_pagina_mermaid(codigo, js), js_bytes)
     url = f"http://127.0.0.1:{srv.server_address[1]}/"
     try:
         medida = pathlib.Path(tempfile.gettempdir()) / ("tutor-medida-" + os.urandom(4).hex() + ".png")
-        _sessao(nav, url, [f"--screenshot={medida}", "--window-size=1800,1400"], espera=est["ev"])
+        _sessao(nav, url, [f"--screenshot={medida}", f"--window-size={1800 + dx},{1400 + dy}"], espera=est["ev"])
         try:
             medida.unlink()
         except OSError:
@@ -189,10 +272,12 @@ def mermaid(entrada, saida, js):
         destino = pathlib.Path(saida).resolve()
         if destino.exists():
             destino.unlink()
-        _sessao(nav, url, [f"--screenshot={destino}", f"--window-size={w},{h}"], espera=est["ev"])
+        _sessao(nav, url, [f"--screenshot={destino}", f"--window-size={w + dx},{h + dy}"], espera=est["ev"])
     finally:
         srv.shutdown()
     ok = _png_ok(saida)
+    if ok and (dx or dy):
+        w, h = _recortar_png(saida, w, h) or (w, h)
     return {"ok": ok, "png": str(pathlib.Path(saida).resolve()), "largura": w, "altura": h, "renderizador": pathlib.Path(nav).name,
             **({} if ok else {"erro": "o navegador não gerou o PNG"})}
 
@@ -220,12 +305,15 @@ def svg(entrada, saida):
         corpo = re.sub(r"^<\?xml[^>]*\?>", "", texto).strip()
         arq.write_text('<!doctype html><meta charset="utf-8"><body style="margin:0;background:#fff">' + corpo, encoding="utf-8")
         try:
-            _sessao(nav, arq.as_uri(), [f"--screenshot={destino}", f"--window-size={w},{h}"])
+            dx, dy = _folga(nav)
+            _sessao(nav, arq.as_uri(), [f"--screenshot={destino}", f"--window-size={w + dx},{h + dy}"])
         finally:
             try:
                 arq.unlink()
             except OSError:
                 pass
+        if _png_ok(saida) and (dx or dy):
+            w, h = _recortar_png(saida, w, h) or (w, h)
         return {"ok": _png_ok(saida), "png": str(destino), "largura": w, "altura": h, "renderizador": pathlib.Path(nav).name}
     for exe, cmd in (("rsvg-convert", ["rsvg-convert", "-o", str(saida), str(entrada)]), ("magick", ["magick", str(entrada), str(saida)])):
         if shutil.which(exe):

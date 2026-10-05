@@ -7,7 +7,10 @@
                     [--parte "T1 / 1a"] [--hoje AAAA-MM-DD]
   fila.py mostrar   ARQUIVO
 
-ARQUIVO é o conhecimento.md da matéria. A tabela fica sob "## Fila de revisão espaçada"
+ARQUIVO é o conhecimento.md da matéria. Com "-" o texto vem do stdin (o cofre Obsidian é lido e gravado pelo MCP, não por
+este script): basta colar a seção "## Fila de revisão espaçada" (ou o arquivo todo). Nesse modo "registrar" não grava nada:
+imprime SECAO / CONTEUDO / FIM, onde CONTEUDO é a seção inteira já atualizada, para o Claude gravar com
+obsidian_patch_content (operation=replace, target_type=heading, target=SECAO). A tabela fica sob "## Fila de revisão espaçada"
 e tem as colunas: Conceito | Tópico/Parte | Aprendido em | Intervalo atual | Próxima revisão | Status.
 Intervalos: 1d 3d 7d 16d 35d 60d 120d e depois arquivado. Erro volta para 1d.
 acerto-fragil (acertou com confiança baixa) repete o mesmo intervalo, sem avançar.
@@ -35,9 +38,18 @@ def _placeholder(cel):
     return all(c in ("—", "-", "") for c in cel[:5])
 
 
-def carregar(caminho):
+def _ler(caminho):
+    if str(caminho) == "-":
+        bruto = sys.stdin.buffer.read()
+        if bruto[:2] in (b"\xff\xfe", b"\xfe\xff"):
+            return bruto.decode("utf-16", errors="replace").replace("\r\n", "\n")
+        return bruto.decode("utf-8-sig", errors="replace").replace("\r\n", "\n")
+    return pathlib.Path(caminho).read_text(encoding="utf-8")
+
+
+def carregar(caminho, texto=None):
     """Devolve (linhas, inicio, fim, rows): a tabela ocupa linhas[inicio:fim]."""
-    linhas = pathlib.Path(caminho).read_text(encoding="utf-8").split("\n")
+    linhas = (_ler(caminho) if texto is None else texto).split("\n")
     t = next((i for i, l in enumerate(linhas) if l.startswith(TITULO)), None)
     if t is None:
         raise ValueError(f"não achei o título '{TITULO}' em {caminho}")
@@ -61,11 +73,25 @@ def carregar(caminho):
     return linhas, ini, fim, rows
 
 
-def salvar(caminho, linhas, ini, fim, rows):
+def novas_linhas(linhas, ini, fim, rows):
     larg = [max(len(CAB[k]), *(len(r[k]) for r in rows)) if rows else len(CAB[k]) for k in range(6)]
     fmt = lambda c: "| " + " | ".join(c[k].ljust(larg[k]) for k in range(6)) + " |"
     tabela = [fmt(CAB), "|" + "|".join("-" * (w + 2) for w in larg) + "|"] + [fmt(r) for r in rows]
-    pathlib.Path(caminho).write_text("\n".join(linhas[:ini] + tabela + linhas[fim:]), encoding="utf-8", newline="\n")
+    return linhas[:ini] + tabela + linhas[fim:]
+
+
+def secao(linhas):
+    """Corpo da seção da fila (da linha depois do título até antes do próximo '## '), sem linhas vazias no fim."""
+    t = next(i for i, l in enumerate(linhas) if l.startswith(TITULO))
+    fim = next((i for i in range(t + 1, len(linhas)) if linhas[i].startswith("## ")), len(linhas))
+    corpo = linhas[t + 1:fim]
+    while corpo and not corpo[-1].strip():
+        corpo.pop()
+    return linhas[t].lstrip("# ").strip(), corpo
+
+
+def salvar(caminho, linhas, ini, fim, rows):
+    pathlib.Path(caminho).write_text("\n".join(novas_linhas(linhas, ini, fim, rows)), encoding="utf-8", newline="\n")
 
 
 def _data(txt):
@@ -90,8 +116,8 @@ def proximo_estado(intervalo, resultado, hoje):
     return f"{seguintes[0]}d", (hoje + datetime.timedelta(days=seguintes[0])).isoformat(), "ativo"
 
 
-def vencidos(caminho, hoje, maximo=3):
-    _, _, _, rows = carregar(caminho)
+def vencidos(caminho, hoje, maximo=3, texto=None):
+    _, _, _, rows = carregar(caminho, texto)
     devidos = [r for r in rows if r[5].lower() == "ativo" and r[4] not in ("—", "") and _data(r[4]) <= hoje]
     devidos.sort(key=lambda r: _data(r[4]))
     return devidos[:maximo], len(devidos)
@@ -109,14 +135,15 @@ def main(argv):
     cmd, caminho, args = argv[0], argv[1], argv[2:]
     hoje = _data(_opcao(args, "--hoje")) if _opcao(args, "--hoje") else datetime.date.today()
     try:
+        texto = _ler(caminho) if caminho == "-" else None
         if cmd == "mostrar":
-            _, _, _, rows = carregar(caminho)
+            _, _, _, rows = carregar(caminho, texto)
             for r in rows:
                 print(" | ".join(r))
             print(f"({len(rows)} conceito(s) na fila)")
             return 0
         if cmd == "vencidos":
-            lista, total = vencidos(caminho, hoje, int(_opcao(args, "--max", 3)))
+            lista, total = vencidos(caminho, hoje, int(_opcao(args, "--max", 3)), texto)
             print(f"VENCIDOS: {total}" + (f" (mostrando {len(lista)}; o resto continua vencido e entra na próxima sessão)" if total > len(lista) else ""))
             for r in lista:
                 atraso = (hoje - _data(r[4])).days
@@ -126,7 +153,7 @@ def main(argv):
         if not conceito or resultado not in ("novo", "acerto", "acerto-fragil", "erro", "erro-confiante"):
             print("ERRO: informe --conceito e --resultado novo|acerto|acerto-fragil|erro|erro-confiante")
             return 2
-        linhas, ini, fim, rows = carregar(caminho)
+        linhas, ini, fim, rows = carregar(caminho, texto)
         linha = next((r for r in rows if r[0].lower() == conceito.lower()), None)
         if linha is None:
             if resultado in ("acerto", "acerto-fragil"):
@@ -139,6 +166,11 @@ def main(argv):
             if _opcao(args, "--parte"):
                 linha[1] = _opcao(args, "--parte")
         linha[3], linha[4], linha[5] = proximo_estado(linha[3], resultado, hoje)
+        if texto is not None:
+            alvo, corpo = secao(novas_linhas(linhas, ini, fim, rows))
+            print(f"SECAO: {alvo}\nCONTEUDO:\n" + "\n".join(corpo) + "\n\nFIM")
+            print(f"OK: {linha[0]} -> intervalo {linha[3]}, próxima revisão {linha[4]}, status {linha[5]}")
+            return 0
         salvar(caminho, linhas, ini, fim, rows)
         print(f"OK: {linha[0]} -> intervalo {linha[3]}, próxima revisão {linha[4]}, status {linha[5]}")
         return 0
