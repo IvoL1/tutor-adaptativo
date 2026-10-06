@@ -1,6 +1,6 @@
 ---
 name: tutor-adaptativo
-description: Tutor Adaptativo — sistema pessoal e ao vivo para aprender, estudar, revisar e entender QUALQUER assunto (programação, idiomas, matemática, ciências, música, negócios, concursos, um curso inteiro ou uma dúvida solta). Use SEMPRE que Ivo quiser aprender, estudar, praticar, revisar ou retomar algo, pedir que você explique ou ensine um conceito (mesmo uma explicação rápida), fazer quiz ou prova, ou quando falar de matéria, trilha, curso ou projeto de estudo. Cobre entrevista inicial, sondagem do nível, plano com mapa de dependências e aprovação, aula em ciclos (motivar, estabelecer, conectar, checar), quizzes com correção na hora, repetição espaçada, calibração de confiança, reforço, projetos de aplicação e protocolo antifrustração. Comandos como "sondar", "plano", "quiz", "prova", "revisão", "reforço", "próximo", "dica", "travei", "retomar", "salva", "abrir", "anexa", "transcreve" e "valida projeto" também acionam esta skill.
+description: Tutor Adaptativo — sistema pessoal e ao vivo para aprender, estudar, revisar e entender QUALQUER assunto (programação, idiomas, matemática, ciências, música, negócios, concursos, um curso inteiro ou uma dúvida solta). Use SEMPRE que Ivo quiser aprender, estudar, praticar, revisar ou retomar algo, pedir que você explique ou ensine um conceito (mesmo uma explicação rápida), fazer quiz ou prova, ou quando falar de matéria, trilha, curso ou projeto de estudo. Cobre entrevista inicial, sondagem do nível, plano com mapa de dependências e aprovação, aula em ciclos (motivar, estabelecer, conectar, checar), quizzes com correção na hora, repetição espaçada, calibração de confiança, reforço, projetos de aplicação e protocolo antifrustração. Comandos como "sondar", "plano", "quiz", "prova", "revisão", "reforço", "próximo", "dica", "travei", "retomar", "salva", "abrir", "anexa", "exportar", "transcreve" e "valida projeto" também acionam esta skill.
 ---
 
 # Tutor Adaptativo
@@ -140,6 +140,7 @@ flowchart LR
 | `"abrir"` | Dá o link `obsidian://` para abrir a nota da sessão ou o painel da matéria no Obsidian (`references/obsidian.md` → "Abrir no Obsidian") |
 | `"anexa"` | Guarda o visual desta aula na nota (Mermaid no corpo) ou em `anexos/` (SVG; PNG só com acesso ao disco) e dá o embed (`references/obsidian.md` → "Visuais e imagens") |
 | `"transcreve"` | Grava a legenda de um vídeo (texto colado, `.vtt` ou link com `yt-dlp`) numa nota em `fontes/` — pista, não fonte para ensinar (`references/obsidian.md` → "Transcrever um vídeo") |
+| `"exportar"` | Grava o exercício ou desafio atual (sem a solução) ou o relatório da última prova como nota no cofre, em `exercicios/` ou `provas/` (`references/obsidian.md` → "Exercícios, desafios e provas como nota") |
 | `"cartões"` | Só se eu uso o plugin Spaced Repetition: grava os conceitos aprovados em `cartoes.md` (`references/obsidian.md` → "Cartões") |
 | `"desafio"` | Variação mais difícil do exercício atual |
 | `"quiz"` | Perguntas rápidas com correção na hora sobre os últimos conceitos |

@@ -16,6 +16,7 @@
 >     · Gravar a nota da sessão
 >     · Visuais e imagens (`"anexa"`)
 >     · Transcrever um vídeo (`"transcreve"`)
+>     · Exercícios, desafios e provas como nota (`"exportar"`)
 >     · Cartões (`"cartões"`)
 >     · Abrir no Obsidian (`"abrir"`)
 >     · Buscar no cofre
@@ -164,6 +165,15 @@ Só se eu uso o plugin **Spaced Repetition** e pedi. A fila do `conhecimento.md`
 1. Leia `{RAIZ}/{sg}/cartoes.md` (se existir) para não repetir cartões.
 2. Não existe: `Write` com frontmatter (`tipo: cartoes`, `materia`, `tags`), o título `# Cartões — Nome` e a linha `#flashcards/{sg}`.
 3. Existe: `Edit` ancorado na última linha, acrescentando os novos, **uma linha cada**, no formato `pergunta::resposta` (sem espaços em volta de `::`), pulando os que já existem.
+
+### Exercícios, desafios e provas como nota (`"exportar"`)
+
+Só quando eu peço (`"exportar"`, ou "põe esse exercício numa nota"). A aula, o quiz e a prova continuam **ao vivo na conversa** (Regra 2); a nota é para eu abrir no Obsidian, reler e refazer.
+
+1. **Exercício ou desafio atual:** caminho `{RAIZ}/{sg}/exercicios/AAAA-MM-DD-{tópico}-{parte}-{nome-em-slug}.md` (slug: minúsculo, sem acento, só letras, números e hifens). Se já existe (`Glob`), não sobrescreva: acrescente `-2`. Grave com `Write` a partir do template "exercício ou desafio" de `references/templates.md`: enunciado, critério de pronto e a escada de dicas **dobrada**, **sem a solução**. Dê o `[[link]]` e diga que a minha resposta vai em `pratica/treinos/t{N}-{parte}/` (essa pasta é minha; não crie nada nela).
+2. **Última prova fechada:** caminho `{RAIZ}/{sg}/provas/AAAA-MM-DD-{tópico}-{parte}-{nome-da-prova}.md`, template "relatório de prova". Preencha **só** com os resultados que o `quiz.py` devolveu nesta conversa e com o bloco do `placar`. Se faltar algum (a conversa foi cortada), deixe a linha de fora e diga qual faltou; nunca reconstrua de memória. A pasta `provas/` e o `progresso.md` não se substituem: o resultado oficial continua no `progresso.md`.
+3. Sem Python não há `placar`: use os números que você corrigiu à mão e diga que foi à mão.
+4. Confira uma vez (`Glob` e `Read` da nota) e liste a nota no `_painel-{sg}.md`, na seção `## Sessões recentes`, só se ela fizer parte da sessão do dia (a nota da sessão pode apenas linkar o exercício).
 
 ### Abrir no Obsidian (`"abrir"`)
 

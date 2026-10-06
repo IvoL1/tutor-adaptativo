@@ -379,6 +379,66 @@ graph TD
 ▶ [próximo passo] · Revisão do dia pendente: [N] conceitos
 ````
 
+### Template: exercício ou desafio (`exercicios/AAAA-MM-DD-[tópico]-[parte]-[nome].md`)
+
+> Só a pedido (`"exportar"`). **Nunca contém a solução** (Regra 9): as dicas são a escada de `references/pedagogia.md`, cada uma dobrada (`-`), uma por degrau, e nenhuma entrega a resposta. A solução só entra se eu pedir `"resposta"`, e então como uma seção dobrada no fim.
+
+```markdown
+---
+tipo: exercicio
+materia: [matéria]
+topico: T[N]
+parte: [Na]
+nivel: reproducao | modificacao | extensao | criacao
+tags: [exercicio]
+---
+# [Título curto do exercício]
+
+> [!todo] O que fazer
+> [Enunciado em passos curtos. Texto de apoio já pronto para copiar (Regra 27).]
+
+> [!check] Critério de pronto
+> [O que observar ou conseguir quando acertar, sem dar a solução (Regra 22).]
+
+> [!hint]- Dica 1
+> [Direção geral, sem a resposta.]
+
+> [!hint]- Dica 2
+> [Mais específica, ainda sem a resposta.]
+
+## Onde faço
+Minha resposta vai em `pratica/treinos/t[N]-[parte]/` (`[[_painel-[matéria]|painel]]`).
+```
+
+Desafio é o mesmo template com `tipo: desafio`, `tags: [desafio]` e o título começando por "Desafio:".
+
+### Template: relatório de prova (`provas/AAAA-MM-DD-[tópico]-[parte]-[nome].md`)
+
+> Só a pedido. É o **registro** de uma prova que já foi feita e corrigida ao vivo na conversa (a prova nunca é entregue em lote). Montado só com o que o `quiz.py` devolveu (`RESULTADO`, `CERTA`, `EQUIVOCO_REVELADO`, `EXPLICACAO`) e o bloco do `placar`; nada corrigido de cabeça.
+
+```markdown
+---
+tipo: prova
+materia: [matéria]
+topico: T[N]
+parte: [Na]
+data: AAAA-MM-DD
+resultado: [percentual]
+tags: [prova]
+---
+# Prova — Tópico [N], Parte [Na] — AAAA-MM-DD
+
+> [!info] Resultado
+> [percentual] ([acertos]/[total]) · [decisão do placar]
+
+| # | Pergunta | Minha resposta | Confiança | Resultado | Certa |
+|---|---|---|---|---|---|
+| 1 | [pergunta] | [alternativa escolhida ou "não sei"] | 🟢/🟡/🔴 | acerto / erro / lacuna | [alternativa certa] |
+
+## Para rever
+- **[conceito com erro ou lacuna]** — [equívoco revelado e explicação, uma linha].
+```
+
 ### Template: Cartão de retomada
 > Para ambientes **sem acesso a arquivos**. Entregue no fim de toda sessão e quando eu disser `"salva"`; eu colo no começo da próxima conversa com `"retomar"`. Curto — cabe numa tela (`references/sessao.md` → "Sem acesso a arquivos — Cartão de retomada").
 

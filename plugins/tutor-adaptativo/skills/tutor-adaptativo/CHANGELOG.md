@@ -3,6 +3,14 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 5.1.0 — 2026-10-06
+
+**Exercícios, desafios e provas como notas no Obsidian** (novo comando `"exportar"`, sempre a pedido)
+- Pastas novas `exercicios/` e `provas/` na matéria, escritas só pelo Claude; a resposta do Ivo continua em `pratica/treinos/` (regra de que `pratica/` é dele não muda).
+- Templates novos em `templates.md`: exercício/desafio (callouts `todo`, `check` e dicas `hint` dobradas, **sem a solução**) e relatório de prova (tabela por pergunta, montada só com o que o `quiz.py` devolveu).
+- Receita nova em `obsidian.md`; nomes canônicos e a tabela "quem mexe no quê" em `sessao.md` atualizados.
+- Testado numa cópia do cofre real com o plugin instalado no Windows 11 (Obsidian 1.14.4, Claudian 2.3.13): criar matéria sem nenhum pedido de permissão e `"exportar"` gerando a nota correta.
+
 ## 5.0.3 — 2026-10-06
 
 **Dois evals que oscilavam diagnosticados e corrigidos** (suíte: 8 de 8 casos que rodam aqui, 1,00 em todos; `quiz-com-ferramenta` não roda no Windows sem sandbox e foi testado direto no script)

@@ -119,6 +119,7 @@ Sem o Claudian, basta `cd` para a pasta do cofre e rodar `claude`.
 | Diagrama ou gráfico | bloco Mermaid na própria nota; SVG e PNG como arquivos em `anexos/` |
 | Colar um print | cole direto na nota no Obsidian (o Claude não vê a sua área de transferência) |
 | Abrir a nota no Obsidian | `"abrir"`: o Claude entrega o link `obsidian://open?…` para você clicar |
+| Exercícios, desafios e provas em nota | `"exportar"`: grava o exercício ou desafio atual (enunciado, critério de pronto e dicas dobradas, **sem a solução**) em `exercicios/`, ou o relatório da última prova em `provas/`. Sua resposta continua em `pratica/treinos/` |
 | Estudar a partir de um vídeo | `"transcreve"`: cole a legenda, indique um `.vtt`/`.srt` ou dê o link (com o `yt-dlp` instalado, baixa só a legenda). Grava em `fontes/` com aviso: **transcrição é pista, não fonte para ensinar** |
 | Ver todas as sessões numa tabela | cada matéria nasce com `_sessoes-[matéria].base` (Bases do Obsidian, recurso nativo) ligada ao painel |
 | Revisar no celular (opcional) | `"cartões"`: grava `cartoes.md` no formato do plugin **Spaced Repetition** (`pergunta::resposta`). A fila do `fila.py` continua sendo a única fonte da Revisão do dia |

@@ -88,6 +88,8 @@ estudos/                                ← raiz dos estudos no cofre Obsidian (
 │   ├── sessoes/                        ← 🤖 uma nota por sessão (o diário: o que entendi, onde travei)
 │   │   └── 2026-09-30-[tópico].md
 │   │
+│   ├── exercicios/                     ← 🤖 exercícios e desafios em nota (enunciado, critério de pronto, dicas dobráveis) — só quando eu peço
+│   ├── provas/                         ← 🤖 relatório de cada prova (pergunta a pergunta, com a correção) — só quando eu peço
 │   ├── anexos/                         ← 🤖 imagens e diagramas que entram nas notas (![[arquivo.svg]], ![[arquivo.png]])
 │   ├── fontes/                         ← 🤖 transcrições de aulas em vídeo (pista, não fonte para ensinar)
 │   ├── _sessoes-[matéria].base         ← 🤖 tabela das sessões (Base do Obsidian)
@@ -120,6 +122,8 @@ estudos/                                ← raiz dos estudos no cofre Obsidian (
 | Pasta | Conteúdo |
 |---|---|
 | `sessoes/` | uma nota por sessão: `AAAA-MM-DD-[tópico].md` (criada com a primeira nota) |
+| `exercicios/` | exercícios e desafios em nota: `AAAA-MM-DD-[tópico]-[parte]-[nome].md` (só o Claude grava, a meu pedido; criada com o primeiro) |
+| `provas/` | relatório de prova: `AAAA-MM-DD-[tópico]-[parte]-[nome da prova].md` (só o Claude grava, a meu pedido; criada com o primeiro) |
 | `anexos/` | imagens e diagramas: `AAAA-MM-DD-[nome].svg` ou `.png` (só o Claude grava; criada com o primeiro anexo) |
 | `fontes/` | transcrições de vídeo: `AAAA-MM-DD-[título].md` (só o Claude grava; criada com a primeira) |
 | `pratica/projeto/` | o projeto de prática (uma só pasta, cresce a trilha inteira) |
@@ -135,6 +139,7 @@ estudos/                                ← raiz dos estudos no cofre Obsidian (
 | `_painel-[matéria].md` · `_sessoes-[matéria].base` · `cartoes.md` (opcional) | raiz da pasta da matéria |
 | `trilha.md` · `progresso.md` · `conhecimento.md` · `conquistas.md` | `registros-da-skill/` |
 | `AAAA-MM-DD-[tópico].md` | `sessoes/` |
+| `AAAA-MM-DD-[tópico]-[parte]-[nome].md` | `exercicios/` e `provas/` |
 | `_leia-me.md` (o único arquivo que o Claude grava em `pratica/`, na criação da matéria) | `pratica/projeto/` e `pratica/treinos/` |
 | `README.md` · `CLAUDE.md` | raiz de `estudos/` (um por cofre — sem frontmatter) |
 
@@ -167,7 +172,8 @@ Em ambientes sem acesso ao meu disco (o chat do claude.ai, por exemplo) **não h
 | · `progresso.md` — posição e **próximo passo** (é aqui que olho quando não sei o que fazer) | |
 | · `conhecimento.md` — conceitos, glossário, fila de revisão | |
 | · `conquistas.md` — dashboard e changelog | |
-| `_painel-[matéria].md`, as notas de `sessoes/` e os arquivos de `anexos/` | |
+| `_painel-[matéria].md`, as notas de `sessoes/`, `exercicios/`, `provas/` e os arquivos de `anexos/` | |
+| (a **resposta** a um exercício de `exercicios/` é minha: vai em `pratica/treinos/t[N]-[parte]/`) | |
 
 ### Ordem do ciclo, do início ao fim
 
