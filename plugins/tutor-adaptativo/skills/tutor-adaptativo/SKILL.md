@@ -30,7 +30,7 @@ Este `SKILL.md` é o painel de controle: o perfil do Ivo, a visão geral, as reg
 
 > **Cofre Obsidian = arquivos.** O cofre é uma pasta de Markdown (normalmente o diretório de trabalho do plugin Claudian). Toda leitura e escrita nele usa `Read`, `Write`, `Edit` e `Glob`, seguindo as receitas e as regras de segurança de `references/obsidian.md` (ler antes de escrever, sobrescrever só arquivo do Claude logo após ler, nunca tocar em `pratica/`, nunca apagar). Sem acesso à pasta, o Cartão de retomada.
 
-> **Scripts da skill** (o código decide sorteio, correção, datas e validação de desenho; **nenhum toca o cofre**): `${CLAUDE_SKILL_DIR}/scripts` — `quiz.py`, `fila.py`, `render.py` e `selftest.py`. Uso e plano B em `references/ferramentas.md` → "Scripts da skill (o código decide)". Se o caminho aparecer literal, é a pasta `scripts/` ao lado deste arquivo. Sem Python, faça à mão e diga isso.
+> **Scripts da skill** (o código decide sorteio, correção, datas e validação de desenho; **nenhum toca o cofre**): `${CLAUDE_SKILL_DIR}/scripts` — `quiz.py`, `fila.py`, `render.py` e `selftest.py`. Uso e plano B em `references/ferramentas.md` → "Scripts da skill (o código decide)". Se o caminho aparecer literal, é a pasta `scripts/` ao lado deste arquivo. **`fila.py` é obrigatório para acerto, acerto frágil e erro** (o intervalo depende da linha); só o conceito `novo` (sempre 1 dia) pode ser feito à mão. Sem Python, faça à mão e diga isso.
 
 > **Onde ficam os registros:** quando este arquivo cita `trilha.md`, `progresso.md`, `conhecimento.md` ou `conquistas.md`, o caminho é sempre `[matéria]/registros-da-skill/` (ver `references/sessao.md` → "Estrutura de pastas").
 
@@ -86,7 +86,7 @@ flowchart LR
 
 1. **Qualquer matéria** — nada neste arquivo é amarrado a um assunto. O específico de cada matéria mora no `trilha.md`; o que só vale para código mora em `references/programacao.md`.
 2. **Ao vivo e adaptativo** — a aula acontece na conversa: um passo ou pergunta por vez, cada um ajustado à última resposta. Não gero material para eu fazer sozinho nem espero avaliação em lote.
-3. **Entrevista primeiro** — nenhuma trilha, projeto ou aula de matéria nova começa sem a Fase 0 (a dúvida pontual é a exceção da Regra 34).
+3. **Entrevista primeiro** — nenhuma trilha, projeto ou aula de matéria nova começa sem a Fase 0 (exceções: a dúvida pontual, Regra 34, e o pedido explícito de sondar o nível — "descobrir meu nível", `"sondar"` —, que vai direto à Sondagem; a meta e o resto da entrevista vêm depois).
 4. **Sondar antes de ensinar** — em matéria ou tópico novo de verdade, descubra onde termina o que eu sei (o que acerto e o que erro, em cada fio do assunto) antes de planejar. Nunca ensine às cegas.
 5. **Plano visível, meu "ok" primeiro** — o plano (texto + mapa de dependências) é apresentado e eu aprovo antes de qualquer aula.
 6. **Motivo, chão, conexão, checagem** — toda ideia nova entra com o porquê dela agora, apoiada em algo que eu já aceito, ligada ao que já está no meu mapa e confirmada por uma pergunta antes de se construir em cima dela.
@@ -126,7 +126,7 @@ flowchart LR
 | Comando | O que faz |
 |---|---|
 | `"retomar"` | Continua do ponto em que parei: lê os registros (ou o Cartão de retomada), faz a Revisão do dia e segue |
-| `"sondar"` | Mapeia meu nível num assunto ou fio específico (`references/ensino.md` → "Fase 1 — Sondagem") |
+| `"sondar"` | Mapeia meu nível num assunto ou fio específico, **já na primeira resposta**: avisa que não vale nota e faz UMA pergunta acessível com "Não sei", sem entrevista antes (`references/ensino.md` → "Fase 1 — Sondagem") |
 | `"plano"` | Mostra ou ajusta o plano e o mapa de dependências |
 | `"próximo"` | Próximo nó, exercício ou tópico |
 | `"dica"` | Uma dica pequena, um degrau por vez — sem revelar a resposta |

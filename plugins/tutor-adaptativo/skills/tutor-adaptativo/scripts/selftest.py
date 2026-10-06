@@ -95,6 +95,7 @@ def testa_quiz():
     d = quiz.parse(pipe)
     ok(d["opcoes"][0]["texto"] == "ls | grep erro" and d["opcoes"][1]["equivoco"].startswith("confunde pipe"), "pipe no texto é preservado e ~ liga o equívoco à errada")
     ok(quiz.lint(quiz.parse("P: x\n~ solto\n+ a\n- b\nE: e\n"), 3)[1], "~ sem errada antes gera aviso")
+    ok(not quiz.lint(quiz.parse("P: x\n+ 5\n- 23\n- erro\nE: e\n"), 3)[1], "alternativas curtas (5 x 23) não geram aviso de tamanho")
     # a prova não acumula entre tentativas separadas por mais de 12 horas
     quiz._salvar("prova-z", {"itens": [{"conceito": "velho", "resultado": "erro", "classe": ""}], "ultima": 0})
     antigo = pathlib.Path(os.environ["TUTOR_STATE"]) / "prova-z.json"

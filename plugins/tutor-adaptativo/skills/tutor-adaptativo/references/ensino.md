@@ -95,6 +95,8 @@ Os dois princípios dizem **como** ensinar; o processo diz **quando**. Em matér
 
 Sem saber onde termina o que eu sei, não dá para ensinar dentro da minha zona de aprendizado; e sem saber o que eu quero de fato, não dá para mirar. Duas incógnitas, duas ferramentas.
 
+**Pedido explícito de sondar** ("quero descobrir meu nível de X", `"sondar"`): não abra com entrevista. Na **primeira resposta**, avise como funciona (abaixo) e faça **uma** primeira pergunta acessível, com a opção "Não sei" (pergunta com opções, `references/ferramentas.md`). A meta (1b) e o resto da Fase 0 vêm depois da sondagem, e a trilha só é montada depois deles.
+
 **Antes de começar, avise como funciona:** *"Vou fazer perguntas de dificuldade crescente até achar onde o conhecimento acaba. Errar aqui é ótimo: é o que me deixa ensinar no lugar certo. Não vale nota."* A sondagem **nunca** conta como prova e **nunca** entra no percentual de `references/avaliacao.md`.
 
 **1a. Meu nível — use quiz. É mapeamento, não conferência.**
@@ -173,6 +175,7 @@ Ao fechar cada nó, marque-o como firme no mapa do `_painel-[assunto].md` (quand
 ## Tamanho do ritual
 
 - **Pedido pequeno** ("o que é X?", "por que isso funciona?", uma dúvida pontual): versão mínima — verifique o que não tiver certeza, dê o motivo, apoie no chão, conecte ao que eu já sei e ofereça uma checagem de uma pergunta. Sem entrevista, sem sondagem completa, sem plano.
+- **Pedido explícito de sondar o nível** de uma matéria nova: comece direto pela Sondagem (Fase 1); a entrevista (Fase 0) completa o que faltar depois.
 - **Matéria ou tópico novo de verdade:** as três fases completas.
 - **Sessão seguinte de uma matéria em andamento:** retome (Revisão do dia + ponto de parada) e siga no ciclo de ensino; nova sondagem só para fio novo.
 - Em todos os casos, o que muda é o **tamanho**, não o **formato**: nada de pular "motivar" nem "conectar".

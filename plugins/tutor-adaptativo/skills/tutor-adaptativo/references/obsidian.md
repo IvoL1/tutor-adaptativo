@@ -82,7 +82,7 @@ Daqui em diante, `{RAIZ}/{matéria}/...` quer dizer o caminho completo a partir 
 
 ### Retomar (ler a posição e a Revisão do dia)
 
-1. `Glob` em `{RAIZ}/*/registros-da-skill/progresso.md` para ver as matérias. Mais de uma: siga `references/sessao.md` → "Se há mais de uma matéria ativa".
+1. **Uma rodada só de busca:** `Glob` em paralelo de `{RAIZ}/*/registros-da-skill/progresso.md` e `**/registros-da-skill/progresso.md`. Vieram vazios: **pare e responda** (não vasculhe outras pastas): diga que não achou registros e pergunte pelo Cartão de retomada ou ofereça começar com a entrevista. Mais de uma matéria: siga `references/sessao.md` → "Se há mais de uma matéria ativa".
 2. **Numa resposta só**, faça três `Read` em paralelo: `{RAIZ}/{sg}/registros-da-skill/progresso.md`, `…/conquistas.md` e `…/conhecimento.md`. Use "Posição atual" e "Pendências abertas" do progresso, a linha `- **Última sessão:** AAAA-MM-DD` do conquistas (decide a Reentrada) e a fila do conhecimento. Leia o `trilha.md` só se precisar do contexto (orçamento de tempo, fonte e versão congelada).
 3. **Revisão do dia:** com Python (`py` no Windows, `python3` nos outros; veja `references/ferramentas.md` → "Scripts da skill"), `python "<pasta>/fila.py" vencidos "{RAIZ}/{sg}/registros-da-skill/conhecimento.md" --max 3` (lê o arquivo; datas por código). Sem Python, aplique a tabela de `references/pedagogia.md` → "Fila de revisão espaçada".
 4. Siga `references/sessao.md` → "Retomar e continuar".

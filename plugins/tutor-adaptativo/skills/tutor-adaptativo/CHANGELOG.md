@@ -3,6 +3,16 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 5.0.3 — 2026-10-06
+
+**Dois evals que oscilavam diagnosticados e corrigidos** (suíte: 8 de 8 casos que rodam aqui, 1,00 em todos; `quiz-com-ferramenta` não roda no Windows sem sandbox e foi testado direto no script)
+- `sondagem-nao-vale-nota`: a skill abria com entrevista de duas perguntas (Regra 3) mesmo quando o pedido era explicitamente "descobrir meu nível", e às vezes esquecia de avisar que não vale nota. Agora o pedido explícito de sondar (`"sondar"`) vai direto à Sondagem: aviso de "não vale nota" + uma pergunta acessível com "Não sei"; a meta e o resto da entrevista vêm depois. Ajustes na Regra 3, no comando `"sondar"` e em `ensino.md` (Fase 1 e "Tamanho do ritual"). 1/3 → 3/3.
+- `retomar-sem-registros`: a busca do cofre podia estourar o limite de turnos e terminar sem resposta. A receita "Retomar" agora faz uma rodada só de `Glob` em paralelo e, se vier vazio, para e pergunta pelo Cartão de retomada. 1/2 → 4/4.
+- `ritual-curto-variavel`: 3/3 sem mudança (era variância).
+- `quiz.py`: o aviso de tamanho ("a certa é bem mais curta/longa", "tamanhos desiguais") disparava em respostas curtíssimas (`5` contra `23`) e obrigava a refazer perguntas boas. Agora só vale quando a maior alternativa passa de 15 caracteres. `selftest.py`: 70 verificações.
+- Auditoria final da 5.0.3 (sem mudança de código): manifestos válidos, `selftest.py` 70/70, referências cruzadas e seções citadas conferidas, sem resto do `mcp-obsidian`. `fila.py` (`acerto` 3d→7d, `acerto-fragil` repete, `erro` e `erro-confiante` voltam a 1d, `novo` 1d, conceito inexistente com erro e arquivo intacto), `quiz.py` (montar, corrigir com erro confiante e lacuna, placar com `--fechar`, ID inválido) e `render.py` (Mermaid válido, erro de sintaxe com linha, SVG simples) rodados à mão; evals: 8 de 8 casos que rodam aqui com 1,00. Com `TUTOR_STATE` definido, o `quiz.py` ainda consulta a pasta temporária do sistema de propósito (o quiz não se perde se o estado mudar no meio); em teste manual, use um `--prova` com nome novo.
+- `fila.py`: testado em `acerto`, `acerto-fragil`, `erro`, `erro-confiante`, encadeado (1d→3d→7d→16d) e conceito inexistente; `--sem-gravar` não altera o arquivo. `quiz.py` testado de ponta a ponta (montar, corrigir com erro confiante, placar). `SKILL.md` deixa explícito que `fila.py` é obrigatório fora do `novo`.
+
 ## 5.0.2 — 2026-10-06
 
 **Testado de verdade com o Claudian 2.3.13** (Claude Code com o cofre como diretório de trabalho; criar matéria, `"retomar"` e `"salva"` num cofre de teste): estrutura, frontmatter, `.base` e edições saíram corretos. Ajustes que o teste pediu:

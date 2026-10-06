@@ -98,12 +98,13 @@ def lint(d, maximo):
     te = [tam(o) for o in erradas]
     media = sum(te) / len(te)
     todas = [tam(o) for o in ops]
-    if tc > 1.3 * media or (tc == max(todas) and tc > 1.15 * max(te)):
-        avisos.append(f"a certa é bem mais longa ({tc:.0f} caracteres contra média {media:.0f}): dá para acertar só pela forma")
-    if tc < 0.6 * media:
-        avisos.append(f"a certa é bem mais curta ({tc:.0f} contra média {media:.0f}): dá para acertar só pela forma")
-    if max(todas) > 2 * min(todas):
-        avisos.append("tamanhos muito desiguais entre as alternativas")
+    if max(todas) > 15:  # respostas curtas (números, termos, "5" x "23") não se entregam pelo tamanho
+        if tc > 1.3 * media or (tc == max(todas) and tc > 1.15 * max(te)):
+            avisos.append(f"a certa é bem mais longa ({tc:.0f} caracteres contra média {media:.0f}): dá para acertar só pela forma")
+        if tc < 0.6 * media:
+            avisos.append(f"a certa é bem mais curta ({tc:.0f} contra média {media:.0f}): dá para acertar só pela forma")
+        if max(todas) > 2 * min(todas):
+            avisos.append("tamanhos muito desiguais entre as alternativas")
     com_justif = [i + 1 for i, o in enumerate(ops) if JUSTIF.search(o["texto"])]
     if com_justif:
         avisos.append(f"justificativa dentro da alternativa {com_justif} (porque/pois/já que): tire; a explicação vai em E:")
