@@ -3,6 +3,13 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 5.0.1 — 2026-10-06
+
+**Correção em `render.py` (sem mudança de comportamento da aula)**
+- `_png_ok` rejeitava qualquer PNG com menos de 1 KB, então um SVG simples (reta numérica, figura chapada) renderizava certo mas voltava `"ok": false`, sem dizer o motivo. Agora confere a assinatura e o IHDR do PNG, e a falha do `svg` passa a trazer o campo `erro`.
+- `selftest.py`: 68 verificações (2 novas para `_png_ok`).
+- Auditoria geral: manifestos válidos (`claude plugin validate`), referências cruzadas e seções citadas conferidas, 17 modelos de `visuais-modelos.md` renderizam, evals rodados (6 de 9; `quiz-com-ferramenta` exige Bash e não roda no Windows sem sandbox; `sondagem-nao-vale-nota` e `ritual-curto-variavel` oscilam, ver 4.1).
+
 ## 5.0 — 2026-10-06
 
 **Cofre por arquivos, sem MCP** (pensado para o plugin Claudian, que roda o Claude Code com o cofre como diretório de trabalho)

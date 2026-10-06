@@ -114,7 +114,13 @@ def _sessao(nav, url, extra, espera=None, timeout=45):
 
 
 def _png_ok(p):
-    return pathlib.Path(p).is_file() and pathlib.Path(p).stat().st_size > 1000
+    """PNG de verdade: assinatura e IHDR no começo (um desenho simples pode ter bem menos de 1 KB)."""
+    try:
+        with open(p, "rb") as f:
+            cab = f.read(24)
+    except OSError:
+        return False
+    return len(cab) == 24 and cab[:8] == b"\x89PNG\r\n\x1a\n" and cab[12:16] == b"IHDR"
 
 
 def _servidor(pagina, js_bytes=None):
@@ -314,7 +320,9 @@ def svg(entrada, saida):
                 pass
         if _png_ok(saida) and (dx or dy):
             w, h = _recortar_png(saida, w, h) or (w, h)
-        return {"ok": _png_ok(saida), "png": str(destino), "largura": w, "altura": h, "renderizador": pathlib.Path(nav).name}
+        ok = _png_ok(saida)
+        return {"ok": ok, "png": str(destino), "largura": w, "altura": h, "renderizador": pathlib.Path(nav).name,
+                **({} if ok else {"erro": "o navegador não gerou o PNG"})}
     for exe, cmd in (("rsvg-convert", ["rsvg-convert", "-o", str(saida), str(entrada)]), ("magick", ["magick", str(entrada), str(saida)])):
         if shutil.which(exe):
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)

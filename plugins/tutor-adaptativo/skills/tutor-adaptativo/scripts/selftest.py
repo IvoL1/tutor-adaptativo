@@ -181,6 +181,12 @@ def testa_png():
         esperado = b"".join(b"\x00" + bytes((x * 7 + y * 13) % 256 for x in range(12 * bpp)) for y in range(18))
         ok(bruto == esperado, f"recorte: os pixels que ficam são os do canto superior esquerdo (cor {cor})")
     ok(render._recortar_png(TMP / "nao-existe.png", 5, 5) is None, "recorte: arquivo inexistente não quebra")
+    pequeno = TMP / "pequeno.png"
+    pequeno.write_bytes(png(4, 4, 2))
+    ok(pequeno.stat().st_size < 1000 and render._png_ok(pequeno), "_png_ok: PNG válido menor que 1 KB é aceito")
+    falso = TMP / "falso.png"
+    falso.write_bytes(b"x" * 5000)
+    ok(not render._png_ok(falso) and not render._png_ok(TMP / "nao-existe.png"), "_png_ok: lixo e arquivo ausente são recusados")
 
 
 def testa_entrada():
