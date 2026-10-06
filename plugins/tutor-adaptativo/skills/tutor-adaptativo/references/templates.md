@@ -189,6 +189,100 @@ views:
 
 > Exemplo: com a raiz de estudos em `estudos/` e a matéria `ingles`, fica `file.inFolder("estudos/ingles/sessoes")`. Com a raiz de estudos sendo o próprio cofre, `file.inFolder("ingles/sessoes")`.
 
+### Templates: `_provas-[matéria].base`, `_exercicios-[matéria].base` e `_boletim-[matéria].md` (o boletim)
+
+> O boletim é uma nota que **mostra** as tabelas das provas, dos exercícios e das sessões (Bases do Obsidian, plugin do núcleo). Nada é calculado à mão: a média das provas é um resumo da própria tabela. Mesma troca de `[caminho da matéria]` do template das sessões. Se a ferramenta recusar a extensão `.base`, a matéria funciona sem elas.
+
+`_provas-[matéria].base`:
+
+```yaml
+filters:
+  and:
+    - file.inFolder("[caminho da matéria]/provas")
+
+properties:
+  file.name:
+    displayName: "Prova"
+  note.data:
+    displayName: "Data"
+  note.topico:
+    displayName: "Tópico"
+  note.parte:
+    displayName: "Parte"
+  note.resultado:
+    displayName: "Resultado (%)"
+
+views:
+  - type: table
+    name: "Provas"
+    order:
+      - file.name
+      - note.data
+      - note.topico
+      - note.parte
+      - note.resultado
+    summaries:
+      note.resultado: Average
+```
+
+`_exercicios-[matéria].base` (mesma estrutura; muda a pasta e as colunas):
+
+```yaml
+filters:
+  and:
+    - file.inFolder("[caminho da matéria]/exercicios")
+
+properties:
+  file.name:
+    displayName: "Exercício"
+  note.tipo:
+    displayName: "Tipo"
+  note.topico:
+    displayName: "Tópico"
+  note.parte:
+    displayName: "Parte"
+  note.status:
+    displayName: "Status"
+
+views:
+  - type: table
+    name: "Exercícios e desafios"
+    order:
+      - file.name
+      - note.tipo
+      - note.topico
+      - note.parte
+      - note.status
+    summaries: {}
+```
+
+`_boletim-[matéria].md`:
+
+```markdown
+---
+tipo: boletim
+materia: [matéria]
+tags: [boletim]
+---
+# 🎓 Boletim — [Matéria]
+
+> [!info] Situação
+> Atualizado em AAAA-MM-DD · Posição: [tópico / parte] · Pendências abertas: [quantas, ou "nenhuma"] · Média das provas: na tabela abaixo
+
+## Provas
+![[_provas-[matéria].base]]
+
+## Exercícios e desafios
+![[_exercicios-[matéria].base]]
+
+## Sessões
+![[_sessoes-[matéria].base]]
+
+## Onde reforçar
+- [[[caminho da matéria]/registros-da-skill/progresso|Pendências abertas e histórico de provas]]
+- [[[caminho da matéria]/registros-da-skill/conhecimento|Fila de revisão e erros comuns]]
+```
+
 ### Template: `_leia-me.md` de `pratica/`
 
 > Um para `pratica/projeto/` e outro para `pratica/treinos/`. Já diz de quem a pasta é e a deixa visível no Obsidian.
@@ -389,7 +483,9 @@ tipo: exercicio
 materia: [matéria]
 topico: T[N]
 parte: [Na]
+data: AAAA-MM-DD
 nivel: reproducao | modificacao | extensao | criacao
+status: pendente
 tags: [exercicio]
 ---
 # [Título curto do exercício]
@@ -412,6 +508,16 @@ Minha resposta vai em `pratica/treinos/t[N]-[parte]/` (`[[_painel-[matéria]|pai
 
 Desafio é o mesmo template com `tipo: desafio`, `tags: [desafio]` e o título começando por "Desafio:".
 
+**Correção (acrescentada depois, quando eu fiz o exercício):** o Claude troca `status: pendente` por `status: feito` e acrescenta ao fim da nota, com `Edit`:
+
+```markdown
+## Correção — AAAA-MM-DD
+> [!success] [O que acertei, em uma frase — celebrar antes de corrigir (Regra 11)]
+
+- **Uma melhoria:** [uma só (Regra 29)]
+- **Minha resposta:** [[caminho do meu arquivo em pratica/treinos/…]]
+```
+
 ### Template: relatório de prova (`provas/AAAA-MM-DD-[tópico]-[parte]-[nome].md`)
 
 > Só a pedido. É o **registro** de uma prova que já foi feita e corrigida ao vivo na conversa (a prova nunca é entregue em lote). Montado só com o que o `quiz.py` devolveu (`RESULTADO`, `CERTA`, `EQUIVOCO_REVELADO`, `EXPLICACAO`) e o bloco do `placar`; nada corrigido de cabeça.
@@ -423,7 +529,7 @@ materia: [matéria]
 topico: T[N]
 parte: [Na]
 data: AAAA-MM-DD
-resultado: [percentual]
+resultado: [percentual, só o número: 80, não 80%]
 tags: [prova]
 ---
 # Prova — Tópico [N], Parte [Na] — AAAA-MM-DD

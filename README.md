@@ -92,7 +92,7 @@ Sorteio, verificação, contas, datas e renderização ficam em scripts Python (
 
 ## Obsidian (o cofre é lido e escrito por arquivos)
 
-O cofre do Obsidian é uma **pasta de arquivos Markdown**. A skill lê e grava nele com as ferramentas de arquivo do Claude (`Read`, `Write`, `Edit`, `Glob`, `Grep`), sem servidor MCP. O jeito mais cômodo de usar é o plugin da comunidade **[Claudian](https://github.com/YishenTu/claudian)**, que roda o Claude Code dentro do Obsidian com o cofre como diretório de trabalho. Também funciona abrindo o Claude Code no terminal, dentro da pasta do cofre. As receitas e as regras de segurança estão em [`references/obsidian.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/obsidian.md).
+O cofre do Obsidian é uma **pasta de arquivos Markdown**. A skill lê e grava nele com as ferramentas de arquivo do Claude (`Read`, `Write`, `Edit`, `Glob`, `Grep`), sem servidor MCP. **O jeito recomendado:** o Claude Code no terminal é o professor e o Obsidian é o caderno (enunciados, provas, correções, boletim, histórico), aberto ao lado. No Windows, o atalho `estudar` (um `estudar.cmd` numa pasta do PATH que faz `cd` para o cofre e roda `claude`) deixa isso em um comando. O plugin da comunidade **[Claudian](https://github.com/YishenTu/claudian)**, que roda o Claude Code dentro do Obsidian, é **opcional**: a skill não depende dele. As receitas e as regras de segurança estão em [`references/obsidian.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/obsidian.md).
 
 As edições usam `Edit` (troca de trecho exato) e, só em arquivo do Claude, ler e regravar com `Write`, com uma conferência ao fim (e releitura depois de qualquer `Write` sobre arquivo existente).
 

@@ -17,7 +17,7 @@
 >     · Visuais e imagens (`"anexa"`)
 >     · Transcrever um vídeo (`"transcreve"`)
 >     · Terminal + Obsidian (modo cofre)
->     · Exercícios, desafios e provas como nota (`"exportar"`)
+>     · Exercícios, desafios e provas como nota (`"exportar"`), corrigir um exercício e boletim (`"boletim"`)
 >     · Cartões (`"cartões"`)
 >     · Abrir no Obsidian (`"abrir"`)
 >     · Buscar no cofre
@@ -108,6 +108,7 @@ Roda **uma vez**, depois do meu "ok" no plano. Repetir não altera nada, porque 
 | 5 | `…/registros-da-skill/conquistas.md` | template de `references/projetos.md` → "Changelog de conquistas", com a data de hoje em "Última sessão" |
 | 6 | `{RAIZ}/{sg}/_painel-{sg}.md` | template "Painel inicial" de `references/templates.md` |
 | 7 | `{RAIZ}/{sg}/_sessoes-{sg}.base` | template "`_sessoes-[matéria].base`" (tabela nativa de sessões; se a gravação falhar, pule este e o link no painel, sem drama) |
+| 7b | `{RAIZ}/{sg}/_provas-{sg}.base`, `{RAIZ}/{sg}/_exercicios-{sg}.base` e `{RAIZ}/{sg}/_boletim-{sg}.md` | templates do boletim em `references/templates.md` (as tabelas ficam vazias até a primeira prova ou exercício; mesma regra do item 7 se a gravação do `.base` falhar: pule as bases e as seções do boletim que as mostram) |
 | 8 | `{RAIZ}/{sg}/pratica/projeto/_leia-me.md` e `{RAIZ}/{sg}/pratica/treinos/_leia-me.md` | template "`_leia-me.md` de `pratica/`" (já diz de quem é a pasta; o `Write` cria as pastas) |
 | 9 | `{RAIZ}/README.md` | se não existir, o template "`README.md`" sem a linha-modelo. Se existir, leia e **acrescente** a linha `- [[_painel-{sg}\|Nome]] — ▶ fazer a entrevista` ao fim da seção `Matérias ativas` (`Edit` ancorado na última linha da seção); se a seção tiver a linha-modelo `- (nenhuma ainda…)`, troque essa linha pela nova. Nunca duplique: procure `_painel-{sg}` antes (`Grep`) |
 
@@ -136,7 +137,7 @@ Caminho: `{RAIZ}/{sg}/sessoes/AAAA-MM-DD-{título-em-slug}.md` (título sem acen
    - **Sim:** `Read` e `Edit` ancorado na última linha, acrescentando `---`, `## Acrescentado às HH:MM` e o novo trecho. Nunca sobrescreva.
 2. **Liste a nota no painel**, em `## Sessões recentes` do `_painel-{sg}.md`: leia o painel e troque com `Edit` o corpo da seção: a linha `> Tabela com todas…` primeiro, depois `- [[AAAA-MM-DD-título]] — a ideia que encaixou` e as demais; sem a linha `- (nenhuma sessão ainda)`. **Só as 8 notas mais recentes ficam listadas** (linhas no formato `- [[AAAA-MM-DD-…]]`); **linhas que eu escrevi à mão na seção nunca saem.**
 3. Se a nota tem visual (próxima receita), ele já entra no corpo antes de gravar.
-4. Atualize o `▶ próximo passo` (bloco `> [!info]` no topo) e o mapa do painel com `Edit` nos trechos que mudaram.
+4. Atualize o `▶ próximo passo` (bloco `> [!info]` no topo) e o mapa do painel com `Edit` nos trechos que mudaram. Se existe o `_boletim-{sg}.md`, atualize só a linha do bloco `> [!info] Situação` (data, posição, quantas pendências abertas), lendo os números do `progresso.md`.
 5. Confira uma vez ao fim (releia o painel e a nota).
 
 ### Visuais e imagens (`"anexa"`)
@@ -185,6 +186,12 @@ No modo cofre isto já acontece sozinho para o exercício e o desafio. `"exporta
 2. **Última prova fechada:** caminho `{RAIZ}/{sg}/provas/AAAA-MM-DD-{tópico}-{parte}-{nome-da-prova}.md`, template "relatório de prova". Preencha **só** com os resultados que o `quiz.py` devolveu nesta conversa e com o bloco do `placar`. Se faltar algum (a conversa foi cortada), deixe a linha de fora e diga qual faltou; nunca reconstrua de memória. A pasta `provas/` e o `progresso.md` não se substituem: o resultado oficial continua no `progresso.md`.
 3. Sem Python não há `placar`: use os números que você corrigiu à mão e diga que foi à mão.
 4. Confira uma vez (`Glob` e `Read` da nota) e liste a nota no `_painel-{sg}.md`, na seção `## Sessões recentes`, só se ela fizer parte da sessão do dia (a nota da sessão pode apenas linkar o exercício).
+
+**Corrigir um exercício (quando eu digo que fiz):** leia a minha resposta em `pratica/treinos/t{N}-{parte}/` (código, texto ou imagem exportada do Excalidraw, com `Read`), corrija ao vivo na conversa (celebrar, uma melhoria) e então, com `Edit` na nota de `exercicios/`: troque `status: pendente` por `status: feito` e acrescente a seção "Correção" do template. Não mexa em nada de `pratica/`.
+
+### Boletim (`"boletim"`)
+
+O boletim é a nota `_boletim-{sg}.md`, que mostra em tabelas as provas (com a média), os exercícios e as sessões, todas lidas do frontmatter das notas. `"boletim"`: se a nota não existe (matéria criada antes da 5.1), crie-a e as duas bases com os templates; atualize a linha "Situação" como na nota da sessão; abra no Obsidian; e diga em duas linhas o que a tabela mostra. A média das provas é o resumo da tabela do Obsidian: **não calcule nem escreva de cabeça**. Para o resultado oficial de cada prova, vale o `progresso.md`.
 
 ### Abrir no Obsidian (`"abrir"`)
 

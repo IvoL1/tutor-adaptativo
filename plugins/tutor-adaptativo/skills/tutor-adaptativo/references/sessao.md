@@ -92,7 +92,10 @@ estudos/                                ← raiz dos estudos no cofre Obsidian (
 │   ├── provas/                         ← 🤖 relatório de cada prova (pergunta a pergunta, com a correção) — só quando eu peço
 │   ├── anexos/                         ← 🤖 imagens e diagramas que entram nas notas (![[arquivo.svg]], ![[arquivo.png]])
 │   ├── fontes/                         ← 🤖 transcrições de aulas em vídeo (pista, não fonte para ensinar)
+│   ├── _boletim-[matéria].md           ← 🤖 boletim: provas (com a média), exercícios e sessões em tabelas
 │   ├── _sessoes-[matéria].base         ← 🤖 tabela das sessões (Base do Obsidian)
+│   ├── _provas-[matéria].base          ← 🤖 tabela das provas (Base)
+│   ├── _exercicios-[matéria].base      ← 🤖 tabela dos exercícios e desafios (Base)
 │   ├── cartoes.md                      ← 🤖 opcional: cartões do plugin Spaced Repetition
 │   │
 │   ├── pratica/                        ← ✍️ 100% MEU
@@ -136,7 +139,7 @@ estudos/                                ← raiz dos estudos no cofre Obsidian (
 
 | Arquivo | Onde |
 |---|---|
-| `_painel-[matéria].md` · `_sessoes-[matéria].base` · `cartoes.md` (opcional) | raiz da pasta da matéria |
+| `_painel-[matéria].md` · `_boletim-[matéria].md` · `_sessoes-[matéria].base` · `_provas-[matéria].base` · `_exercicios-[matéria].base` · `cartoes.md` (opcional) | raiz da pasta da matéria |
 | `trilha.md` · `progresso.md` · `conhecimento.md` · `conquistas.md` | `registros-da-skill/` |
 | `AAAA-MM-DD-[tópico].md` | `sessoes/` |
 | `AAAA-MM-DD-[tópico]-[parte]-[nome].md` | `exercicios/` e `provas/` |
@@ -172,7 +175,7 @@ Em ambientes sem acesso ao meu disco (o chat do claude.ai, por exemplo) **não h
 | · `progresso.md` — posição e **próximo passo** (é aqui que olho quando não sei o que fazer) | |
 | · `conhecimento.md` — conceitos, glossário, fila de revisão | |
 | · `conquistas.md` — dashboard e changelog | |
-| `_painel-[matéria].md`, as notas de `sessoes/`, `exercicios/`, `provas/` e os arquivos de `anexos/` | |
+| `_painel-[matéria].md`, `_boletim-[matéria].md`, as notas de `sessoes/`, `exercicios/`, `provas/` e os arquivos de `anexos/` | |
 | (a **resposta** a um exercício de `exercicios/` é minha: vai em `pratica/treinos/t[N]-[parte]/`) | |
 
 ### Ordem do ciclo, do início ao fim
