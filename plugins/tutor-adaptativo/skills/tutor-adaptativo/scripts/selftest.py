@@ -157,6 +157,12 @@ def testa_fila_stdin():
     ok(cod == 0 and "VENCIDOS: 1" in saida and "git commit" in saida, "stdin: vencidos lê o texto colado")
     ok(rodar(fila.main, ["registrar", "-", "--conceito", "x", "--resultado", "acerto", "--hoje", "2026-10-02"], com_linha)[0] == 2, "stdin: acerto em conceito desconhecido é erro")
     ok(rodar(fila.main, ["vencidos", "-"], "sem tabela nenhuma\n")[0] == 2, "stdin: texto sem a seção da fila dá erro limpo")
+    # --sem-gravar com caminho de arquivo: lê, imprime a seção atualizada e NÃO grava
+    g = TMP / "so-leitura.md"
+    g.write_text(com_linha, encoding="utf-8")
+    antes = g.read_bytes()
+    cod, saida = rodar(fila.main, ["registrar", str(g), "--conceito", "git commit", "--resultado", "acerto", "--hoje", "2026-10-02", "--sem-gravar"])
+    ok(cod == 0 and saida.startswith("SECAO: Fila de revisão espaçada\nCONTEUDO:\n") and "| 3d" in saida and g.read_bytes() == antes, "--sem-gravar: imprime a seção e não toca o arquivo")
     ult = rodar(fila.main, ["registrar", "-", "--conceito", "z", "--resultado", "novo", "--hoje", "2026-10-01"], "## Fila de revisão espaçada\n" + TABELA.split("\n", 1)[1])
     ok(ult[0] == 0 and "| z " in ult[1], "stdin: seção que é o fim do arquivo (sem '## ' depois) também funciona")
 

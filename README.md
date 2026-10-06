@@ -83,18 +83,18 @@ Sorteio, verificação, contas, datas e renderização ficam em scripts Python (
 | Script | O que faz por código |
 |---|---|
 | `quiz.py` | sorteia a posição da certa (nunca a mesma duas vezes seguidas), **acusa alternativa que se entrega pela forma** (tamanho, "porque", negrito assimétrico, "todas as anteriores"), corrige, revela o equívoco da errada escolhida e calcula o percentual e a decisão da prova (80% e 50%), avisa quando a amostra é pequena |
-| `fila.py` | repetição espaçada: intervalos 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado, e as datas; acerto frágil não avança. Lê o texto da nota pelo stdin e devolve a seção da fila já atualizada (`SECAO`/`CONTEUDO`), sem gravar |
+| `fila.py` | repetição espaçada: intervalos 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado, e as datas; acerto frágil não avança. Lê o `conhecimento.md` (com `--sem-gravar`) ou o texto pelo stdin e devolve a seção da fila já atualizada (`SECAO`/`CONTEUDO`), sem gravar |
 | `render.py` | valida Mermaid/SVG e gera PNG com o Chrome ou o Edge já instalados, **devolvendo a mensagem exata de erro de sintaxe**; aceita `--mermaid-js` com a versão do Obsidian (11.4.1) e entrega a imagem no tamanho exato |
 
 `python plugins/tutor-adaptativo/skills/tutor-adaptativo/scripts/selftest.py` roda as verificações (sem rede e sem tocar nos seus arquivos). Sem Python, a skill funciona igual: cada seção de `references/ferramentas.md` tem um plano B à mão.
 
-**Permissões:** na primeira vez, o Claude Code pede permissão para rodar `python`. Para não ser perguntado a cada quiz, depois de ler o código (está todo neste repositório) você pode liberar só estes scripts nas suas permissões (`settings.json`): `"Bash(python *tutor-adaptativo/scripts/*)"` e `"Bash(python3 *tutor-adaptativo/scripts/*)"`. O campo `allowed-tools` da skill só vale no turno em que ela é chamada, por isso não o usei.
+**Permissões:** na primeira vez, o Claude Code pede permissão para rodar `python`. Para não ser perguntado a cada quiz, depois de ler o código (está todo neste repositório) você pode liberar só estes scripts nas suas permissões (`settings.json`): `"Bash(python *tutor-adaptativo/scripts/*)"` e `"Bash(python3 *tutor-adaptativo/scripts/*)"` (no Windows, o comando que costuma funcionar é `py`: acrescente `"Bash(py *tutor-adaptativo/scripts/*)"`). O campo `allowed-tools` da skill só vale no turno em que ela é chamada, por isso não o usei.
 
 ## Obsidian (o cofre é lido e escrito por arquivos)
 
 O cofre do Obsidian é uma **pasta de arquivos Markdown**. A skill lê e grava nele com as ferramentas de arquivo do Claude (`Read`, `Write`, `Edit`, `Glob`, `Grep`), sem servidor MCP. O jeito mais cômodo de usar é o plugin da comunidade **[Claudian](https://github.com/YishenTu/claudian)**, que roda o Claude Code dentro do Obsidian com o cofre como diretório de trabalho. Também funciona abrindo o Claude Code no terminal, dentro da pasta do cofre. As receitas e as regras de segurança estão em [`references/obsidian.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/obsidian.md).
 
-As edições usam `Edit` (troca de trecho exato) e, só em arquivo do Claude, ler e regravar com `Write`, sempre conferindo a releitura.
+As edições usam `Edit` (troca de trecho exato) e, só em arquivo do Claude, ler e regravar com `Write`, com uma conferência ao fim (e releitura depois de qualquer `Write` sobre arquivo existente).
 
 ### Configurar (uma vez, por você)
 
@@ -103,6 +103,11 @@ As edições usam `Edit` (troca de trecho exato) e, só em arquivo do Claude, le
 3. Abra o painel do Claudian e diga "quero estudar X". Se a skill não for reconhecida lá, use o Claude Code no terminal, dentro da pasta do cofre.
 
 Sem o Claudian, basta `cd` para a pasta do cofre e rodar `claude`.
+
+**Testado com o Claudian 2.3.13** (Claude Code rodando com o cofre como diretório de trabalho): a skill e o estilo `tutor-adaptativo:Tutor` aparecem lá porque o Claudian carrega as configurações de usuário do Claude Code (`loadUserSettings`), onde o plugin está habilitado. Criar a matéria, `"retomar"` e `"salva"` gravaram corretamente os arquivos, e a pergunta com opções (`AskUserQuestion`) é suportada. Dicas:
+- **Modelo:** o Claudian vem com `haiku` como padrão. Para aula, dicas e quizzes bem escritos, escolha um modelo maior no seletor do painel.
+- **Python no Windows:** se `python` abrir a Microsoft Store, use o `py` (a skill usa `py` no Windows e só calcula a fila à mão se o script não rodar).
+- **O cofre é a raiz:** num cofre só de estudos, as matérias nascem direto na raiz (`ingles-basico/…`, `CLAUDE.md`, `README.md`).
 
 ### O que o Claude faz por você
 
@@ -118,7 +123,7 @@ Sem o Claudian, basta `cd` para a pasta do cofre e rodar `claude`.
 | Ver todas as sessões numa tabela | cada matéria nasce com `_sessoes-[matéria].base` (Bases do Obsidian, recurso nativo) ligada ao painel |
 | Revisar no celular (opcional) | `"cartões"`: grava `cartoes.md` no formato do plugin **Spaced Repetition** (`pergunta::resposta`). A fila do `fila.py` continua sendo a única fonte da Revisão do dia |
 
-**Regras de segurança** (valem sempre): o Claude lê antes de escrever, só regrava arquivo que é dele (registros, painel, notas) logo depois de ler e conferindo a releitura, nunca escreve em `pratica/` (é seu), nunca escreve em `.obsidian/` e nunca apaga. Sem acesso à pasta do cofre, entrega o **Cartão de retomada**. Para reforçar por código, bloqueie `rm` e a escrita em `pratica/` nas permissões (`settings.json`, `deny`).
+**Regras de segurança** (valem sempre): o Claude lê antes de escrever, só regrava arquivo que é dele (registros, painel, notas) logo depois de ler (e conferindo o resultado), nunca escreve em `pratica/` (é seu), nunca escreve em `.obsidian/` e nunca apaga. Sem acesso à pasta do cofre, entrega o **Cartão de retomada**. Para reforçar por código, bloqueie `rm` e a escrita em `pratica/` nas permissões (`settings.json`, `deny`).
 
 **O que mudou na 5.0:** o MCP do Obsidian foi removido; o cofre passou a ser lido e gravado por arquivos (Claudian ou Claude Code na pasta do cofre).
 

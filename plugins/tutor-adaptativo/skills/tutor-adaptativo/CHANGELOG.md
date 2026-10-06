@@ -3,6 +3,14 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 5.0.2 — 2026-10-06
+
+**Testado de verdade com o Claudian 2.3.13** (Claude Code com o cofre como diretório de trabalho; criar matéria, `"retomar"` e `"salva"` num cofre de teste): estrutura, frontmatter, `.base` e edições saíram corretos. Ajustes que o teste pediu:
+- `fila.py registrar|vencidos|mostrar CAMINHO --sem-gravar`: lê o arquivo direto e só imprime `SECAO`/`CONTEUDO`/`FIM`. É um comando simples, sem pipe nem heredoc, que não gera pedido extra de permissão (antes, o comando composto era barrado e o Claude calculava a fila à mão). Receitas de `obsidian.md` e `ferramentas.md` passam a usá-lo; o modo stdin continua. `selftest.py`: 69 verificações.
+- Python no Windows: `python` e `python3` podem ser só atalhos da Loja; a skill usa `py` no Windows e `python3` nos outros, testando com uma chamada simples (comando composto com `||`/`for` é barrado pelas permissões) antes de recorrer ao plano B à mão.
+- `obsidian.md`: a linha do dashboard é `- **Última sessão:** AAAA-MM-DD` (o template grava em negrito, as receitas citavam sem). Releitura proporcional: `Edit`/`Write` já falham com erro; releitura após `Write` sobre arquivo existente e **uma conferência final** em criação e `"salva"` (a regra antiga, reler depois de toda edição, não era seguida e o Claude admitia não ter relido).
+- README: seção "Testado com o Claudian" (modelo padrão `haiku` do Claudian, `py` no Windows, raiz do cofre) e permissão `Bash(py …)`.
+
 ## 5.0.1 — 2026-10-06
 
 **Correção em `render.py` (sem mudança de comportamento da aula)**

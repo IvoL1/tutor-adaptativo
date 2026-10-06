@@ -53,7 +53,7 @@ Detalhes que mordem:
 - `Edit` falha se o `old_string` não for único ou não bater exatamente (espaços, acentos, emojis). Releia o trecho e inclua mais contexto; **nunca** caia para `Write` só porque o `Edit` falhou: leia de novo e ajuste o trecho.
 - Tabelas Markdown: troque a **linha inteira** da tabela, não só uma célula, para o `old_string` ser único.
 - O `Write` exige que o arquivo existente tenha sido lido antes na sessão; se der esse erro, leia e tente de novo.
-- **Depois de toda edição, releia** (a seção ou o arquivo) e confira que só mudou o pretendido.
+- **Conferência proporcional.** `Edit` e `Write` devolvem erro quando falham; se voltaram sem erro, a troca exata aconteceu e não precisa reler cada uma. Releia (a seção ou o arquivo) **depois de um `Write` sobre arquivo que já existia**, e **sempre uma vez ao fim** de uma criação ou de um `"salva"` (um `Glob` mais um `Read` ou `Grep` nos pontos que mudaram; não pule). Nunca diga "conferi" sem ter feito isso, e diga o que não foi relido.
 
 ## Regras de segurança do cofre
 
@@ -83,8 +83,8 @@ Daqui em diante, `{RAIZ}/{matéria}/...` quer dizer o caminho completo a partir 
 ### Retomar (ler a posição e a Revisão do dia)
 
 1. `Glob` em `{RAIZ}/*/registros-da-skill/progresso.md` para ver as matérias. Mais de uma: siga `references/sessao.md` → "Se há mais de uma matéria ativa".
-2. **Numa resposta só**, faça três `Read` em paralelo: `{RAIZ}/{sg}/registros-da-skill/progresso.md`, `…/conquistas.md` e `…/conhecimento.md`. Use "Posição atual" e "Pendências abertas" do progresso, a linha "Última sessão: AAAA-MM-DD" do conquistas (decide a Reentrada) e a fila do conhecimento. Leia o `trilha.md` só se precisar do contexto (orçamento de tempo, fonte e versão congelada).
-3. **Revisão do dia:** com Python, cole a seção `## Fila de revisão espaçada` no stdin: `python "<pasta>/fila.py" vencidos - --max 3` (datas por código). Sem Python, aplique a tabela de `references/pedagogia.md` → "Fila de revisão espaçada".
+2. **Numa resposta só**, faça três `Read` em paralelo: `{RAIZ}/{sg}/registros-da-skill/progresso.md`, `…/conquistas.md` e `…/conhecimento.md`. Use "Posição atual" e "Pendências abertas" do progresso, a linha `- **Última sessão:** AAAA-MM-DD` do conquistas (decide a Reentrada) e a fila do conhecimento. Leia o `trilha.md` só se precisar do contexto (orçamento de tempo, fonte e versão congelada).
+3. **Revisão do dia:** com Python (`py` no Windows, `python3` nos outros; veja `references/ferramentas.md` → "Scripts da skill"), `python "<pasta>/fila.py" vencidos "{RAIZ}/{sg}/registros-da-skill/conhecimento.md" --max 3` (lê o arquivo; datas por código). Sem Python, aplique a tabela de `references/pedagogia.md` → "Fila de revisão espaçada".
 4. Siga `references/sessao.md` → "Retomar e continuar".
 
 Se **nenhum** registro existir, é matéria nova (Entrevista), nunca "retomada de memória".
@@ -120,8 +120,8 @@ Ao terminar: **confira** (receita "Conferir o cofre"), mostre a árvore criada (
 - **Posição atual, Pendências abertas** (progresso): `Read`, depois `Edit` com o corpo atual da seção como `old_string` e o corpo novo inteiro como `new_string` (mantenha a linha de citação `>` do início da seção).
 - **Linha do tempo (sessões)** (última seção do progresso): `Edit` ancorado na última linha, acrescentando a linha nova depois dela.
 - **Histórico de provas e Checkpoints:** têm subtítulos (`## Prova — …`). Acrescente o bloco (o `quiz.py placar` já devolve o bloco pronto) com `Edit` ancorado no fim do grupo certo.
-- **Última sessão e o dashboard do `conquistas.md`:** `Edit` na linha `Última sessão: …` e nas linhas do dashboard que mudaram. Linha nova no changelog de conquistas: `Edit` ancorado na última linha do changelog.
-- **Fila de revisão:** com Python, cole a seção da fila e rode `python "<pasta>/fila.py" registrar - --conceito "..." --resultado novo|acerto|acerto-fragil|erro|erro-confiante --parte "T1 / 1a"`. O script **não grava**: imprime `SECAO:`, `CONTEUDO:` (a seção inteira já atualizada) e `FIM`. Aplique com **um** `Edit`: `old_string` = a seção atual da fila (tabela inteira, como acabou de ler) e `new_string` = o `CONTEUDO`. Sem Python, calcule à mão pela tabela de `references/pedagogia.md`.
+- **Última sessão e o dashboard do `conquistas.md`:** `Edit` na linha `- **Última sessão:** …` (com os asteriscos) e nas linhas do dashboard que mudaram. Linha nova no changelog de conquistas: `Edit` ancorado na última linha do changelog.
+- **Fila de revisão:** com Python, rode `python "<pasta>/fila.py" registrar "{RAIZ}/{sg}/registros-da-skill/conhecimento.md" --conceito "..." --resultado novo|acerto|acerto-fragil|erro|erro-confiante --parte "T1 / 1a" --sem-gravar` (**sempre** `--sem-gravar` dentro do cofre). O script **só lê**: imprime `SECAO:`, `CONTEUDO:` (a seção inteira já atualizada) e `FIM`. Aplique com **um** `Edit`: `old_string` = a seção atual da fila (tabela inteira, como acabou de ler) e `new_string` = o `CONTEUDO`. Sem Python, calcule à mão pela tabela de `references/pedagogia.md`.
 - **Frontmatter:** `topico`, `data`, `status` e afins: `Edit` na linha do campo. Adicionar campo ou tag nova: `Edit` na linha de `tags:` ou no `---` de abertura, ou regrave o arquivo se for mais simples.
 - **`trilha.md`:** quando o plano for aprovado, troque `**Status:** rascunho` por `**Status:** aprovado em AAAA-MM-DD` e complete as seções, com `Edit` por seção (ou `Write` do arquivo inteiro, que é do Claude, logo após ler).
 
@@ -135,7 +135,7 @@ Caminho: `{RAIZ}/{sg}/sessoes/AAAA-MM-DD-{título-em-slug}.md` (título sem acen
 2. **Liste a nota no painel**, em `## Sessões recentes` do `_painel-{sg}.md`: leia o painel e troque com `Edit` o corpo da seção: a linha `> Tabela com todas…` primeiro, depois `- [[AAAA-MM-DD-título]] — a ideia que encaixou` e as demais; sem a linha `- (nenhuma sessão ainda)`. **Só as 8 notas mais recentes ficam listadas** (linhas no formato `- [[AAAA-MM-DD-…]]`); **linhas que eu escrevi à mão na seção nunca saem.**
 3. Se a nota tem visual (próxima receita), ele já entra no corpo antes de gravar.
 4. Atualize o `▶ próximo passo` (bloco `> [!info]` no topo) e o mapa do painel com `Edit` nos trechos que mudaram.
-5. Confira o resultado (releia o painel e a nota).
+5. Confira uma vez ao fim (releia o painel e a nota).
 
 ### Visuais e imagens (`"anexa"`)
 
@@ -180,8 +180,8 @@ Depois de criar a matéria ou de mudar a estrutura, `Glob` em `{RAIZ}/{sg}/**` e
 - existem `registros-da-skill/trilha.md`, `progresso.md`, `conhecimento.md`, `conquistas.md` e `_painel-{sg}.md`;
 - `progresso.md` tem as cinco seções com os nomes exatos (`## Posição atual`, `## Pendências abertas`, `## Histórico de provas`, `## Checkpoints`, `## Linha do tempo (sessões)`);
 - `trilha.md` tem a linha `**Status:** rascunho` (ou `aprovado em …`);
-- `conquistas.md` tem `Última sessão: AAAA-MM-DD`;
-- a tabela de `conhecimento.md` tem as seis colunas (`python fila.py mostrar -` com a seção colada confirma);
+- `conquistas.md` tem `- **Última sessão:** AAAA-MM-DD`;
+- a tabela de `conhecimento.md` tem as seis colunas (`fila.py mostrar CAMINHO` confirma);
 - as notas de `sessoes/` se chamam `AAAA-MM-DD-[tópico].md`.
 
 Liste o que faltar ou divergir e corrija com as receitas acima.

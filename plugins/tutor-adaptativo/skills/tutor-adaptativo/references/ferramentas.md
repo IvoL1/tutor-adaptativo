@@ -88,7 +88,7 @@ Quando os subagentes não existirem no ambiente (app do claude.ai, instalação 
 
 **O que são:** scripts em Python que fazem o que **não deve depender de eu obedecer a uma instrução**: sorteio, verificação, contas, datas e renderização. O Claude os chama pelo Bash. Ficam na pasta `scripts/`, ao lado do `SKILL.md` (o `SKILL.md` mostra o caminho completo; use-o no lugar de `<pasta>` abaixo). **Nenhum deles toca o cofre:** ler e gravar notas é com as ferramentas de arquivo.
 
-**Requisito:** Python 3.8+ no PATH (`python` ou `python3`; use o que existir). Só o `render.py` ainda precisa de um navegador (Chrome ou Edge) e de rede. Sem Python, ou se um script falhar: **faça à mão pelo plano B de cada seção e diga que foi à mão** — a skill nunca trava por isso. Para conferir que tudo está certo: `python <pasta>/selftest.py` (deve dizer que todas as verificações passaram).
+**Requisito:** Python 3.8+ no PATH. **Qual comando:** no **Windows**, `py` (`python` e `python3` costumam ser só atalhos da Microsoft Store que não rodam nada); no Linux e no macOS, `python3`. Use esse nome onde os exemplos abaixo dizem `python`. Teste com **uma chamada simples** (`py --version`) e rode cada script também **numa chamada simples**: caminho completo do script, caminho do arquivo relativo ao diretório de trabalho (o cofre) e **sem** `cd … &&`, `||`, `for`, parênteses ou `command -v`. Comando composto pede aprovação extra e costuma ser barrado. Se a chamada simples falhar, tente o outro nome em outra chamada simples. **Só caia para o plano B à mão depois disso** e diga o que testou. Só o `render.py` ainda precisa de um navegador (Chrome ou Edge) e de rede. Sem Python, ou se um script falhar: **faça à mão pelo plano B de cada seção e diga que foi à mão** — a skill nunca trava por isso. Para conferir que tudo está certo: `python <pasta>/selftest.py` (deve dizer que todas as verificações passaram).
 
 ### Quiz (`quiz.py`)
 
@@ -116,7 +116,10 @@ Linhas: `P:` pergunta, `C:` contexto, `T:` conceito testado, `+` certa, `-` erra
 
 ### Fila de revisão (`fila.py`)
 
-O arquivo vive no cofre e é lido com `Read`; o script recebe o texto pelo **stdin** (`-` no lugar do arquivo). Cole a seção `## Fila de revisão espaçada` do `conhecimento.md` (ou o arquivo todo):
+O arquivo vive no cofre e **nenhum script o regrava**. Há dois jeitos de dar o texto ao script; **prefira o primeiro**, que é um comando simples (sem pipe nem heredoc, logo sem pedido extra de permissão):
+
+1. **Caminho do arquivo + `--sem-gravar`**: `python "<pasta>/fila.py" registrar "{RAIZ}/{sg}/registros-da-skill/conhecimento.md" --conceito "git commit" --resultado novo --parte "T1 / 1a" --sem-gravar`. O script só **lê** o arquivo e imprime o resultado. `vencidos` e `mostrar` com caminho de arquivo também só leem.
+2. **Texto pelo stdin** (`-` no lugar do arquivo), se o caminho não for acessível ao script. Cole a seção `## Fila de revisão espaçada` do `conhecimento.md` (ou o arquivo todo):
 
 ```bash
 python "<pasta>/fila.py" vencidos - --max 3 <<'EOF'
@@ -128,8 +131,9 @@ EOF
 ```
 
 - `vencidos` lista até 3 conceitos da Revisão do dia (o resto continua vencido).
-- `registrar - --conceito "git commit" --resultado acerto` (mesma seção no stdin) aceita `--resultado novo|acerto|acerto-fragil|erro|erro-confiante` e `--parte "T1 / 1a"` no `novo`. Intervalos: 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado; erro volta para 1d; **acerto frágil** (acertei, mas com 🔴) repete o mesmo intervalo, sem avançar. **No modo `-` ele não grava nada:** imprime `SECAO:` (o nome do cabeçalho), `CONTEUDO:` (a seção inteira já atualizada, com a tabela recalculada) e `FIM`. Aplique com **um** `Edit` (`old_string` = a seção atual da fila, como acabou de ler; `new_string` = o `CONTEUDO`) e releia a seção.
-- `mostrar -` imprime a fila. Com um caminho no lugar do `-`, o script lê e grava o arquivo direto no disco (útil só fora do cofre).
+- `registrar - --conceito "git commit" --resultado acerto` (mesma seção no stdin) aceita `--resultado novo|acerto|acerto-fragil|erro|erro-confiante` e `--parte "T1 / 1a"` no `novo`. Intervalos: 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado; erro volta para 1d; **acerto frágil** (acertei, mas com 🔴) repete o mesmo intervalo, sem avançar. **Com `-` ou com `--sem-gravar` ele não grava nada:** imprime `SECAO:` (o nome do cabeçalho), `CONTEUDO:` (a seção inteira já atualizada, com a tabela recalculada) e `FIM`. Aplique com **um** `Edit` (`old_string` = a seção atual da fila, como acabou de ler; `new_string` = o `CONTEUDO`) e confira a seção ao fim da sessão.
+- `mostrar -` imprime a fila. **Sem `--sem-gravar`**, `registrar` com caminho de arquivo regrava o arquivo no disco: não use dentro do cofre.
+- **Quando o script é indispensável:** para `acerto`, `acerto-fragil`, `erro` e `erro-confiante` (o intervalo depende do estado da linha). Para um conceito **`novo`** a conta é sempre intervalo `1d` e revisão no dia seguinte, e pode ser feita à mão sem drama.
 - Plano B: a tabela de `references/pedagogia.md` → "Fila de revisão espaçada (dentro do `conhecimento.md`)".
 
 ### Diagramas (`render.py`)

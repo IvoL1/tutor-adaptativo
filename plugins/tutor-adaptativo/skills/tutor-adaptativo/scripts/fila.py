@@ -4,13 +4,15 @@
 
   fila.py vencidos  ARQUIVO [--max 3] [--hoje AAAA-MM-DD]
   fila.py registrar ARQUIVO --conceito C --resultado novo|acerto|acerto-fragil|erro|erro-confiante
-                    [--parte "T1 / 1a"] [--hoje AAAA-MM-DD]
+                    [--parte "T1 / 1a"] [--hoje AAAA-MM-DD] [--sem-gravar]
   fila.py mostrar   ARQUIVO
 
 ARQUIVO é o conhecimento.md da matéria. Com "-" o texto vem do stdin (o cofre Obsidian é lido e gravado pelo Claude por arquivos, não por
 este script): basta colar a seção "## Fila de revisão espaçada" (ou o arquivo todo). Nesse modo "registrar" não grava nada:
 imprime SECAO / CONTEUDO / FIM, onde CONTEUDO é a seção inteira já atualizada, para o Claude gravar com
-Edit (old_string = a seção atual, new_string = CONTEUDO). A tabela fica sob "## Fila de revisão espaçada"
+Edit (old_string = a seção atual, new_string = CONTEUDO). O mesmo vale com um caminho de arquivo e --sem-gravar:
+o script só LÊ o arquivo (sem pipe nem heredoc) e imprime SECAO / CONTEUDO / FIM. Sem --sem-gravar, um caminho
+de arquivo é regravado pelo script (uso fora do cofre). A tabela fica sob "## Fila de revisão espaçada"
 e tem as colunas: Conceito | Tópico/Parte | Aprendido em | Intervalo atual | Próxima revisão | Status.
 Intervalos: 1d 3d 7d 16d 35d 60d 120d e depois arquivado. Erro volta para 1d.
 acerto-fragil (acertou com confiança baixa) repete o mesmo intervalo, sem avançar.
@@ -135,7 +137,8 @@ def main(argv):
     cmd, caminho, args = argv[0], argv[1], argv[2:]
     hoje = _data(_opcao(args, "--hoje")) if _opcao(args, "--hoje") else datetime.date.today()
     try:
-        texto = _ler(caminho) if caminho == "-" else None
+        sem_gravar = "--sem-gravar" in args
+        texto = _ler(caminho).replace("\r\n", "\n") if (caminho == "-" or sem_gravar) else None
         if cmd == "mostrar":
             _, _, _, rows = carregar(caminho, texto)
             for r in rows:
