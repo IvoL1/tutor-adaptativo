@@ -1,6 +1,6 @@
 # Referência — Visuais: diagramas, gráficos e imagens
 
-> Leia antes de desenhar qualquer diagrama, mapa, gráfico ou figura numa aula — e antes de decidir que **não** vale desenhar. O catálogo de tipos, os modelos prontos e os gráficos estão em `references/visuais-modelos.md`; como gravar no cofre, em `references/obsidian.md` → "Visuais e imagens".
+> Leia antes de desenhar qualquer diagrama, mapa, gráfico ou figura numa aula — e antes de decidir que **não** vale desenhar. O catálogo de tipos, os modelos prontos e os gráficos estão em `references/visuais-modelos.md`; como gravar na pasta de estudos, em `references/arquivos.md` → "Visuais e imagens".
 
 > **Nesta referência:**
 > **1. Quando visualizar (e quando não)**
@@ -10,7 +10,7 @@
 > **5. Verificar antes de mostrar**
 > **6. Onde mostrar**
 >
-> *(catálogo, modelos de SVG, gráficos, Canvas, imagens e interativos: `references/visuais-modelos.md`)*
+> *(catálogo, modelos de SVG, gráficos, imagens e interativos: `references/visuais-modelos.md`)*
 
 ## Quando visualizar (e quando não)
 
@@ -67,8 +67,8 @@ Se você consegue renderizar (o subagente tenta), **olhe** a imagem. Se não con
 ## Onde mostrar
 
 - **No chat:** o bloco mermaid, com uma frase de introdução. Em algumas interfaces ele aparece como código — sem problema, o desenho está na nota da sessão. SVG: mostre o PNG renderizado, se houver, ou o código.
-- **Na nota da sessão e no painel** (`references/templates.md`): o mesmo bloco mermaid, que o Obsidian e o GitHub renderizam nativamente. É o caminho padrão e o único que dispensa arquivo.
-- **Arquivo em `anexos/`** (SVG sempre que o visual precisar existir fora de um bloco; PNG por `cp` no disco): como gravar, nomear e embutir com `![[arquivo.svg]]` está em `references/obsidian.md` → "Visuais e imagens".
-- **Um print que eu copiei:** o Claude não enxerga a minha área de transferência; eu colo direto na nota no Obsidian. Se o Claude precisa **olhar** a imagem, eu a anexo na conversa.
-- **Depois de gravar, não dá para ver como o Obsidian renderiza.** Em tipo `-beta` ou pouco comum, diga ao Ivo para conferir a nota e deixe a alternativa pronta (`references/visuais-modelos.md` → "Compatibilidade com o Obsidian").
+- **Na nota da sessão e no painel** (`references/templates.md`): o mesmo bloco mermaid, que o `ver.py` e o GitHub renderizam. É o caminho padrão e o único que dispensa arquivo.
+- **Arquivo em `anexos/`** (SVG sempre que o visual precisar existir fora de um bloco; PNG por `cp` no disco): como gravar, nomear e embutir com `![descrição](caminho/arquivo.svg)` está em `references/arquivos.md` → "Visuais e imagens".
+- **Um print que eu copiei:** o Claude não enxerga a minha área de transferência; se o Claude precisa **olhar** a imagem, eu a anexo na conversa ou a salvo em `pratica/` e digo o nome (o Claude lê PNG e JPG).
+- **Depois de gravar, confira como o `ver.py` mostra:** em tipo `-beta` ou pouco comum, rode `render.py` antes (ele valida e gera o PNG) e deixe a alternativa pronta (SVG ou tabela) se o desenho sair estranho.
 - Apresente o visual numa frase e deixe-o carregar a ideia; **não narre cada elemento de volta em texto**.

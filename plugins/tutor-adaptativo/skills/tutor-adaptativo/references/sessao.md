@@ -2,7 +2,7 @@
 
 > Leia ao iniciar ou finalizar uma sessão, ao criar a estrutura de pastas de uma matéria, ao retomar sem arquivos, ou quando precisar do nome canônico de qualquer arquivo, pasta ou seção.
 
-> **Nota sobre `CLAUDE.md`:** é um **ponteiro curto**, não uma cópia do sistema. A fonte única da verdade é sempre esta skill — copiar o conteúdo dela para o cofre criaria duas versões que divergem a cada atualização. O `CLAUDE.md` (template em `references/templates.md`) só diz ao Claude Code: "este cofre usa a skill `tutor-adaptativo`; siga-a; ignore memórias automáticas de sessões antigas". Se `estudos/CLAUDE.md` não existir, gere-o a partir do template. Se existir um `CLAUDE.md` antigo e longo (cópia do sistema), substitua pelo ponteiro.
+> **Nota sobre `CLAUDE.md`:** é um **ponteiro curto**, não uma cópia do sistema. A fonte única da verdade é sempre esta skill — copiar o conteúdo dela para a pasta de estudos criaria duas versões que divergem a cada atualização. O `CLAUDE.md` (template em `references/templates.md`) só diz ao Claude Code: "esta pasta usa a skill `tutor-adaptativo`; siga-a; ignore memórias automáticas de sessões antigas". Se `Estudos/CLAUDE.md` não existir, gere-o a partir do template. Se existir um `CLAUDE.md` antigo e longo (cópia do sistema), substitua pelo ponteiro.
 
 > **Nesta referência:**
 > **1. Se há mais de uma matéria ativa**
@@ -20,7 +20,7 @@
 
 ## Se há mais de uma matéria ativa
 
-Antes de tudo, verifique quantas pastas de matéria existem em `estudos/`.
+Antes de tudo, verifique quantas pastas de matéria existem em `Estudos/`.
 - **Uma matéria:** segue direto os modos abaixo.
 - **Mais de uma:** confirme qual é a de hoje pelo contexto da mensagem, ou pergunte se não estiver claro. O comando `"trocar assunto"` muda a matéria ativa a qualquer momento, sem perder o lugar nas outras — cada uma mantém seu próprio `progresso.md` e `conhecimento.md`.
 - **Revisão espaçada entre matérias:** se no mesmo dia houver conceitos vencidos em mais de uma matéria, **não empilhe tudo** — limite a no máximo **3 perguntas de revisão por matéria**, dentro da sessão da matéria ativa. O que sobrar continua vencido e entra na próxima sessão.
@@ -33,7 +33,7 @@ Primeiro identifique **o modo**:
 
 Quando eu disser `"retomar"`, abrir uma matéria que já existe, ou simplesmente voltar a estudar:
 
-1. **Leia a posição.** Com `Read`, leia `registros-da-skill/progresso.md`, `conquistas.md` e `conhecimento.md` da matéria ativa (receita "Retomar" em `references/obsidian.md`); o `trilha.md` só se precisar do contexto. Sem acesso à pasta, use o **Cartão de retomada** que eu colar. **Se não houver registros nem cartão**, pergunte se eu tenho um cartão guardado; se não tiver, trate como matéria nova (Entrevista). **A posição atual vem só desses registros**, nunca de memória automática de conversas anteriores; se a memória disser uma coisa e os registros outra, os registros vencem.
+1. **Leia a posição.** Com `Read`, leia `registros-da-skill/progresso.md`, `conquistas.md` e `conhecimento.md` da matéria ativa (receita "Retomar" em `references/arquivos.md`); o `trilha.md` só se precisar do contexto. Sem acesso à pasta, use o **Cartão de retomada** que eu colar. **Se não houver registros nem cartão**, pergunte se eu tenho um cartão guardado; se não tiver, trate como matéria nova (Entrevista). **A posição atual vem só desses registros**, nunca de memória automática de conversas anteriores; se a memória disser uma coisa e os registros outra, os registros vencem.
 2. **Se eu estou voltando depois de dias**, aplique a **Reentrada** (`references/pedagogia.md` → "Reentrada depois de uma pausa"): recapitule em 1–2 frases, sem cobrar, e já siga.
 3. **Revisão do dia** (`references/pedagogia.md` → "Fila de revisão espaçada (dentro do `conhecimento.md`)"): 1 a 3 quizzes dos conceitos vencidos. Se não houver nenhum, diga isso e siga.
 4. **Confirme o plano de hoje em uma pergunta de escolha** (`references/ferramentas.md` → "Perguntas com opções"): continuar do ponto em que parei (padrão, recomendado), revisar, fazer um quiz, ou outra coisa. Se eu parecer sem energia, ofereça o modo leve (`references/pedagogia.md` → "Sessão mínima viável (para manter a continuidade)").
@@ -64,9 +64,9 @@ Se eu só pedir para você explicar ou ensinar algo pontual, sem uma matéria em
    - `progresso.md` — posição, **Pendências abertas**, provas, linha do tempo da sessão.
    - `conhecimento.md` — termos novos no glossário e os intervalos de revisão (Revisão do dia e nós aprovados).
    - `conquistas.md` — Dashboard (incluindo a **data desta sessão**) e, se concluí uma parte, uma linha no changelog do que o projeto passou a fazer (`references/projetos.md` → "Changelog de conquistas (`conquistas.md`)").
-3. **Grave a nota da sessão** em `sessoes/` (template em `references/templates.md`) — o diário em que eu releio o que entendi. Com `Write`, grave a nota com o frontmatter certo, acrescentando (nunca sobrescrevendo) se já houver uma do dia, e liste-a em "Sessões recentes" do painel (receita "Gravar a nota da sessão" em `references/obsidian.md`). Diagramas entram no corpo da nota como bloco mermaid ou como `![[arquivo.svg]]` em `anexos/` (`references/obsidian.md` → "Visuais e imagens"). Sem acesso a arquivos, entregue o **Cartão de retomada** (neste arquivo → "Sem acesso a arquivos — Cartão de retomada").
+3. **Grave a nota da sessão** em `sessoes/` (template em `references/templates.md`) — o diário em que eu releio o que entendi. Com `Write`, grave a nota com o frontmatter certo, acrescentando (nunca sobrescrevendo) se já houver uma do dia, e liste-a em "Sessões recentes" do painel (receita "Gravar a nota da sessão" em `references/arquivos.md`). Diagramas entram no corpo da nota como bloco mermaid ou como `![descrição](../anexos/arquivo.svg)` em `anexos/` (`references/arquivos.md` → "Visuais e imagens"). Sem acesso a arquivos, entregue o **Cartão de retomada** (neste arquivo → "Sem acesso a arquivos — Cartão de retomada").
 4. **Atualize o mapa** no `_painel-[assunto].md`: nós firmes marcados e o `▶ próximo passo`.
-5. **Confira o cofre** depois de criar ou alterar registros (`references/obsidian.md` → "Conferir o cofre") e corrija o que divergir.
+5. **Confira a pasta de estudos** depois de criar ou alterar registros (`references/arquivos.md` → "Conferir a pasta") e corrija o que divergir.
 6. **Matéria de código:** verifique mudanças sem commit em `pratica/projeto/` e lembre de commitar antes de fechar (`references/programacao.md` → "Versionamento (git)").
 7. **Se a entrevista, a sondagem ou o plano não terminaram** nesta sessão, registre o que já foi levantado como **rascunho** (no `trilha.md` com a marca `rascunho`, ou no Cartão de retomada), para não refazer tudo. O rascunho só vira trilha depois do meu "ok" no plano.
 8. Diga **exatamente qual é o próximo passo** e proponha o que fazer na próxima sessão.
@@ -75,12 +75,12 @@ Se eu só pedir para você explicar ou ensinar algo pontual, sem uma matéria em
 
 ## Estrutura de pastas
 
-> Desenhada para a ordem ser óbvia só de olhar: o que **eu** escrevo fica em `pratica/`; o que o Claude escreve fica nos registros e nas notas. Compatível com Obsidian (wikilinks, callouts, frontmatter) sem quebrar Markdown padrão — ver "Convenções Obsidian" em `references/templates.md`.
+> Desenhada para a ordem ser óbvia só de olhar: o que **eu** escrevo fica em `pratica/`; o que o Claude escreve fica nos registros e nas notas. Markdown comum (links relativos, citações, frontmatter), sem depender de programa nenhum — ver "Convenções dos arquivos" em `references/templates.md`.
 
 ```
-estudos/                                ← raiz dos estudos no cofre Obsidian (subpasta dele, ou o próprio cofre)
-├── README.md                           ← 🤖 índice geral: matérias ativas com [[links]] e status
-├── CLAUDE.md                           ← 🚫 ponteiro curto: "este cofre usa a skill X, siga-a"
+Estudos/                                ← raiz dos estudos (uma pasta comum)
+├── README.md                           ← 🤖 índice geral: matérias ativas com links e status
+├── CLAUDE.md                           ← 🚫 ponteiro curto: "esta pasta usa a skill X, siga-a"
 │
 ├── [nome-da-matéria]/
 │   ├── _painel-[matéria].md            ← 🤖 painel: mapa de dependências, status e "▶ próximo passo"
@@ -90,13 +90,9 @@ estudos/                                ← raiz dos estudos no cofre Obsidian (
 │   │
 │   ├── exercicios/                     ← 🤖 exercícios e desafios em nota (enunciado, critério de pronto, dicas dobráveis) — só quando eu peço
 │   ├── provas/                         ← 🤖 relatório de cada prova (pergunta a pergunta, com a correção) — só quando eu peço
-│   ├── anexos/                         ← 🤖 imagens e diagramas que entram nas notas (![[arquivo.svg]], ![[arquivo.png]])
+│   ├── anexos/                         ← 🤖 imagens e diagramas que entram nas notas (`![](anexos/arquivo.svg)`)
 │   ├── fontes/                         ← 🤖 transcrições de aulas em vídeo (pista, não fonte para ensinar)
-│   ├── _boletim-[matéria].md           ← 🤖 boletim: provas (com a média), exercícios e sessões em tabelas
-│   ├── _sessoes-[matéria].base         ← 🤖 tabela das sessões (Base do Obsidian)
-│   ├── _provas-[matéria].base          ← 🤖 tabela das provas (Base)
-│   ├── _exercicios-[matéria].base      ← 🤖 tabela dos exercícios e desafios (Base)
-│   ├── cartoes.md                      ← 🤖 opcional: cartões do plugin Spaced Repetition
+│   ├── _boletim-[matéria].md           ← 🤖 boletim: provas (com a média), exercícios e sessões, gerado por `boletim.py`
 │   │
 │   ├── pratica/                        ← ✍️ 100% MEU
 │   │   ├── projeto/                    ←    o projeto de prática (em código: versionado com git)
@@ -112,9 +108,9 @@ estudos/                                ← raiz dos estudos no cofre Obsidian (
     └── ...
 ```
 
-> **Criar tudo de uma vez:** a receita "Criar a matéria" de `references/obsidian.md` grava, por arquivos, os quatro registros, o painel, a Base de sessões e o `_leia-me.md` de `pratica/projeto/` e `pratica/treinos/`, a partir dos templates de `references/templates.md`, e põe a matéria no `README.md` do cofre. `sessoes/`, `anexos/` e `fontes/` nascem quando o primeiro arquivo é gravado neles. Nunca sobrescreve o que já existe.
+> **Criar tudo de uma vez:** a receita "Criar a matéria" de `references/arquivos.md` grava, por arquivos, os quatro registros, o painel, o boletim e o `_leia-me.md` de `pratica/projeto/` e `pratica/treinos/`, a partir dos templates de `references/templates.md`, e põe a matéria no `README.md` da pasta de estudos. `sessoes/`, `exercicios/`, `provas/`, `anexos/` e `fontes/` nascem quando o primeiro arquivo é gravado neles. Nunca sobrescreve o que já existe.
 
-> **Por que `_painel-` em vez de `README.md` repetido:** no Obsidian, vários arquivos com o mesmo nome tornam `[[README]]` ambíguo (autocompletar inútil, grafo com nós idênticos, busca poluída). Nomes únicos resolvem isso, e o prefixo `_` faz o painel aparecer **sempre no topo** da pasta. O `README.md` sobrevive só na raiz do cofre, onde é único e a convenção tem valor.
+> **Por que `_painel-` em vez de `README.md` repetido:** vários arquivos com o mesmo nome em pastas diferentes confundem a busca e as listas. Nomes únicos resolvem isso, e o prefixo `_` faz o painel aparecer **sempre no topo** da pasta. O `README.md` sobrevive só na raiz da pasta de estudos, onde é único e a convenção tem valor.
 
 ### Nomes canônicos (pastas, arquivos e seções)
 
@@ -139,12 +135,12 @@ estudos/                                ← raiz dos estudos no cofre Obsidian (
 
 | Arquivo | Onde |
 |---|---|
-| `_painel-[matéria].md` · `_boletim-[matéria].md` · `_sessoes-[matéria].base` · `_provas-[matéria].base` · `_exercicios-[matéria].base` · `cartoes.md` (opcional) | raiz da pasta da matéria |
+| `_painel-[matéria].md` · `_boletim-[matéria].md` | raiz da pasta da matéria |
 | `trilha.md` · `progresso.md` · `conhecimento.md` · `conquistas.md` | `registros-da-skill/` |
 | `AAAA-MM-DD-[tópico].md` | `sessoes/` |
 | `AAAA-MM-DD-[tópico]-[parte]-[nome].md` | `exercicios/` e `provas/` |
 | `_leia-me.md` (o único arquivo que o Claude grava em `pratica/`, na criação da matéria) | `pratica/projeto/` e `pratica/treinos/` |
-| `README.md` · `CLAUDE.md` | raiz de `estudos/` (um por cofre — sem frontmatter) |
+| `README.md` · `CLAUDE.md` | raiz de `Estudos/` (um por pasta de estudos — sem frontmatter) |
 
 #### Seções do `progresso.md` (nomes exatos)
 

@@ -1,13 +1,20 @@
 {
   "name": "tutor-adaptativo",
   "displayName": "Tutor Adaptativo",
-  "description": "Sistema pessoal de estudo ao vivo e adaptativo para qualquer matéria: sondagem do nível, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada, protocolo antifrustração, integração com o cofre Obsidian por arquivos (plugin Claudian) (criar matéria, registros, notas da sessão, visuais, transcrição de vídeo), catálogo de visuais (Mermaid, SVG, gráficos), subagentes e testes automáticos.",
-  "version": "5.1.0",
+  "description": "Sistema pessoal de estudo ao vivo e adaptativo para qualquer matéria: sondagem do nível, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada, protocolo antifrustração, caderno de estudos em arquivos Markdown comuns (uma pasta por matéria, com exercícios, provas, correções e boletim com a média calculada por código), leitor no navegador, catálogo de visuais (Mermaid, SVG, gráficos), subagentes e testes automáticos.",
+  "version": "6.0.0",
   "author": {
     "name": "Ivo"
   },
   "homepage": "https://github.com/IvoL1/tutor-adaptativo",
   "repository": "https://github.com/IvoL1/tutor-adaptativo",
   "license": "MIT",
-  "keywords": ["estudo", "aprendizagem", "tutor", "obsidian", "repetição espaçada", "português"]
+  "keywords": [
+    "estudo",
+    "aprendizagem",
+    "tutor",
+    "repetição espaçada",
+    "português",
+    "markdown"
+  ]
 }

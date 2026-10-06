@@ -18,7 +18,7 @@ Entrada de `montar` (uma linha por item):
 """
 import datetime, json, os, pathlib, random, re, secrets, sys, tempfile, time
 
-# Estado das perguntas e provas em andamento: TUTOR_STATE, senão a pasta temporária (nunca dentro do cofre Obsidian).
+# Estado das perguntas e provas em andamento: TUTOR_STATE, senão a pasta temporária (nunca dentro da pasta de estudos).
 STATE = pathlib.Path(os.environ.get("TUTOR_STATE") or pathlib.Path(tempfile.gettempdir()) / "tutor-adaptativo")
 MIN_PROVA = 5  # abaixo disso o percentual de 80% equivale a exigir 100% (3 de 3, 4 de 4)
 PROVA_PARADA_H = 12  # prova sem atividade por mais que isso recomeça do zero

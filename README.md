@@ -26,8 +26,8 @@ plugins/tutor-adaptativo/
 ├── skills/tutor-adaptativo/             ← a skill
 │   ├── SKILL.md                         ← perfil, regras e comandos
 │   ├── CHANGELOG.md
-│   ├── references/                      ← o passo a passo de cada etapa (12 arquivos, incl. obsidian.md e visuais-modelos.md)
-│   └── scripts/                         ← quiz.py, fila.py, render.py, selftest.py
+│   ├── references/                      ← o passo a passo de cada etapa (12 arquivos, incl. arquivos.md e visuais-modelos.md)
+│   └── scripts/                         ← quiz.py, fila.py, boletim.py, render.py, ver.py, selftest.py
 ├── agents/
 │   ├── tutor-pesquisador.md             ← subagente: verifica fatos e acha fontes
 │   └── tutor-diagramador.md             ← subagente: cria diagramas e os verifica
@@ -78,83 +78,78 @@ Todos os comandos estão na tabela de `SKILL.md`.
 
 ## Ferramentas: o código decide o que não pode depender de obediência
 
-Sorteio, verificação, contas, datas e renderização ficam em scripts Python (3.8+, só biblioteca padrão, sem rede, exceto o `render.py`). **Nenhum deles toca o cofre do Obsidian** (isso é com as ferramentas de arquivo, abaixo):
+Sorteio, verificação, contas, datas, médias e renderização ficam em scripts Python (3.8+, só biblioteca padrão, sem rede, exceto o `render.py` e as fórmulas e diagramas do `ver.py`). **Nenhum deles grava na pasta de estudos** (isso é com as ferramentas de arquivo, abaixo):
 
 | Script | O que faz por código |
 |---|---|
 | `quiz.py` | sorteia a posição da certa (nunca a mesma duas vezes seguidas), **acusa alternativa que se entrega pela forma** (tamanho, "porque", negrito assimétrico, "todas as anteriores"), corrige, revela o equívoco da errada escolhida e calcula o percentual e a decisão da prova (80% e 50%), avisa quando a amostra é pequena |
 | `fila.py` | repetição espaçada: intervalos 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado, e as datas; acerto frágil não avança. Lê o `conhecimento.md` (com `--sem-gravar`) ou o texto pelo stdin e devolve a seção da fila já atualizada (`SECAO`/`CONTEUDO`), sem gravar |
-| `render.py` | valida Mermaid/SVG e gera PNG com o Chrome ou o Edge já instalados, **devolvendo a mensagem exata de erro de sintaxe**; aceita `--mermaid-js` com a versão do Obsidian (11.4.1) e entrega a imagem no tamanho exato |
+| `boletim.py` | lê o `progresso.md`, as notas de exercícios e as sessões e devolve o bloco do boletim: tabela das provas com a **média calculada**, exercícios feitos de quantos, pendências abertas |
+| `render.py` | valida Mermaid/SVG e gera PNG com o Chrome ou o Edge já instalados, **devolvendo a mensagem exata de erro de sintaxe**; aceita `--mermaid-js` (arquivo local, offline) e entrega a imagem no tamanho exato |
+| `ver.py` | **leitor**: converte as notas `.md` em páginas HTML numa pasta temporária (tabelas, dicas dobráveis, fórmulas, diagramas, imagens, links entre notas) e abre no navegador; não grava nada nos estudos |
 
 `python plugins/tutor-adaptativo/skills/tutor-adaptativo/scripts/selftest.py` roda as verificações (sem rede e sem tocar nos seus arquivos). Sem Python, a skill funciona igual: cada seção de `references/ferramentas.md` tem um plano B à mão.
 
 **Permissões:** na primeira vez, o Claude Code pede permissão para rodar `python`. Para não ser perguntado a cada quiz, depois de ler o código (está todo neste repositório) você pode liberar só estes scripts nas suas permissões (`settings.json`): `"Bash(python *tutor-adaptativo/scripts/*)"` e `"Bash(python3 *tutor-adaptativo/scripts/*)"` (no Windows, o comando que costuma funcionar é `py`: acrescente `"Bash(py *tutor-adaptativo/scripts/*)"`). O campo `allowed-tools` da skill só vale no turno em que ela é chamada, por isso não o usei.
 
-## Obsidian (o cofre é lido e escrito por arquivos)
+## A pasta de estudos (Markdown comum, sem programa nenhum)
 
-O cofre do Obsidian é uma **pasta de arquivos Markdown**. A skill lê e grava nele com as ferramentas de arquivo do Claude (`Read`, `Write`, `Edit`, `Glob`, `Grep`), sem servidor MCP. **O jeito recomendado:** o Claude Code no terminal é o professor e o Obsidian é o caderno (enunciados, provas, correções, boletim, histórico), aberto ao lado. No Windows, o atalho `estudar` (um `estudar.cmd` numa pasta do PATH que faz `cd` para o cofre e roda `claude`) deixa isso em um comando. O plugin da comunidade **[Claudian](https://github.com/YishenTu/claudian)**, que roda o Claude Code dentro do Obsidian, é **opcional**: a skill não depende dele. As receitas e as regras de segurança estão em [`references/obsidian.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/obsidian.md).
+Tudo que a skill guarda é **uma pasta de arquivos Markdown**, por exemplo `Documents\Estudos`, com **uma subpasta por matéria**. Não precisa de programa extra, de plugin nem de servidor: o Claude Code aberto nessa pasta lê e grava com as ferramentas de arquivo (`Read`, `Write`, `Edit`, `Glob`, `Grep`), e qualquer editor de texto abre os arquivos.
 
-As edições usam `Edit` (troca de trecho exato) e, só em arquivo do Claude, ler e regravar com `Write`, com uma conferência ao fim (e releitura depois de qualquer `Write` sobre arquivo existente).
+```
+Estudos/
+├── README.md, CLAUDE.md
+└── matematica-basica/
+    ├── _painel-matematica-basica.md      ← o mapa e o próximo passo
+    ├── _boletim-matematica-basica.md     ← provas (com a média), exercícios e sessões
+    ├── sessoes/  exercicios/  provas/  anexos/  fontes/
+    ├── pratica/                          ← suas respostas (só você escreve aqui)
+    └── registros-da-skill/               ← trilha, progresso, conhecimento, conquistas
+```
 
-### Configurar (uma vez, por você)
+**Como estudar:** abra o terminal **dentro da pasta de estudos** e rode `claude`. No Windows, um atalho `estudar.cmd` numa pasta do PATH (`cd /d "%USERPROFILE%\Documents\Estudos" && claude %*`) deixa isso em um comando. O Claude ensina no terminal, e o que é longo ou visual (enunciados, desafios, diagramas, provas) vai para notas, que você lê no navegador com `"abrir"`.
 
-1. No Obsidian: Configurações → Plugins da comunidade → desligue o modo restrito → Procurar → **Claudian** → Instalar → Ativar. Plugin da comunidade é código que roda dentro do Obsidian com acesso ao cofre: a instalação fica com você.
-2. Tenha o **Claude Code** instalado (o Claudian usa o `claude` do seu PC) e o plugin deste repositório (`/plugin install tutor-adaptativo@tutor-adaptativo`).
-3. Abra o painel do Claudian e diga "quero estudar X". Se a skill não for reconhecida lá, use o Claude Code no terminal, dentro da pasta do cofre.
-
-Sem o Claudian, basta `cd` para a pasta do cofre e rodar `claude`.
-
-**Testado com o Claudian 2.3.13** (Claude Code rodando com o cofre como diretório de trabalho): a skill e o estilo `tutor-adaptativo:Tutor` aparecem lá porque o Claudian carrega as configurações de usuário do Claude Code (`loadUserSettings`), onde o plugin está habilitado. Criar a matéria, `"retomar"` e `"salva"` gravaram corretamente os arquivos, e a pergunta com opções (`AskUserQuestion`) é suportada. Dicas:
-- **Modelo:** o Claudian vem com `haiku` como padrão. Para aula, dicas e quizzes bem escritos, escolha um modelo maior no seletor do painel.
-- **Python no Windows:** se `python` abrir a Microsoft Store, use o `py` (a skill usa `py` no Windows e só calcula a fila à mão se o script não rodar).
-- **O cofre é a raiz:** num cofre só de estudos, as matérias nascem direto na raiz (`ingles-basico/…`, `CLAUDE.md`, `README.md`).
+As edições usam `Edit` (troca de trecho exato) e, só em arquivo do Claude, ler e regravar com `Write`, com uma conferência ao fim (e releitura depois de qualquer `Write` sobre arquivo existente). As receitas e as regras de segurança estão em [`references/arquivos.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/arquivos.md).
 
 ### O que o Claude faz por você
 
 | O que você quer | Como (o Claude faz sozinho; você só pede) |
 |---|---|
 | Retomar | `"retomar"`: lê `progresso.md`, `conquistas.md` e `conhecimento.md` da matéria e faz a Revisão do dia (as datas vêm do `fila.py`) |
-| Começar uma matéria com tudo no lugar | depois do seu "ok" no plano, grava os 4 registros, painel, Base de sessões e `pratica/`, e põe no `README.md`. Nunca sobrescreve |
+| Começar uma matéria com tudo no lugar | depois do seu "ok" no plano, grava os 4 registros, painel, boletim e `pratica/`, e põe no `README.md`. Nunca sobrescreve |
 | Anotar a sessão | cria `sessoes/AAAA-MM-DD-título.md` com frontmatter, acrescenta se já houver nota do dia e lista no painel |
+| Exercícios e desafios | o enunciado vai para `exercicios/` (critério de pronto e **dicas dobráveis, sem a solução**) e abre no navegador; sua resposta fica em `pratica/treinos/`; depois da correção o status vira `feito` e a nota ganha a seção "Correção". `"exportar"` grava o que ficou só na conversa |
+| Provas | a prova continua ao vivo (uma questão por vez, corrigida por código); `"prova em nota"` monta o caderno inteiro em `provas/` para você responder de uma vez; o relatório fica em `provas/` |
+| Boletim | `"boletim"`: provas com a **média calculada por `boletim.py`**, exercícios feitos de quantos e sessões, em `_boletim-[matéria].md` |
+| Ler no navegador | `"abrir"`: `ver.py` converte as notas em páginas (tabelas, dicas, fórmulas, diagramas) numa pasta temporária e abre. Fórmulas e diagramas precisam de rede |
 | Diagrama ou gráfico | bloco Mermaid na própria nota; SVG e PNG como arquivos em `anexos/` |
-| Colar um print | cole direto na nota no Obsidian (o Claude não vê a sua área de transferência) |
-| Abrir a nota no Obsidian | `"abrir"`: o Claude entrega o link `obsidian://open?…` para você clicar |
-| Exercícios, desafios e provas em nota | `"exportar"`: grava o exercício ou desafio atual (enunciado, critério de pronto e dicas dobradas, **sem a solução**) em `exercicios/`, ou o relatório da última prova em `provas/`. Sua resposta continua em `pratica/treinos/` |
 | Estudar a partir de um vídeo | `"transcreve"`: cole a legenda, indique um `.vtt`/`.srt` ou dê o link (com o `yt-dlp` instalado, baixa só a legenda). Grava em `fontes/` com aviso: **transcrição é pista, não fonte para ensinar** |
-| Ver todas as sessões numa tabela | cada matéria nasce com `_sessoes-[matéria].base` (Bases do Obsidian, recurso nativo) ligada ao painel |
-| Revisar no celular (opcional) | `"cartões"`: grava `cartoes.md` no formato do plugin **Spaced Repetition** (`pergunta::resposta`). A fila do `fila.py` continua sendo a única fonte da Revisão do dia |
+| Revisar um desenho seu | salve como PNG ou SVG em `pratica/treinos/` e diga o nome: o Claude lê a imagem |
 
-**Regras de segurança** (valem sempre): o Claude lê antes de escrever, só regrava arquivo que é dele (registros, painel, notas) logo depois de ler (e conferindo o resultado), nunca escreve em `pratica/` (é seu), nunca escreve em `.obsidian/` e nunca apaga. Sem acesso à pasta do cofre, entrega o **Cartão de retomada**. Para reforçar por código, bloqueie `rm` e a escrita em `pratica/` nas permissões (`settings.json`, `deny`).
+**Regras de segurança** (valem sempre): o Claude lê antes de escrever, só regrava arquivo que é dele (registros, painel, boletim, notas) logo depois de ler (e conferindo o resultado), nunca escreve em `pratica/` (é seu) e nunca apaga. Sem acesso à pasta de estudos, entrega o **Cartão de retomada**. Para reforçar por código, bloqueie `rm` e a escrita em `pratica/` nas permissões (`settings.json`, `deny`).
 
-**O que mudou na 5.0:** o MCP do Obsidian foi removido; o cofre passou a ser lido e gravado por arquivos (Claudian ou Claude Code na pasta do cofre).
-
-### Passos que só você pode fazer no Obsidian (opcionais)
-
-- **Plugin Spaced Repetition** (só se quiser revisar cartões no Obsidian ou no celular): Configurações → Plugins da comunidade → desligar o modo restrito → Explorar → procurar "Spaced Repetition" → Instalar → Ativar. Plugin da comunidade é código que roda dentro do Obsidian com acesso ao cofre; por isso a instalação fica com você, pela loja do próprio Obsidian.
-- **Bases:** se a tabela `_sessoes-[matéria].base` não abrir, confira em Configurações → Plugins do núcleo se "Bases" está ligado.
-- **Anexos colados:** em Configurações → Arquivos e links você escolhe onde vão as imagens que colar à mão.
+**O que mudou na 6.0:** a skill ficou autossuficiente: só Markdown comum (links relativos, citações, `<details>`), sem programa nem plugin de terceiros. Ganhou o `boletim.py` (média por código) e o `ver.py` (leitor no navegador). Detalhes no `CHANGELOG.md`.
 
 ## Visuais: diagramas, gráficos e imagens
 
 A skill desenha só quando ajuda (Regra 31) e **confere antes de mostrar**. O que ela sabe gerar, em [`references/visuais-modelos.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/visuais-modelos.md):
 
-- **Mermaid** (renderiza na nota): fluxo e mapa de dependências, sequência, estado, ER, classes, mapa mental, linha do tempo, git, quadrante, pizza, gantt e gráfico de linha/barra (`xychart-beta`);
+- **Mermaid** (renderiza no `ver.py` e no GitHub): fluxo e mapa de dependências, sequência, estado, ER, classes, mapa mental, linha do tempo, git, quadrante, pizza, gantt e gráfico de linha/barra (`xychart-beta`);
 - **SVG pronto** para adaptar: reta numérica, plano cartesiano, fração, teclado de piano; valores e coordenadas calculados por código;
-- **Gráficos de função e de dados**, matemática em LaTeX e química com `\ce{}`;
-- **Canvas do Obsidian** (opcional) para um mapa que você arrasta;
+- **Gráficos de função e de dados** e matemática em LaTeX;
 - **Imagem de fonte confiável** (com crédito), regra para ilustração gerada e **visual interativo** quando a ideia só se entende mexendo.
 
-Limite honesto: o Obsidian embute o Mermaid 11.4.1 (o `render.py` usa o 11.17.2 por padrão). Todos os modelos foram testados nas duas versões, mas a skill não vê a nota renderizada no Obsidian: em tipos `-beta` ela avisa para você conferir. No `quadrantChart`, rótulos sem acento.
+Limite honesto: a skill valida o Mermaid e o SVG com o `render.py` (11.17.2, a mesma versão do `ver.py`), mas só **vê** o resultado quando há navegador; em tipos `-beta` ela confere o PNG e avisa se ficar estranho.
 
 ## Dicas para o dia a dia
 
 - **Estilo de resposta "Tutor" (opcional):** `/output-style` e escolha o estilo do plugin, para a voz de professor valer a sessão toda (frases completas, uma coisa por vez). Se o nome não aparecer na lista, use `/plugin` para conferir se o estilo foi carregado.
-- **Plugins que brigam com o estudo:** estilos que mandam responder em fragmentos ou com o mínimo de código (por exemplo `caveman` ou `ponytail`) atrapalham a aula. No cofre, desligue-os em `.claude/settings.json` (`"enabledPlugins": {"nome@marketplace": false}`). Skills de aprendizado concorrentes (como a `learn` da Anthropic, que vem do app) podem ser escondidas com `"skillOverrides": {"anthropic-skills:learn": "off"}`; eu não consegui testar o efeito dessas duas chaves numa sessão real.
+- **Plugins que brigam com o estudo:** estilos que mandam responder em fragmentos ou com o mínimo de código (por exemplo `caveman` ou `ponytail`) atrapalham a aula. Na pasta de estudos, desligue-os em `.claude/settings.json` (`"enabledPlugins": {"nome@marketplace": false}`). Skills de aprendizado concorrentes (como a `learn` da Anthropic, que vem do app) podem ser escondidas com `"skillOverrides": {"anthropic-skills:learn": "off"}`; eu não consegui testar o efeito dessas duas chaves numa sessão real.
 - **Lembrete da Revisão do dia:** as tarefas agendadas do app desktop rodam na sua máquina e persistem entre sessões. Peça ao Claude uma tarefa diária que leia o `conhecimento.md` e avise quando houver conceitos vencidos. (Ideia não testada.)
 
 ## Testes automáticos
 
-`plugins/tutor-adaptativo/evals/` tem 9 casos para o `claude plugin eval` (entrevista, dúvida curta, retomar sem registros, dica sem entregar a resposta, frustração, sondagem, quiz por script, criar a matéria sem cofre (não inventa) e "não sequestrar tarefa de código"). Rodam com e sem o plugin para medir o que ele acrescenta. Comandos e custo em [`evals/README.md`](plugins/tutor-adaptativo/evals/README.md). Eles usam a sua cota, então não rodam sozinhos.
+`plugins/tutor-adaptativo/evals/` tem 9 casos para o `claude plugin eval` (entrevista, dúvida curta, retomar sem registros, dica sem entregar a resposta, frustração, sondagem, quiz por script, criar a matéria sem pasta de estudos (não inventa) e "não sequestrar tarefa de código"). Rodam com e sem o plugin para medir o que ele acrescenta. Comandos e custo em [`evals/README.md`](plugins/tutor-adaptativo/evals/README.md). Eles usam a sua cota, então não rodam sozinhos.
 
 ## Sobre ser pessoal
 

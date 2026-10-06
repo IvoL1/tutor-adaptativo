@@ -161,7 +161,6 @@ Tabela na seção "Fila de revisão espaçada" do `conhecimento.md`:
 - **Toda sessão começa pela "Revisão do dia":** 1 a 3 perguntas (quiz) dos conceitos **vencidos** (próxima revisão ≤ hoje). Se não houver nenhum vencido, pule o bloco e diga isso. Com Python, cole a seção da fila no stdin de `fila.py vencidos -` e ele lista o que vence (datas por código).
 - Na hora, atualize os intervalos: acertou avança, errou volta para 1d, e **acertou com 🔴 (acerto frágil) repete o mesmo intervalo**, sem avançar. Com Python, `fila.py registrar -` calcula o novo intervalo e a data e devolve a seção da fila já atualizada, que você grava no `conhecimento.md` com um `Edit` (`references/ferramentas.md` → "Scripts da skill (o código decide)"); sem ele, atualize a tabela à mão no fim da sessão.
 - Se eu disser `"revisão"`, faz a Revisão do dia agora, em qualquer momento.
-- **Cartões no Obsidian (opcional):** se eu uso o plugin Spaced Repetition e peço `"cartões"`, grave os conceitos aprovados em `cartoes.md` (`references/obsidian.md` → "Cartões"). É um extra para revisar no celular ou fora da conversa: **a fila do `conhecimento.md` continua sendo a única fonte de verdade** da Revisão do dia, e a revisão feita no plugin não atualiza a fila.
 
 ### Intercalação (misturar tipos de problema)
 
@@ -202,7 +201,7 @@ Tabela na seção "Fila de revisão espaçada" do `conhecimento.md`:
 2. Blog, changelog e notas de versão oficiais; repositório oficial do projeto.
 3. Referência de plataforma mantida por fornecedor ou instituição reconhecida (ex.: MDN para HTML, CSS e JavaScript; dicionários e gramáticas acadêmicas).
 4. Especificações, RFCs, padrões e artigos revisados por pares (ex.: WHATWG, W3C, TC39, IETF) — a fonte final quando 1 a 3 divergem.
-5. Artigos, tutoriais, Medium, dev.to, vídeos (inclusive a transcrição de um vídeo, `references/obsidian.md` → "Transcrever um vídeo") — **só como pista**, nunca como fonte para ensinar. Se algo só aparece aqui, confirmar em 1–4 antes de usar; se não der para confirmar, não entra na aula.
+5. Artigos, tutoriais, Medium, dev.to, vídeos (inclusive a transcrição de um vídeo, `references/arquivos.md` → "Transcrever um vídeo") — **só como pista**, nunca como fonte para ensinar. Se algo só aparece aqui, confirmar em 1–4 antes de usar; se não der para confirmar, não entra na aula.
 
 **Versão ou edição congelada por trilha:**
 - Na entrevista, registre no `trilha.md` a versão ou edição exata adotada (de preferência a estável, LTS ou mais atual do momento).
@@ -266,7 +265,7 @@ Ao concluir um tópico, peça: *"Explique [tópico] como se ensinasse alguém qu
 
 ## Meu histórico de dificuldades
 
-> **Onde mora o histórico vivo:** este arquivo faz parte da skill e é sobrescrito a cada atualização do plugin, então a lista abaixo é só o **ponto de partida**. O histórico de verdade fica no `CLAUDE.md` do cofre (que o Claude Code carrega em toda sessão), nas seções "Dificuldades persistentes" e "Dificuldades superadas". **Atualize lá, nunca aqui**, quando um padrão novo aparecer ou um antigo for superado; dificuldades superadas não somem, são referência.
+> **Onde mora o histórico vivo:** este arquivo faz parte da skill e é sobrescrito a cada atualização do plugin, então a lista abaixo é só o **ponto de partida**. O histórico de verdade fica no `CLAUDE.md` da pasta de estudos (que o Claude Code carrega em toda sessão), nas seções "Dificuldades persistentes" e "Dificuldades superadas". **Atualize lá, nunca aqui**, quando um padrão novo aparecer ou um antigo for superado; dificuldades superadas não somem, são referência.
 
 ### Dificuldades persistentes (gerais)
 - **Desanimo e paro quando algo fica difícil ou complexo** — a mais importante. Aplicar o "Protocolo Antifrustração e Continuidade" com prioridade: encolher o passo, ganhar vitória pequena, normalizar o difícil.
@@ -276,4 +275,4 @@ Ao concluir um tópico, peça: *"Explique [tópico] como se ensinasse alguém qu
 - Aprendo fazendo, não lendo — teoria longa sem exercício não fixa.
 
 ### Dificuldades superadas
-O que foi difícil e como foi resolvido fica no `CLAUDE.md` do cofre (lista vazia no início), como referência para revisão futura.
+O que foi difícil e como foi resolvido fica no `CLAUDE.md` da pasta de estudos (lista vazia no início), como referência para revisão futura.

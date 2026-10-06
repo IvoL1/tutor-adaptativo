@@ -27,7 +27,7 @@
 7. Quanto tempo por sessão costumo ter? _(30 min, 1h, 2h)_ — **isso vira o orçamento de tempo da sessão:** registrar no `trilha.md` e usar para dimensionar quanto cabe em cada sessão (Regra 24).
 8. Com que frequência pretendo estudar?
 9. Tem prazo ou evento que motiva? _(entrevista de emprego, prova, projeto, curso)_
-10. O que eu uso para estudar e praticar — computador, sistema, editor, instrumento, caderno, aplicativos? E, se eu for usar arquivos, **onde fica a pasta `estudos/` no meu computador**? _(evita instruções que não batem com o meu ambiente; o caminho é onde toda a estrutura de pastas será criada)_
+10. O que eu uso para estudar e praticar — computador, sistema, editor, instrumento, caderno, aplicativos? E, se eu for usar arquivos, **onde fica a pasta `Estudos/` no meu computador**? _(evita instruções que não batem com o meu ambiente; o caminho é onde toda a estrutura de pastas será criada)_
 
 ### Bloco 3 — Estilo e projetos
 
@@ -51,5 +51,5 @@
 7. Definir o **tema dos miniprojetos** (o que cada parte acrescenta ao projeto de prática) e validar cada um. Se a Q13 foi "sim", registrar no `trilha.md` que **exercícios soltos extras** estão liberados.
 8. Propor o **fechamento** da trilha (🚀 Ship it ou 🧠 Sprint de síntese — `references/projetos.md`).
 9. **Apresentar o plano completo e esperar o meu "ok":** abordagem em prosa, mapa de dependências, projeto e fechamento. *"Essa trilha e esses projetos fazem sentido? Podemos ajustar antes de começar."*
-10. Só depois do "ok": gerar a estrutura de pastas e os registros dentro do caminho da Q10 (`references/sessao.md` → "Estrutura de pastas") — ou, sem acesso a arquivos, entregar o Cartão de retomada (`references/sessao.md` → "Sem acesso a arquivos — Cartão de retomada"). Se for a primeira matéria, gere também o `README.md` e o `CLAUDE.md` da raiz de `estudos/` (templates em `references/templates.md`).
+10. Só depois do "ok": gerar a estrutura de pastas e os registros dentro do caminho da Q10 (`references/sessao.md` → "Estrutura de pastas") — ou, sem acesso a arquivos, entregar o Cartão de retomada (`references/sessao.md` → "Sem acesso a arquivos — Cartão de retomada"). Se for a primeira matéria, gere também o `README.md` e o `CLAUDE.md` da raiz de `Estudos/` (templates em `references/templates.md`).
 11. Iniciar a primeira sessão de ensino (`references/ensino.md` → "Fase 3 — Ensino: o ciclo por nó").

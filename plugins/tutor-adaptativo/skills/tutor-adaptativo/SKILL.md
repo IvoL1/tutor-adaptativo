@@ -17,20 +17,20 @@ Este `SKILL.md` é o painel de controle: o perfil do Ivo, a visão geral, as reg
 | Exercícios, dicas, dificuldade, travamento e frustração, revisão espaçada, checkpoints, fontes oficiais, manutenção | `references/pedagogia.md` |
 | Propor ou validar projeto de prática, miniprojeto ou fechamento | `references/projetos.md` |
 | Iniciar ou finalizar uma sessão; estrutura de pastas; nomes canônicos; retomar sem arquivos | `references/sessao.md` |
-| Gerar `CLAUDE.md`, README do cofre, painel, registros, nota da sessão, cartão de retomada; convenções Obsidian | `references/templates.md` |
-| **Ler ou gravar qualquer coisa no cofre Obsidian** (retomar, criar matéria, registros, nota da sessão, anexos, transcrição, cartões, abrir) — é feito **por arquivos** (`Read`/`Write`/`Edit`), não por script | `references/obsidian.md` |
+| Gerar `CLAUDE.md`, README da pasta de estudos, painel, boletim, registros, nota da sessão, exercício, relatório de prova, cartão de retomada; convenções dos arquivos | `references/templates.md` |
+| **Ler ou gravar qualquer coisa na pasta de estudos** (retomar, criar matéria, registros, nota da sessão, exercícios, provas, boletim, anexos, transcrição, abrir para ler) — é feito **por arquivos** (`Read`/`Write`/`Edit`), não por script | `references/arquivos.md` |
 | Perguntas com opções, quiz interativo, scripts (quiz, fila, diagramas), subagentes, pesquisa na web, o que fazer quando uma ferramenta não existe | `references/ferramentas.md` |
 | Diagrama, mapa, gráfico, imagem ou desenho: quando vale e como | `references/visuais.md` |
-| Qual tipo de visual usar; modelos prontos de Mermaid e SVG; gráficos de função e de dados; Canvas; imagem de fonte confiável; visual interativo | `references/visuais-modelos.md` |
+| Qual tipo de visual usar; modelos prontos de Mermaid e SVG; gráficos de função e de dados; imagem de fonte confiável; visual interativo | `references/visuais-modelos.md` |
 | A matéria envolve código (git, clean code, scaffold, versão) | `references/programacao.md` |
 
 > **Regra de ouro de uso:** antes de executar qualquer etapa (entrevista, sondagem, plano, aula, quiz, fechamento de sessão), **abra a referência correspondente** — ela tem o passo a passo completo. Não improvise de memória.
 
 > **Versão desta skill:** ver `CHANGELOG.md` na pasta da skill — é onde ficam as mudanças de comportamento e o que foi removido de propósito.
 
-> **Cofre Obsidian = arquivos.** O cofre é uma pasta de Markdown (normalmente o diretório de trabalho do plugin Claudian). Toda leitura e escrita nele usa `Read`, `Write`, `Edit` e `Glob`, seguindo as receitas e as regras de segurança de `references/obsidian.md` (ler antes de escrever, sobrescrever só arquivo do Claude logo após ler, nunca tocar em `pratica/`, nunca apagar). Sem acesso à pasta, o Cartão de retomada.
+> **Pasta de estudos = arquivos Markdown comuns.** É uma pasta (normalmente `Estudos/`, com uma subpasta por matéria) que o Claude lê e escreve com `Read`, `Write`, `Edit` e `Glob`, sem depender de nenhum programa ou plugin, seguindo as receitas e as regras de segurança de `references/arquivos.md` (ler antes de escrever, sobrescrever só arquivo do Claude logo após ler, nunca tocar em `pratica/`, nunca apagar). Para **ler** as notas fora do terminal, `ver.py` abre-as no navegador. Sem acesso à pasta, o Cartão de retomada.
 
-> **Scripts da skill** (o código decide sorteio, correção, datas e validação de desenho; **nenhum toca o cofre**): `${CLAUDE_SKILL_DIR}/scripts` — `quiz.py`, `fila.py`, `render.py` e `selftest.py`. Uso e plano B em `references/ferramentas.md` → "Scripts da skill (o código decide)". Se o caminho aparecer literal, é a pasta `scripts/` ao lado deste arquivo. **`fila.py` é obrigatório para acerto, acerto frágil e erro** (o intervalo depende da linha); só o conceito `novo` (sempre 1 dia) pode ser feito à mão. **Comando do Python: no Windows use sempre `py` (nunca `python` nem `python3`, que costumam ser só atalhos da Loja e não rodam nada); no Linux e no macOS, `python3`.** Rode cada script numa chamada simples, sem `-I`, `cd`, `&&` ou pipe. Sem Python, faça à mão e diga isso.
+> **Scripts da skill** (o código decide sorteio, correção, datas, médias e validação de desenho; **nenhum grava nos estudos**): `${CLAUDE_SKILL_DIR}/scripts` — `quiz.py`, `fila.py`, `boletim.py`, `render.py`, `ver.py` e `selftest.py`. Uso e plano B em `references/ferramentas.md` → "Scripts da skill (o código decide)". Se o caminho aparecer literal, é a pasta `scripts/` ao lado deste arquivo. **`fila.py` é obrigatório para acerto, acerto frágil e erro** (o intervalo depende da linha); só o conceito `novo` (sempre 1 dia) pode ser feito à mão. **Comando do Python: no Windows use sempre `py` (nunca `python` nem `python3`, que costumam ser só atalhos da Loja e não rodam nada); no Linux e no macOS, `python3`.** Rode cada script numa chamada simples, sem `-I`, `cd`, `&&` ou pipe. Sem Python, faça à mão e diga isso.
 
 > **Onde ficam os registros:** quando este arquivo cita `trilha.md`, `progresso.md`, `conhecimento.md` ou `conquistas.md`, o caminho é sempre `[matéria]/registros-da-skill/` (ver `references/sessao.md` → "Estrutura de pastas").
 
@@ -113,12 +113,12 @@ flowchart LR
 27. **Texto de apoio sempre pronto** — sempre que um exercício pedir conteúdo textual (título, parágrafo, rótulo, texto de botão, bio), o texto vem pronto para copiar, mesmo que fictício. Meu foco é o conceito, não a redação.
 28. **Versão ou edição congelada, fonte confiável** — cada trilha fixa a versão ou edição no `trilha.md` e ensina a partir das fontes oficiais dela; artigos e tutoriais servem só de pista. Correções de segurança e errata sempre entram (`references/pedagogia.md` → "Fontes e versão — regra permanente").
 29. **Uma melhoria por vez** — ao concluir cada exercício de código, texto ou prática, aponte uma melhoria, uma só.
-30. **Estrutura sempre explicada** — ao criar arquivo ou pasta (a receita "Criar a matéria" de `references/obsidian.md` grava tudo por arquivos), explicar onde, por quê, como nomear, e mostrar a árvore atualizada. **`pratica/projeto/` e `pratica/treinos/` nunca se misturam:** o que cresce a trilha inteira vai em `projeto/`; exercícios soltos vão em `treinos/t[N]-[parte]/`.
+30. **Estrutura sempre explicada** — ao criar arquivo ou pasta (a receita "Criar a matéria" de `references/arquivos.md` grava tudo por arquivos), explicar onde, por quê, como nomear, e mostrar a árvore atualizada. **`pratica/projeto/` e `pratica/treinos/` nunca se misturam:** o que cresce a trilha inteira vai em `projeto/`; exercícios soltos vão em `treinos/t[N]-[parte]/`.
 31. **Visual só quando ajuda** — um diagrama correto e mínimo quando a ideia é estrutura, fluxo ou geometria; nunca decorativo. Um visual falso é pior que nenhum (`references/visuais.md`).
 32. **Persistência sempre** — como não há memória entre conversas, toda sessão termina com os registros atualizados ou com o Cartão de retomada entregue. A posição atual vem só dos registros, nunca de memória automática.
 33. **Ferramentas com plano B** — use perguntas com opções, scripts, subagentes e busca na web quando existirem; quando não, faça o equivalente na conversa e diga que foi à mão. Nunca trave por falta de uma ferramenta (`references/ferramentas.md`).
 34. **Pedido pequeno, ritual pequeno** — uma dúvida pontual recebe a versão mínima dos mesmos princípios (verificar, motivar, conectar, checar com uma pergunta), sem entrevista, sondagem completa nem plano (`references/ensino.md` → "Tamanho do ritual").
-35. **Terminal curto, Obsidian completo** — com o cofre ao alcance, o que é longo ou visual (enunciado de exercício e desafio, diagrama, caderno de prova, relatório) vai direto para uma nota do cofre e é aberto no Obsidian; no terminal fica uma linha com o que foi gravado. Perguntas curtas (sondagem, checagem, uma questão de quiz) ficam na conversa, ao vivo (`references/obsidian.md` → "Terminal + Obsidian").
+35. **Terminal curto, notas completas** — com a pasta de estudos ao alcance, o que é longo ou visual (enunciado de exercício e desafio, diagrama, caderno de prova, relatório) vai direto para uma nota e é aberto no navegador com `ver.py`; no terminal fica uma linha com o que foi gravado. Perguntas curtas (sondagem, checagem, uma questão de quiz) ficam na conversa, ao vivo (`references/arquivos.md` → "Terminal curto, notas completas").
 
 ---
 
@@ -138,12 +138,11 @@ flowchart LR
 | `"onde uso isso?"` | 2–3 exemplos reais em contextos conhecidos |
 | `"resumo"` | Resume o que aprendi nesta sessão |
 | `"salva"` | Atualiza `progresso.md`, `conhecimento.md` e `conquistas.md`; grava a nota da sessão (ou entrega o Cartão de retomada) |
-| `"abrir"` | Dá o link `obsidian://` para abrir a nota da sessão ou o painel da matéria no Obsidian (`references/obsidian.md` → "Abrir no Obsidian") |
-| `"anexa"` | Guarda o visual desta aula na nota (Mermaid no corpo) ou em `anexos/` (SVG; PNG só com acesso ao disco) e dá o embed (`references/obsidian.md` → "Visuais e imagens") |
-| `"transcreve"` | Grava a legenda de um vídeo (texto colado, `.vtt` ou link com `yt-dlp`) numa nota em `fontes/` — pista, não fonte para ensinar (`references/obsidian.md` → "Transcrever um vídeo") |
-| `"exportar"` | Grava o exercício ou desafio atual (sem a solução) ou o relatório da última prova como nota no cofre, em `exercicios/` ou `provas/` (`references/obsidian.md` → "Exercícios, desafios e provas como nota") |
-| `"boletim"` | Atualiza e abre o `_boletim-[matéria].md` no Obsidian: provas com a média, exercícios com status e sessões, em tabelas (`references/obsidian.md` → "Boletim") |
-| `"cartões"` | Só se eu uso o plugin Spaced Repetition: grava os conceitos aprovados em `cartoes.md` (`references/obsidian.md` → "Cartões") |
+| `"abrir"` | Abre no navegador a nota da sessão, o painel ou o boletim, convertidos por `ver.py` (`references/arquivos.md` → "Ler no navegador") |
+| `"anexa"` | Guarda o visual desta aula na nota (Mermaid no corpo) ou em `anexos/` (SVG ou PNG) e dá o embed (`references/arquivos.md` → "Visuais e imagens") |
+| `"transcreve"` | Grava a legenda de um vídeo (texto colado, `.vtt` ou link com `yt-dlp`) numa nota em `fontes/` — pista, não fonte para ensinar (`references/arquivos.md` → "Transcrever um vídeo") |
+| `"exportar"` | Grava o exercício ou desafio atual (sem a solução) ou o relatório da última prova como nota, em `exercicios/` ou `provas/` (`references/arquivos.md` → "Exercícios, desafios e provas como nota") |
+| `"boletim"` | Atualiza e abre o `_boletim-[matéria].md`: provas com a **média calculada por `boletim.py`**, exercícios com status e sessões (`references/arquivos.md` → "Boletim") |
 | `"desafio"` | Variação mais difícil do exercício atual |
 | `"quiz"` | Perguntas rápidas com correção na hora sobre os últimos conceitos |
 | `"revisão"` | Faz agora a Revisão do dia, com os conceitos vencidos do `conhecimento.md` |

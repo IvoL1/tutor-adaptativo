@@ -1,6 +1,6 @@
-# Referência — Modelos de visuais (catálogo, SVG pronto, gráficos, canvas)
+# Referência — Modelos de visuais (catálogo, SVG pronto, gráficos)
 
-> Leia depois de `references/visuais.md` decidir que **vale** desenhar, e antes de escolher o tipo de visual ou de escrever o código dele. Os modelos abaixo foram conferidos: os blocos Mermaid passaram no analisador do Mermaid **11.4.1** (a versão que o Obsidian embute, segundo o fórum dele) e do 11.17.2 (o do `render.py`), e os SVG são XML válido que renderiza.
+> Leia depois de `references/visuais.md` decidir que **vale** desenhar, e antes de escolher o tipo de visual ou de escrever o código dele. Os modelos abaixo foram conferidos: os blocos Mermaid passaram no analisador do Mermaid **11.17.2** (o do `render.py` e do `ver.py`) e, por segurança, também no 11.4.1, e os SVG são XML válido que renderiza.
 
 > **Nesta referência:**
 > **1. Qual visual para qual ideia**
@@ -8,9 +8,8 @@
 > **3. SVG: modelos prontos para adaptar**
 > **4. Gráficos de função e de dados**
 > **5. Matemática, química e código na nota**
-> **6. Mapa navegável no Obsidian (Canvas, opcional)**
-> **7. Imagem de fonte confiável, ilustração e visual interativo**
-> **8. Compatibilidade com o Obsidian**
+> **6. Imagem de fonte confiável, ilustração e visual interativo**
+> **7. Cuidados com o Mermaid**
 
 ## Qual visual para qual ideia
 
@@ -35,7 +34,7 @@
 | tabela comparativa | Markdown | tabela, não desenho |
 | o conceito só se entende **mexendo** (arrastar, mudar um número e ver o efeito) | visual interativo | seção 7 |
 
-Os tipos marcados `-beta` e os que o Obsidian pode não conhecer estão na seção 8.
+Os tipos marcados `-beta` e os cuidados com o Mermaid estão na seção 7.
 
 ## Mermaid: modelos mínimos
 
@@ -154,13 +153,12 @@ gantt
 ```
 ````
 
-**`quadrantChart`: só ASCII nos rótulos dos quadrantes e dos pontos.** O analisador do Mermaid 11.4.1 (o do Obsidian) recusa acento e cedilha ali (`já`, `Funções` dão erro de sintaxe); título e eixos aceitam acento. Nos demais tipos testados, acento funciona.
 
 **Estado de domínio no mapa de dependências** (o do painel): nós firmes em verde, o resto cinza, com `classDef` (modelo em `references/templates.md` → painel).
 
 ## SVG: modelos prontos para adaptar
 
-SVG é texto: dá para gravar como `anexos/AAAA-MM-DD-nome.svg` com `Write` e embutir com `![[…svg]]`, ou colar num bloco ```` ```svg ```` quando o ambiente renderizar. Regras do desenhista: fundo branco, traço escuro, **uma** cor de destaque (`#d9480f`), fonte a partir de 12, nada fora do `viewBox`. **Coordenadas se calculam, não se estimam:** guarde a conta num comentário (`<!-- 50 px por unidade, zero em x=200 -->`) e, para muitos pontos, calcule no Bash (`awk`).
+SVG é texto: dá para gravar como `anexos/AAAA-MM-DD-nome.svg` com `Write` e embutir com `![descrição](caminho/arquivo.svg)`, ou colar num bloco ```` ```svg ```` quando o ambiente renderizar. Regras do desenhista: fundo branco, traço escuro, **uma** cor de destaque (`#d9480f`), fonte a partir de 12, nada fora do `viewBox`. **Coordenadas se calculam, não se estimam:** guarde a conta num comentário (`<!-- 50 px por unidade, zero em x=200 -->`) e, para muitos pontos, calcule no Bash (`awk`).
 
 **Reta numérica** (50 px por unidade; zero em x = 200; ponto em 2 → x = 300):
 
@@ -286,39 +284,21 @@ Precisa de curva suave, vários eixos ou dados demais? Faça o SVG com `<polylin
 
 ## Matemática, química e código na nota
 
-- **Matemática:** LaTeX, `$f(x)=x^2$` em linha e `$$…$$` em bloco próprio. O Obsidian renderiza nativo.
-- **Química:** o Obsidian (MathJax) entende `\ce{}`: `$\ce{2H2 + O2 -> 2H2O}$`.
+- **Matemática:** LaTeX, `$f(x)=x^2$` em linha e `$$…$$` em bloco próprio. O `ver.py` renderiza (KaTeX, precisa de rede).
+- **Química:** escreva as fórmulas em LaTeX comum (`$2H_2 + O_2 \rightarrow 2H_2O$`); o `\ce{}` não é garantido no leitor.
 - **Código:** bloco com a linguagem (```` ```python ````); para mostrar o que acontece passo a passo, uma tabela de "estado das variáveis por linha" costuma ensinar mais que um desenho.
 - **Tabelas** para comparar (tempos verbais, regras, prós e contras): Markdown puro, sem desenho.
-- **Partitura e notação especial:** não há suporte nativo no Obsidian. Use o teclado/braço em SVG (acima), cifra e tablatura em bloco de código monoespaçado, e diga ao Ivo se existir um plugin da comunidade para o caso (a instalação é com ele).
-
-## Mapa navegável no Obsidian (Canvas, opcional)
-
-O mapa de dependências do painel é o Mermaid. Se o Ivo quiser um mapa que **ele arrasta e reorganiza** no Obsidian, grave um arquivo `.canvas` (JSON Canvas, é texto) ao lado do painel, `{RAIZ}/{sg}/mapa-{sg}.canvas`. Se a ferramenta recusar a extensão, o Mermaid do painel continua valendo. Modelo mínimo (dois nós e uma seta):
-
-```json
-{
-  "nodes": [
-    {"id": "n1", "type": "text", "text": "verdade de chão", "x": 0, "y": 0, "width": 220, "height": 60, "color": "4"},
-    {"id": "n2", "type": "text", "text": "ideia derivada", "x": 0, "y": 160, "width": 220, "height": 60}
-  ],
-  "edges": [
-    {"id": "e1", "fromNode": "n1", "fromSide": "bottom", "toNode": "n2", "toSide": "top", "label": "sustenta"}
-  ]
-}
-```
-
-Os `id` são únicos; `color` é `"1"` a `"6"` (4 = verde, 1 = vermelho); a seta vai do `fromNode` ao `toNode`. Confira o JSON antes de gravar (uma vírgula sobrando corrompe o canvas). Atualizar o mapa depois é regravar o canvas **inteiro**, então só o ofereça se o Ivo for mesmo usá-lo; o Mermaid é a fonte do mapa aprovado.
+- **Partitura e notação especial:** não há suporte nativo. Use o teclado/braço em SVG (acima), cifra e tablatura em bloco de código monoespaçado.
 
 ## Imagem de fonte confiável, ilustração e visual interativo
 
-- **Foto, mapa, anatomia, obra de arte, espécime** (o que um diagrama não substitui): ache numa fonte confiável (Wikimedia Commons, acervo de museu, site oficial) com a busca na web, **abra a página** para confirmar a imagem e a licença, e embuta por link na nota: `![descrição](https://…)`, com uma linha de crédito (`Fonte: …, licença …`). O Obsidian mostra imagem remota; se a página sumir, a imagem some, então a fonte fica anotada. Não baixe imagem sem licença clara.
+- **Foto, mapa, anatomia, obra de arte, espécime** (o que um diagrama não substitui): ache numa fonte confiável (Wikimedia Commons, acervo de museu, site oficial) com a busca na web, **abra a página** para confirmar a imagem e a licença, e embuta por link na nota: `![descrição](https://…)`, com uma linha de crédito (`Fonte: …, licença …`). O leitor mostra imagem remota (com rede); se a página sumir, a imagem some, então a fonte fica anotada. Não baixe imagem sem licença clara.
 - **Imagem gerada por IA:** este sistema não tem gerador de imagem. Se o ambiente tiver um, use só para **ilustração mnemônica** (uma cena para lembrar um vocabulário, por exemplo), marcada como "ilustração gerada", **nunca** para fato (anatomia, mapa, texto dentro da imagem, fórmula, bandeira, partitura): imagem gerada erra isso com cara de certeza (Regra 31).
 - **Visual interativo** (Regra 14, prática > teoria): quando a ideia só se entende mexendo — um parâmetro que se arrasta e muda o gráfico, um algoritmo que se executa passo a passo, uma função cujos valores mudam —, uma página HTML de **um arquivo só**, sem dependência externa, pode ensinar mais que qualquer desenho. Se o ambiente tiver a ferramenta de artefatos/HTML, use-a; se não, dê o experimento como exercício (um trecho de código para rodar). Valem as mesmas regras: uma ideia, poucos controles, conferir que o resultado é verdadeiro, e nunca decorativo. O link do artefato entra na nota da sessão.
 
-## Compatibilidade com o Obsidian
+## Cuidados com o Mermaid
 
-- O Obsidian embute o **Mermaid 11.4.1** (informação do fórum do Obsidian; pode mudar quando o Obsidian atualizar), enquanto o `render.py` valida com o 11.17.2. **Testei todos os modelos da seção 2 nas duas versões**: todos passam no analisador de ambas, inclusive os tipos `-beta` (`xychart-beta`, `block-beta`, `architecture-beta`, `packet-beta`) e `kanban`. A única diferença achada é a do `quadrantChart` (ASCII). Mas **analisar não é desenhar**: o layout dos tipos novos pode sair diferente, e eu **não consigo ver a nota renderizada no Obsidian**. Em tipo `-beta`, diga ao Ivo para conferir na nota e tenha a alternativa pronta (SVG ou tabela).
-- Para validar contra a versão do Obsidian, use `python "<pasta>/render.py" mermaid entrada.mmd saida.png --mermaid-js mermaid-11.4.1.min.js` (o arquivo sai de `npm pack mermaid@11.4.1`, em `package/dist/mermaid.min.js`). Sem isso, o `render.py` usa o 11.17.2.
-- O Obsidian aplica o tema claro/escuro por conta própria. Evite cores fixas de texto em Mermaid; use `classDef` só com preenchimento claro (como no painel) e `color:#000` junto.
-- Nome do arquivo de anexo: sem acento, minúsculo, com hifens; embed `![[arquivo.svg|500]]` limita a largura.
+- O `render.py` e o `ver.py` usam o **Mermaid 11.17.2**. **Testei todos os modelos da seção 2** no analisador dessa versão e da 11.4.1 (ainda embutida em vários programas): todos passam nas duas, inclusive os tipos `-beta` (`xychart-beta`, `block-beta`, `architecture-beta`, `packet-beta`) e `kanban`. Mas **analisar não é desenhar**: o layout dos tipos novos pode sair diferente. Em tipo `-beta`, rode `render.py` e **olhe o PNG** antes de gravar; se ficar estranho, use SVG ou tabela.
+- Só na 11.4.1, o `quadrantChart` recusa acento e cedilha nos rótulos (`já`, `Funções`). Se o desenho for para outro programa além do `ver.py`, prefira ASCII nesses rótulos.
+- O `ver.py` tem tema claro e escuro. Evite cores fixas de texto em Mermaid; use `classDef` só com preenchimento claro (como no painel) e `color:#000` junto.
+- Nome do arquivo de anexo: sem acento, minúsculo, com hifens.

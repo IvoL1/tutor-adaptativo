@@ -221,8 +221,101 @@ def testa_entrada():
     quiz.STATE = antigo
 
 
+PROGRESSO = """# progresso.md
+
+## Posição atual
+- Tópico / Parte: T1 / 1b
+
+## Pendências abertas
+| Conceito | Onde travou | Marcado em | Status |
+|---|---|---|---|
+| — | — | — | aberto / resolvido em [data] |
+| mmc | 1a | 2026-10-06 | aberto |
+| fração | 1a | 2026-10-05 | resolvido em 2026-10-06 |
+
+## Histórico de provas
+## Prova — Tópico [X], Parte [Y] — [data]
+- Resultado: [%] | Status: ✅/⚠️/🔁
+## Prova — Tópico T1, Parte 1a — 2026-10-06
+- Resultado: 80% (4/5)
+- Status: ✅ Aprovado
+## Prova — Tópico T1, Parte 1b — 2026-10-07
+- Resultado: 50% (2/4)
+- Status: ⚠️ Reforço seletivo
+
+## Checkpoints
+x
+"""
+
+
+def monta_materia():
+    raiz = TMP / "Estudos"
+    mat = raiz / "mat"
+    (mat / "registros-da-skill").mkdir(parents=True, exist_ok=True)
+    (mat / "exercicios").mkdir(exist_ok=True)
+    (mat / "sessoes").mkdir(exist_ok=True)
+    (mat / "anexos").mkdir(exist_ok=True)
+    (mat / "registros-da-skill" / "progresso.md").write_text(PROGRESSO, encoding="utf-8")
+    (mat / "exercicios" / "2026-10-06-t1-1a-somar.md").write_text("---\ntipo: exercicio\nparte: 1a\nstatus: feito\n---\n# Somar frações\n", encoding="utf-8")
+    (mat / "exercicios" / "2026-10-07-t1-1b-mmc.md").write_text("---\ntipo: desafio\nparte: 1b\nstatus: pendente\n---\n# Desafio: mmc\n", encoding="utf-8")
+    (mat / "sessoes" / "2026-10-06-fracoes.md").write_text("# s\n", encoding="utf-8")
+    return raiz, mat
+
+
+def testa_boletim():
+    boletim = importlib.import_module("boletim")
+    raiz, mat = monta_materia()
+    cod, saida = rodar(boletim.principal, [str(mat), "--hoje", "2026-10-07"])
+    ok(cod == 0 and saida.startswith("SECAO: boletim") and saida.rstrip().endswith("FIM"), "boletim.py devolve SECAO/CONTEUDO/FIM")
+    ok("<!-- boletim:inicio -->" in saida and "<!-- boletim:fim -->" in saida, "boletim.py traz os marcadores")
+    ok("**Média das 2 prova(s): 65.0%**" in saida, "média das provas calculada por código (80 e 50 = 65.0)")
+    ok("[X]" not in saida and "[%]" not in saida, "o bloco-modelo do progresso não vira prova")
+    ok("**Feitos: 1 de 2**" in saida and "✅ feito" in saida and "⏳ pendente" in saida, "exercícios feitos e pendentes")
+    ok("Pendências abertas: 1" in saida, "pendência 'resolvido' e linha-modelo não contam")
+    ok("(exercicios/2026-10-07-t1-1b-mmc.md)" in saida and "(sessoes/2026-10-06-fracoes.md)" in saida, "links relativos ao boletim")
+    ok(rodar(boletim.principal, [str(TMP / "nada")])[0] == 2, "pasta que não é matéria dá erro limpo")
+    antes = (mat / "registros-da-skill" / "progresso.md").read_text(encoding="utf-8")
+    ok(antes == PROGRESSO, "boletim.py não grava nos estudos")
+    # regressão: no Windows a saída redirecionada é cp1252 e o emoji quebrava o script
+    import subprocess
+    env = {k: v for k, v in os.environ.items() if k != "PYTHONIOENCODING"}
+    for script, args in (("boletim.py", [str(mat)]), ("ver.py", [str(raiz)])):
+        r = subprocess.run([sys.executable, str(AQUI / script)] + args, capture_output=True, env=env)
+        ok(r.returncode == 0 and "Traceback" not in r.stderr.decode("utf-8", "replace"), f"{script} roda com a saída redirecionada sem PYTHONIOENCODING")
+
+
+def testa_ver():
+    ver = importlib.import_module("ver")
+    raiz, mat = monta_materia()
+    (mat / "_painel-mat.md").write_text(
+        "---\ntipo: indice\nmateria: mat\ntags: [materia]\n---\n# 📚 Matéria <b>x</b>\n\n> ▶ **Próximo passo** — somar *frações*\n\n"
+        "```mermaid\ngraph TD\n  A-->B\n```\n\n- [ ] T1\n  - [x] 1a\n\n| Prova | Resultado |\n|---|---|\n| p1 | 80% |\n\n"
+        "$$\nx^2\n$$\n\nFórmula $\\frac{1}{4}$ e `$código$`.\n\n<details>\n<summary>Dica 1</summary>\n\nPense no mmc.\n\n</details>\n\n"
+        "![fig](anexos/f.svg) [boletim](_boletim-mat.md) [ex](exercicios/2026-10-07-t1-1b-mmc.md#topo) [site](https://exemplo.com)\n\n1. um\n2. dois\n",
+        encoding="utf-8")
+    (mat / "_boletim-mat.md").write_text("# Boletim\n", encoding="utf-8")
+    os.environ["TUTOR_VER"] = str(TMP / "ver")
+    cod, saida = rodar(ver.main, [str(raiz), "mat/_painel-mat.md"])
+    info = json.loads(saida)
+    ok(cod == 0 and info["ok"] and info["paginas"] >= 4 and info["aberto"] is False, "ver.py gera as páginas sem abrir o navegador")
+    h = pathlib.Path(info["html"]).read_text(encoding="utf-8")
+    ok("tipo: indice" not in h and "<h1>📚 Matéria &lt;b&gt;x&lt;/b&gt;</h1>" in h, "frontmatter fora do corpo e HTML do texto escapado")
+    ok('<pre class="mermaid">' in h and "<table>" in h and "<details>" in h and "<summary>Dica 1</summary>" in h, "mermaid, tabela e details")
+    ok("<blockquote><p>▶ <strong>Próximo passo</strong>" in h and "<em>frações</em>" in h, "citação, negrito e itálico")
+    ok("☐ T1" in h and "☑ 1a" in h and "<ol>" in h, "tarefas aninhadas e lista numerada")
+    ok("$\\frac{1}{4}$" in h and "<code>$código$</code>" in h and '<div class="math">$$' in h, "fórmulas ficam para o KaTeX; código em linha preservado")
+    ok('href="_boletim-mat.html"' in h and 'href="exercicios/2026-10-07-t1-1b-mmc.html#topo"' in h and 'href="https://exemplo.com"' in h, "links .md viram .html; externos ficam")
+    ok('src="file:///' in h and "anexos/f.svg" in h, "imagem relativa vira file:// absoluto")
+    ok("integrity=" in h and "katex" in h and "mermaid" in h, "scripts externos com versão fixa e integridade")
+    idx = (pathlib.Path(info["html"]).parents[1] / "index.html").read_text(encoding="utf-8")
+    ok('href="mat/_painel-mat.html"' in idx and 'href="mat/_boletim-mat.html"' in idx, "index lista a matéria com painel e boletim")
+    ok(rodar(ver.main, [str(raiz), str(TMP / "fora.md")])[0] == 2, "arquivo fora da pasta de estudos é recusado")
+    ok(rodar(ver.main, [str(TMP / "nao-existe")])[0] == 2, "pasta inexistente dá erro limpo")
+    ok(not list(raiz.rglob("*.html")), "ver.py não grava nada nos estudos")
+
+
 if __name__ == "__main__":
-    for t in (testa_quiz, testa_fila, testa_fila_stdin, testa_png, testa_entrada):
+    for t in (testa_quiz, testa_fila, testa_fila_stdin, testa_png, testa_entrada, testa_boletim, testa_ver):
         try:
             t()
         except Exception as e:  # um erro inesperado também conta como falha

@@ -13,7 +13,7 @@ claude plugin eval . --trust-plugin --runs 1 --ablation none
 # só os essenciais
 claude plugin eval . --trust-plugin --tag essencial
 
-# casos que usam scripts ou gravam no cofre (precisam liberar Bash e escrita)
+# casos que usam scripts ou gravam na pasta de estudos (precisam liberar Bash e escrita)
 claude plugin eval . --trust-plugin --tag ferramentas --allow-tools Bash,Write,Edit
 ```
 

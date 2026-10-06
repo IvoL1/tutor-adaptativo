@@ -3,6 +3,16 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 6.0.0 — 2026-10-06
+
+**A skill ficou autossuficiente: nada de Obsidian, de plugin do Obsidian nem de Claudian.** A pasta de estudos (`Estudos/`, uma subpasta por matéria) é Markdown comum, lida e escrita pelo Claude Code com as ferramentas de arquivo.
+- **Removido de propósito:** `references/obsidian.md` (virou `references/arquivos.md`), tabelas `.base`, callouts `> [!tipo]`, `[[wikilinks]]` e `![[embeds]]`, links `obsidian://`, detecção por `.obsidian/` e `obsidian.json`, `cartoes.md` (comando `"cartões"` e plugin Spaced Repetition), mapa `.canvas`, nota de compatibilidade com o Mermaid do Obsidian, `cofre.py` na documentação. Não reintroduzir.
+- **Convenções novas dos arquivos:** links Markdown relativos ao arquivo, destaques em citação com emoji (`> ▶ **Próximo passo** …`), dicas dobráveis com `<details>`, imagens `![descrição](caminho)`.
+- **`scripts/ver.py` (novo): o leitor.** Converte todas as notas `.md` em páginas HTML numa pasta temporária (nada é gravado nos estudos) e abre no navegador padrão (`webbrowser`, sem `cmd.exe`): tabelas, listas e tarefas, citações, `<details>`, imagens, links entre notas, fórmulas (KaTeX 0.16.11) e diagramas (Mermaid 11.17.2, o mesmo do `render.py`), os dois com versão fixa e SRI; sem rede abrem como texto. Comando `"abrir"`.
+- **`scripts/boletim.py` (novo):** o código calcula a média das provas, os exercícios feitos de quantos e as pendências a partir do `progresso.md`, de `exercicios/` e de `sessoes/`, e devolve o bloco entre `<!-- boletim:inicio -->` e `<!-- boletim:fim -->` do `_boletim-[matéria].md`; o Claude só aplica com `Edit`. Substitui as Bases do Obsidian.
+- `selftest.py`: 94 verificações (24 novas para `boletim.py` e `ver.py`).
+- Mantido da 5.1: `"exportar"`, exercícios e desafios em nota com dicas dobráveis, correção com `status: feito`, prova em nota, `"boletim"`; o modo pasta (Regra 35) agora abre as notas pelo `ver.py`.
+
 ## 5.1.0 — 2026-10-06
 
 **Exercícios, desafios e provas como notas no Obsidian** (novo comando `"exportar"`, sempre a pedido)

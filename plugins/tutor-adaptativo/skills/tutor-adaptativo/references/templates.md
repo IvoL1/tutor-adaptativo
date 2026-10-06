@@ -1,15 +1,15 @@
 # Referência — Templates dos arquivos
 
-> Use ao gerar `CLAUDE.md`, README do cofre, painel, `trilha.md`, `progresso.md`, `conhecimento.md`, `conquistas.md`, a nota da sessão ou o Cartão de retomada.
+> Use ao gerar `CLAUDE.md`, README da pasta de estudos, painel, `trilha.md`, `progresso.md`, `conhecimento.md`, `conquistas.md`, a nota da sessão ou o Cartão de retomada.
 
 > **Nesta referência:**
-> **1. Convenções Obsidian (valem para TODO arquivo gerado)**
+> **1. Convenções dos arquivos (valem para TODO arquivo gerado)**
 > **2. Templates**
->     · Template: `CLAUDE.md` (raiz do cofre — ponteiro, gerado 1x)
->     · Template: `README.md` (raiz do cofre — índice geral, gerado com a primeira matéria)
+>     · Template: `CLAUDE.md` (raiz dos estudos — ponteiro, gerado 1x)
+>     · Template: `README.md` (raiz dos estudos — índice geral, gerado com a primeira matéria)
 >     · Template: `_painel-[matéria].md` (o mapa e o painel da matéria — atualizado ao fim de cada sessão)
 >     · Template: Painel inicial (o começo honesto de uma matéria recém-criada)
->     · Template: `_sessoes-[matéria].base` (tabela nativa das sessões)
+>     · Template: `_boletim-[matéria].md` (o boletim)
 >     · Template: `_leia-me.md` de `pratica/`
 >     · Template: `trilha.md`
 >     · Template: `progresso.md`
@@ -18,33 +18,33 @@
 >     · Template: nota da sessão (`sessoes/AAAA-MM-DD-[tópico].md`)
 >     · Template: Cartão de retomada
 
-## Convenções Obsidian (valem para TODO arquivo gerado)
+## Convenções dos arquivos (valem para TODO arquivo gerado)
 
-> A documentação é feita para ser lida no Obsidian, sem quebrar Markdown padrão:
-- **Frontmatter YAML** no topo de todo arquivo gerado **dentro da pasta de uma matéria**: `tipo` (sessao/registro/indice), `materia`, `topico`, `parte`, `tags` — mais `data` nas notas de sessão. Campos que não se aplicam ao arquivo (um painel não tem `parte`) simplesmente não entram. Invisível no Markdown puro, vira propriedades no Obsidian. **Exceção:** `README.md` e `CLAUDE.md` da raiz de `estudos/` não levam frontmatter — não pertencem a nenhuma matéria.
-- **[[Wikilinks]]** para conectar arquivos: o painel linka as notas de sessão; as notas linkam conceitos do `conhecimento` da matéria quando citados. Sem extensão; quando o nome se repete entre matérias, com o caminho (ver "Wikilinks entre matérias" abaixo).
-- **Callouts** no lugar de HTML: celebração ou conquista usa `> [!success]`; avisos usam `> [!warning]`; perguntas em aberto usam `> [!question]`; destaques usam `> [!info]`. Em Markdown puro degradam como citações, sem quebrar nada.
-- **Diagramas em mermaid:** um bloco ```` ```mermaid ```` renderiza nativo no Obsidian e no GitHub (`references/visuais.md`).
-- **Matemática em LaTeX:** `$f(x)$` em linha e `$$` em bloco próprio — o Obsidian renderiza nativamente. Sempre que houver notação matemática, escreva em LaTeX, e não em aproximação de texto simples.
-- **Nomes de arquivo:** minúsculos, com hifens, autoexplicativos (`2026-09-30-funcoes.md`, nunca `nota1.md`).
-- **Imagens e diagramas** ficam em `[matéria]/anexos/` e entram na nota com `![[arquivo.png]]` (largura opcional: `![[arquivo.png|500]]`); como gravar (Mermaid no corpo, SVG como texto, PNG só com acesso ao disco) está em `references/obsidian.md` → "Visuais e imagens".
-- **Wikilinks entre matérias:** nomes como `conquistas` e `progresso` existem em toda matéria, então um `[[conquistas]]` solto fica ambíguo. Use o caminho completo a partir do cofre com apelido: `[[ingles/registros-da-skill/conquistas|conquistas]]`. Só os nomes únicos (`_painel-[matéria]`, notas de `sessoes/`) podem ir sem caminho.
+> São Markdown comum: abrem em qualquer editor e o `ver.py` os mostra no navegador.
+- **Frontmatter YAML** no topo de todo arquivo gerado **dentro da pasta de uma matéria**: `tipo` (sessao/registro/indice/exercicio/desafio/prova/boletim/fonte), `materia`, `topico`, `parte`, `tags` — mais `data` nas notas de sessão, `status` nos exercícios e `resultado` (só o número) nas provas. Campos que não se aplicam ao arquivo (um painel não tem `parte`) simplesmente não entram. Os scripts (`boletim.py`) leem `tipo`, `status` e `parte`. **Exceção:** `README.md` e `CLAUDE.md` da raiz dos estudos não levam frontmatter — não pertencem a nenhuma matéria.
+- **Links entre arquivos** são links Markdown com caminho **relativo ao arquivo que os contém**: `[texto](sessoes/2026-09-30-funcoes.md)` no painel, `[painel](../_painel-matéria.md)` numa nota de `exercicios/`.
+- **Destaques** são citações com um emoji e o rótulo em negrito: `> ▶ **Próximo passo** …`, `> 💡 **A ideia que encaixou hoje** …`, `> ⚠️ **Atenção** …`, `> ❓ **Em aberto** …`, `> 🎉 **Conquista** …`. Nada de `> [!tipo]`.
+- **Dicas e respostas dobráveis** usam `<details><summary>Título</summary>` + linha em branco + texto + linha em branco + `</details>`.
+- **Diagramas em mermaid:** um bloco ```mermaid renderiza no `ver.py` e no GitHub (`references/visuais.md`).
+- **Matemática em LaTeX:** `$f(x)$` em linha e `$$` em bloco próprio — o `ver.py` renderiza (precisa de rede). Sempre que houver notação matemática, escreva em LaTeX, e não em aproximação de texto simples.
+- **Nomes de arquivo:** minúsculos, com hifens, sem acento, autoexplicativos (`2026-09-30-funcoes.md`, nunca `nota1.md`).
+- **Imagens e diagramas** ficam em `[matéria]/anexos/` e entram na nota com `![descrição](caminho/relativo/arquivo.png)`; como gravar (Mermaid no corpo, SVG como texto, PNG por cópia) está em `references/arquivos.md` → "Visuais e imagens".
 
 ## Templates
 
-### Template: `CLAUDE.md` (raiz do cofre — ponteiro, gerado 1x)
+### Template: `CLAUDE.md` (raiz dos estudos — ponteiro, gerado 1x)
 
 ```markdown
-# Cofre de estudos do Ivo
+# Pasta de estudos do Ivo
 
-Este cofre usa a skill **tutor-adaptativo**. Siga-a para tudo
+Esta pasta usa a skill **tutor-adaptativo**. Siga-a para tudo
 (entrevista, sondagem, plano, aula, quiz, estrutura de pastas). Não duplique regras aqui.
 
 - A posição de cada matéria está em `[matéria]/registros-da-skill/progresso.md`.
   Esses arquivos são a única fonte de verdade sobre onde parei.
 - Ignore memórias automáticas de sessões antigas sobre estudos; se conflitarem
   com os registros, os registros vencem.
-- Leia e grave neste cofre por arquivos, seguindo `references/obsidian.md` da skill:
+- Leia e grave nesta pasta por arquivos, seguindo `references/arquivos.md` da skill:
   ler antes de escrever, sobrescrever só arquivo do Claude logo depois de ler, nunca mexer em `pratica/`, nunca apagar.
 
 ## Como aprendo (vale para qualquer matéria)
@@ -57,21 +57,21 @@ Este cofre usa a skill **tutor-adaptativo**. Siga-a para tudo
 - (o que foi difícil e como foi resolvido)
 ```
 
-> Este é o único lugar onde o histórico de dificuldades é **atualizado**: o arquivo da skill é sobrescrito a cada atualização do plugin, o `CLAUDE.md` do cofre não.
+> Este é o único lugar onde o histórico de dificuldades é **atualizado**: o arquivo da skill é sobrescrito a cada atualização do plugin, o `CLAUDE.md` da pasta de estudos não.
 
-### Template: `README.md` (raiz do cofre — índice geral, gerado com a primeira matéria)
+### Template: `README.md` (raiz dos estudos — índice geral, gerado com a primeira matéria)
 
 ```markdown
 # Estudos do Ivo
 
-Índice do cofre. Cada matéria tem a sua pasta, e dentro dela o painel é a porta
+Índice dos estudos. Cada matéria tem a sua pasta, e dentro dela o painel é a porta
 de entrada. O sistema é a skill **tutor-adaptativo**.
 
 ## Matérias ativas
-- [[_painel-[matéria]|[Matéria]]] — T[N] parte [X] · ▶ [próximo passo em 1 frase]
+- [Matéria]([matéria]/_painel-[matéria].md) — T[N] parte [X] · ▶ [próximo passo em 1 frase]
 
 ## Matérias concluídas
-- [[_painel-[matéria]|[Matéria]]] — concluída em [AAAA-MM-DD] · entra em `"manutenção"`
+- [Matéria]([matéria]/_painel-[matéria].md) — concluída em [AAAA-MM-DD] · entra em `"manutenção"`
 
 ## Como uso isto
 1. Abro o Claude e digo `"retomar"` (ou o nome da matéria).
@@ -79,7 +79,7 @@ de entrada. O sistema é a skill **tutor-adaptativo**.
 3. No fim, ele grava a nota da sessão e o próximo passo.
 ```
 
-> Atualizado quando uma matéria nasce, muda de posição ou conclui.
+> Atualizado quando uma matéria nasce, muda de posição ou conclui. Troque `[Matéria]` pelo nome mostrado e `[matéria]` pela pasta.
 
 ### Template: `_painel-[matéria].md` (o mapa e o painel da matéria — atualizado ao fim de cada sessão)
 
@@ -91,8 +91,7 @@ tags: [materia]
 ---
 # 📚 [Matéria]
 
-> [!info] ▶ Próximo passo
-> [nó ou tópico] — [o que fazer nele em 1 frase]
+> ▶ **Próximo passo** — [nó ou tópico] — [o que fazer nele em 1 frase]
 
 ## Mapa de dependências
 > O mapa aprovado na Fase 2 do plano. Nós firmes em verde; o que vem depois, em cinza.
@@ -110,14 +109,13 @@ graph TD
 - [ ] T2 — [Tópico] ⬜
 
 ## Sessões recentes
-- [[2026-09-30-tópico]] — [a ideia que encaixou]
+- [2026-09-30-tópico](sessoes/2026-09-30-tópico.md) — [a ideia que encaixou]
 
 ## Onde mexo e onde não mexo
 - ✍️ **Mexo:** `pratica/`
 - 🚫 **Não mexo:** `registros-da-skill/` (ler pode — editar não) · `sessoes/` · painel
 
-> [!success] Nos dias difíceis
-> Abro [[[matéria]/registros-da-skill/conquistas|conquistas]] e vejo o quanto já andei.
+> 💪 **Nos dias difíceis** — abro as [conquistas](registros-da-skill/conquistas.md) e vejo o quanto já andei.
 ````
 
 ### Template: Painel inicial (o começo honesto de uma matéria recém-criada)
@@ -132,8 +130,7 @@ tags: [materia]
 ---
 # 📚 [Matéria]
 
-> [!info] ▶ Próximo passo
-> Fazer a entrevista e a sondagem; o plano aprovado vira a trilha aqui
+> ▶ **Próximo passo** — Fazer a entrevista e a sondagem; o plano aprovado vira a trilha aqui
 
 ## Mapa de dependências
 > O mapa aprovado na Fase 2 do plano aparece aqui.
@@ -147,116 +144,19 @@ graph TD
 - [ ] (a trilha aparece aqui depois do plano aprovado)
 
 ## Sessões recentes
-> Tabela com todas: [[_sessoes-[matéria].base|todas as sessões]]
+> Todas as sessões e o boletim: [boletim](_boletim-[matéria].md)
 - (nenhuma sessão ainda)
 
 ## Onde mexo e onde não mexo
 - ✍️ **Mexo:** `pratica/`
 - 🚫 **Não mexo:** `registros-da-skill/` (ler pode — editar não) · `sessoes/` · painel
 
-> [!success] Nos dias difíceis
-> Abro [[[matéria]/registros-da-skill/conquistas|conquistas]] e vejo o quanto já andei.
+> 💪 **Nos dias difíceis** — abro as [conquistas](registros-da-skill/conquistas.md) e vejo o quanto já andei.
 ````
 
-### Template: `_sessoes-[matéria].base` (tabela nativa das sessões)
+### Template: `_boletim-[matéria].md` (o boletim)
 
-> Recurso **Bases** do Obsidian (plugin do núcleo). Lista as notas de `sessoes/` pelo frontmatter. Troque `[caminho da matéria]` pelo caminho da pasta da matéria a partir da raiz do cofre. Se a ferramenta recusar a extensão `.base`, a matéria funciona sem ela.
-
-```yaml
-filters:
-  and:
-    - file.inFolder("[caminho da matéria]/sessoes")
-
-formulas: {}
-
-properties:
-  file.name:
-    displayName: "Sessão"
-  note.data:
-    displayName: "Data"
-  note.topico:
-    displayName: "Tópico"
-
-views:
-  - type: table
-    name: "Sessões"
-    order:
-      - file.name
-      - note.data
-      - note.topico
-    summaries: {}
-```
-
-> Exemplo: com a raiz de estudos em `estudos/` e a matéria `ingles`, fica `file.inFolder("estudos/ingles/sessoes")`. Com a raiz de estudos sendo o próprio cofre, `file.inFolder("ingles/sessoes")`.
-
-### Templates: `_provas-[matéria].base`, `_exercicios-[matéria].base` e `_boletim-[matéria].md` (o boletim)
-
-> O boletim é uma nota que **mostra** as tabelas das provas, dos exercícios e das sessões (Bases do Obsidian, plugin do núcleo). Nada é calculado à mão: a média das provas é um resumo da própria tabela. Mesma troca de `[caminho da matéria]` do template das sessões. Se a ferramenta recusar a extensão `.base`, a matéria funciona sem elas.
-
-`_provas-[matéria].base`:
-
-```yaml
-filters:
-  and:
-    - file.inFolder("[caminho da matéria]/provas")
-
-properties:
-  file.name:
-    displayName: "Prova"
-  note.data:
-    displayName: "Data"
-  note.topico:
-    displayName: "Tópico"
-  note.parte:
-    displayName: "Parte"
-  note.resultado:
-    displayName: "Resultado (%)"
-
-views:
-  - type: table
-    name: "Provas"
-    order:
-      - file.name
-      - note.data
-      - note.topico
-      - note.parte
-      - note.resultado
-    summaries:
-      note.resultado: Average
-```
-
-`_exercicios-[matéria].base` (mesma estrutura; muda a pasta e as colunas):
-
-```yaml
-filters:
-  and:
-    - file.inFolder("[caminho da matéria]/exercicios")
-
-properties:
-  file.name:
-    displayName: "Exercício"
-  note.tipo:
-    displayName: "Tipo"
-  note.topico:
-    displayName: "Tópico"
-  note.parte:
-    displayName: "Parte"
-  note.status:
-    displayName: "Status"
-
-views:
-  - type: table
-    name: "Exercícios e desafios"
-    order:
-      - file.name
-      - note.tipo
-      - note.topico
-      - note.parte
-      - note.status
-    summaries: {}
-```
-
-`_boletim-[matéria].md`:
+> Provas com a média, exercícios com status e sessões. **O bloco entre os marcadores é gerado por `scripts/boletim.py`** (a conta é do código); o Claude só troca o que está entre eles, com `Edit` (`references/arquivos.md` → "Boletim"). Nasce com o bloco vazio.
 
 ```markdown
 ---
@@ -266,26 +166,21 @@ tags: [boletim]
 ---
 # 🎓 Boletim — [Matéria]
 
-> [!info] Situação
-> Atualizado em AAAA-MM-DD · Posição: [tópico / parte] · Pendências abertas: [quantas, ou "nenhuma"] · Média das provas: na tabela abaixo
+<!-- boletim:inicio -->
 
-## Provas
-![[_provas-[matéria].base]]
+> 📋 **Situação** — ainda sem dados: rode `"boletim"` depois da primeira prova ou exercício
 
-## Exercícios e desafios
-![[_exercicios-[matéria].base]]
-
-## Sessões
-![[_sessoes-[matéria].base]]
+<!-- boletim:fim -->
 
 ## Onde reforçar
-- [[[caminho da matéria]/registros-da-skill/progresso|Pendências abertas e histórico de provas]]
-- [[[caminho da matéria]/registros-da-skill/conhecimento|Fila de revisão e erros comuns]]
+- [Pendências abertas e histórico de provas](registros-da-skill/progresso.md)
+- [Fila de revisão e erros comuns](registros-da-skill/conhecimento.md)
+- [Painel da matéria](_painel-[matéria].md)
 ```
 
 ### Template: `_leia-me.md` de `pratica/`
 
-> Um para `pratica/projeto/` e outro para `pratica/treinos/`. Já diz de quem a pasta é e a deixa visível no Obsidian.
+> Um para `pratica/projeto/` e outro para `pratica/treinos/`. Já diz de quem a pasta é.
 
 ```markdown
 ---
@@ -295,8 +190,7 @@ tags: [materia]
 ---
 # ✍️ [projeto de prática | treinos] — [Matéria]
 
-> [!info] Esta pasta é minha
-> Aqui eu escrevo e guardo o que faço. O Claude lê, revisa e sugere, mas não edita nem apaga nada aqui.
+> ✍️ **Esta pasta é minha** — aqui eu escrevo e guardo o que faço. O Claude lê, revisa e sugere, mas não edita nem apaga nada aqui.
 
 - **`projeto/`:** o projeto de prática, que cresce a trilha inteira.
 - **`treinos/`:** exercícios soltos, uma subpasta por parte (`t1-1a/`, `t1-1b/`…).
@@ -316,7 +210,7 @@ tags: [materia]
 - **Orçamento de tempo por sessão:** [30min/1h/2h] — usado para dimensionar cada sessão (Regra 24)
 - Prazo (se houver):
 - **Ambiente e recursos:** [computador/SO/editor, instrumento, materiais…] — evita instruções que não batem com o meu ambiente
-- **Raiz dos estudos no cofre:** [caminho da pasta de estudos a partir da raiz do cofre Obsidian, ex.: `estudos/`; e, se o Claude alcança o disco, a pasta do cofre; ou "sem acesso a arquivos"]
+- **Raiz dos estudos:** [caminho da pasta de estudos, ex.: `Estudos/`; ou "sem acesso a arquivos"]
 - **Bagagem relacionada:** [o que já domino de parecido + tempo, ou "nenhuma"] — usar para analogias em vez de ensinar do zero o que é transferível
 - **Interesses pessoais (para analogias e exemplos):** [hobbies, áreas de interesse — ou "nenhum informado"]
 - Fonte de referência: [URL, livro, norma…]
@@ -441,7 +335,7 @@ _(demais dificuldades: preencha conforme aparecerem ao longo da trilha)_
 > Ver o template completo (dashboard + changelog) em `references/projetos.md`, seção "Changelog de conquistas (`conquistas.md`)". O Dashboard guarda a **data da última sessão** — é o que decide se a próxima sessão abre com a Reentrada.
 
 ### Template: nota da sessão (`sessoes/AAAA-MM-DD-[tópico].md`)
-> É o diário da sessão, escrito pelo Claude ao fim dela (ou quando eu disser `"salva"`). Serve para eu reler, no Obsidian e com tudo renderizado (diagramas, matemática, código), o que entendi — sem precisar rolar a conversa. Guarde o que vale reler, não a transcrição inteira.
+> É o diário da sessão, escrito pelo Claude ao fim dela (ou quando eu disser `"salva"`). Serve para eu reler, no navegador (`ver.py`) e com tudo renderizado (diagramas, matemática, código), o que entendi — sem precisar rolar a conversa. Guarde o que vale reler, não a transcrição inteira.
 
 ````markdown
 ---
@@ -453,8 +347,7 @@ tags: [materia, sessao]
 ---
 # Sessão AAAA-MM-DD — [o que foi estudado]
 
-> [!success] A ideia que encaixou hoje
-> [uma frase]
+> 💡 **A ideia que encaixou hoje** — [uma frase]
 
 ## O que vimos
 - [nó ou conceito] — [1 linha] · checagem: ✅ / ❌ / não sei
@@ -475,7 +368,7 @@ graph TD
 
 ### Template: exercício ou desafio (`exercicios/AAAA-MM-DD-[tópico]-[parte]-[nome].md`)
 
-> Só a pedido (`"exportar"`). **Nunca contém a solução** (Regra 9): as dicas são a escada de `references/pedagogia.md`, cada uma dobrada (`-`), uma por degrau, e nenhuma entrega a resposta. A solução só entra se eu pedir `"resposta"`, e então como uma seção dobrada no fim.
+> Só a pedido (`"exportar"`). **Nunca contém a solução** (Regra 9): as dicas são a escada de `references/pedagogia.md`, cada uma dobrada (`<details>`), uma por degrau, e nenhuma entrega a resposta. A solução só entra se eu pedir `"resposta"`, e então como uma seção dobrada no fim.
 
 ```markdown
 ---
@@ -490,20 +383,28 @@ tags: [exercicio]
 ---
 # [Título curto do exercício]
 
-> [!todo] O que fazer
+> 📝 **O que fazer**
 > [Enunciado em passos curtos. Texto de apoio já pronto para copiar (Regra 27).]
 
-> [!check] Critério de pronto
+> ✅ **Critério de pronto**
 > [O que observar ou conseguir quando acertar, sem dar a solução (Regra 22).]
 
-> [!hint]- Dica 1
-> [Direção geral, sem a resposta.]
+<details>
+<summary>Dica 1</summary>
 
-> [!hint]- Dica 2
-> [Mais específica, ainda sem a resposta.]
+[Direção geral, sem a resposta.]
+
+</details>
+
+<details>
+<summary>Dica 2</summary>
+
+[Mais específica, ainda sem a resposta.]
+
+</details>
 
 ## Onde faço
-Minha resposta vai em `pratica/treinos/t[N]-[parte]/` (`[[_painel-[matéria]|painel]]`).
+Minha resposta vai em `pratica/treinos/t[N]-[parte]/` ([painel](../_painel-[matéria].md)).
 ```
 
 Desafio é o mesmo template com `tipo: desafio`, `tags: [desafio]` e o título começando por "Desafio:".
@@ -512,10 +413,10 @@ Desafio é o mesmo template com `tipo: desafio`, `tags: [desafio]` e o título c
 
 ```markdown
 ## Correção — AAAA-MM-DD
-> [!success] [O que acertei, em uma frase — celebrar antes de corrigir (Regra 11)]
+> 🎉 **[O que acertei, em uma frase — celebrar antes de corrigir (Regra 11)]**
 
 - **Uma melhoria:** [uma só (Regra 29)]
-- **Minha resposta:** [[caminho do meu arquivo em pratica/treinos/…]]
+- **Minha resposta:** [meu arquivo](../pratica/treinos/…)
 ```
 
 ### Template: relatório de prova (`provas/AAAA-MM-DD-[tópico]-[parte]-[nome].md`)
@@ -534,8 +435,7 @@ tags: [prova]
 ---
 # Prova — Tópico [N], Parte [Na] — AAAA-MM-DD
 
-> [!info] Resultado
-> [percentual] ([acertos]/[total]) · [decisão do placar]
+> 📊 **Resultado** — [percentual] ([acertos]/[total]) · [decisão do placar]
 
 | # | Pergunta | Minha resposta | Confiança | Resultado | Certa |
 |---|---|---|---|---|---|

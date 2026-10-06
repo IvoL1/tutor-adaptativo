@@ -1,6 +1,6 @@
 # Referência — Ferramentas e subagentes (com plano B)
 
-> Leia ao fazer uma pergunta com opções, aplicar um quiz, delegar pesquisa ou diagrama a um subagente, rodar um script, ou quando uma ferramenta não existir no ambiente. Para ler ou gravar no cofre, vá direto a `references/obsidian.md`.
+> Leia ao fazer uma pergunta com opções, aplicar um quiz, delegar pesquisa ou diagrama a um subagente, rodar um script, ou quando uma ferramenta não existir no ambiente. Para ler ou gravar na pasta de estudos, vá direto a `references/arquivos.md`.
 
 > **Princípio (Regra 33):** use a ferramenta quando ela existir e faça o equivalente na conversa quando não existir. **Nunca** trave por falta de ferramenta, e nunca diga "não consigo" se a conversa resolve.
 
@@ -9,11 +9,13 @@
 > **2. Quiz interativo**
 > **3. Subagentes**
 >     · Sem subagentes
-> **4. Cofre Obsidian por arquivos**
+> **4. Pasta de estudos por arquivos**
 > **5. Scripts da skill (o código decide)**
 >     · Quiz (`quiz.py`)
 >     · Fila de revisão (`fila.py`)
 >     · Diagramas (`render.py`)
+>     · Boletim (`boletim.py`)
+>     · Leitor no navegador (`ver.py`)
 > **6. Arquivos: com e sem acesso**
 > **7. Formatação**
 
@@ -56,7 +58,7 @@ Diferença entre escolha e quiz: `references/avaliacao.md` → "Perguntas com re
 | `tutor-pesquisador` | Pesquisar na web e devolver um relatório curto com fontes, links e datas | Na menor dúvida sobre um fato (`references/ensino.md` → "Precisão inegociável"); ao mapear um campo novo; ao levantar fonte e versão na entrevista |
 | `tutor-diagramador` | Criar **um** diagrama correto e mínimo e verificá-lo olhando o resultado | Quando uma ideia é melhor como desenho (`references/visuais.md`) |
 
-**Como chamar:** descreva a tarefa por **completo** — o subagente roda isolado e **não conhece a conversa**. Inclua o que precisa saber, o que quer de volta e o que já foi descartado — e, para o `tutor-diagramador`, **o caminho completo da pasta `scripts/`** (do `SKILL.md`), onde ele acha o `render.py`. O subagente devolve o **código** do visual; quem grava no cofre é você, por arquivos (`references/obsidian.md`). Se a skill foi instalada como plugin, o nome aparece com o prefixo do plugin (`tutor-adaptativo:tutor-pesquisador`); a descrição do subagente basta para o Claude escolher certo.
+**Como chamar:** descreva a tarefa por **completo** — o subagente roda isolado e **não conhece a conversa**. Inclua o que precisa saber, o que quer de volta e o que já foi descartado — e, para o `tutor-diagramador`, **o caminho completo da pasta `scripts/`** (do `SKILL.md`), onde ele acha o `render.py`. O subagente devolve o **código** do visual; quem grava na pasta de estudos é você, por arquivos (`references/arquivos.md`). Se a skill foi instalada como plugin, o nome aparece com o prefixo do plugin (`tutor-adaptativo:tutor-pesquisador`); a descrição do subagente basta para o Claude escolher certo.
 
 **Nunca confie cegamente no retorno:** o pesquisador devolve veredito e fonte; leia a fonte quando a afirmação for central para a aula. Se o subagente voltar sem achar fonte oficial, o fato é **não verificável** e **não entra na aula**.
 
@@ -66,29 +68,17 @@ Quando os subagentes não existirem no ambiente (app do claude.ai, instalação 
 - **Pesquisa:** use a busca e a leitura de páginas da web, se existirem, seguindo a mesma hierarquia de fontes (`references/pedagogia.md` → "Fontes e versão — regra permanente"). Sem acesso à web, **diga que não conseguiu verificar** e marque o fato como não verificado na aula — nunca ensine de memória como se fosse certo.
 - **Diagramas:** escreva você mesmo um bloco mermaid simples (`references/visuais.md` → "Como fazer").
 
-## Cofre Obsidian por arquivos
+## Pasta de estudos por arquivos
 
-**O que é:** o cofre de estudos é uma pasta de Markdown, lida e escrita pelas ferramentas de arquivo (`Read`, `Write`, `Edit`, `Glob`, `Grep`), em geral pelo plugin **Claudian** do Obsidian. Não há script de cofre: o que o antigo `cofre.py` fazia agora é receita, em `references/obsidian.md`:
+**O que é:** a pasta de estudos é uma pasta de Markdown comum, lida e escrita pelas ferramentas de arquivo (`Read`, `Write`, `Edit`, `Glob`, `Grep`), com o Claude Code aberto nela. Nenhum programa ou plugin é necessário. Tudo (retomar, criar matéria, nota da sessão, visuais, transcrição, exercícios, provas, boletim, abrir para ler, conferir) é receita em `references/arquivos.md`.
 
-| Antes (`cofre.py`) | Agora |
-|---|---|
-| `resumo` (hook de abertura) | receita "Retomar": ler `progresso.md`, `conquistas.md` e `conhecimento.md` ao dizer `"retomar"` |
-| `nova-materia` | receita "Criar a matéria" (templates em `references/templates.md`) |
-| `nota` | receita "Gravar a nota da sessão" |
-| `anexar` | receita "Visuais e imagens": Mermaid no corpo, SVG como texto em `anexos/`; PNG por `cp` quando o cofre está no disco da mesma máquina |
-| `transcrever` | receita "Transcrever um vídeo" (lê `.vtt` ou texto colado, limpa e grava em `fontes/`) |
-| `cartoes` | receita "Cartões" |
-| `abrir` | link `obsidian://open?…` para clicar |
-| `validar` | lista "Conferir o cofre" |
-| `diario` (hook `Stop`) | removido: a nota da sessão já guarda o que vale reler |
-
-**Plano B:** sem acesso à pasta do cofre, o Cartão de retomada (`references/obsidian.md` → "Sem acesso a arquivos"). **Nunca apague nem sobrescreva** arquivo meu; **nunca escreva em `pratica/`** (regras de segurança em `references/obsidian.md`).
+**Plano B:** sem acesso à pasta de estudos, o Cartão de retomada (`references/arquivos.md` → "Sem acesso a arquivos"). **Nunca apague nem sobrescreva** arquivo meu; **nunca escreva em `pratica/`** (regras de segurança em `references/arquivos.md`).
 
 ## Scripts da skill (o código decide)
 
-**O que são:** scripts em Python que fazem o que **não deve depender de eu obedecer a uma instrução**: sorteio, verificação, contas, datas e renderização. O Claude os chama pelo Bash. Ficam na pasta `scripts/`, ao lado do `SKILL.md` (o `SKILL.md` mostra o caminho completo; use-o no lugar de `<pasta>` abaixo). **Nenhum deles toca o cofre:** ler e gravar notas é com as ferramentas de arquivo.
+**O que são:** scripts em Python que fazem o que **não deve depender de eu obedecer a uma instrução**: sorteio, verificação, contas, datas, médias e renderização. O Claude os chama pelo Bash. Ficam na pasta `scripts/`, ao lado do `SKILL.md` (o `SKILL.md` mostra o caminho completo; use-o no lugar de `<pasta>` abaixo). **Nenhum deles toca a pasta de estudos:** ler e gravar notas é com as ferramentas de arquivo.
 
-**Requisito:** Python 3.8+ no PATH. **Qual comando:** no **Windows**, `py` (`python` e `python3` costumam ser só atalhos da Microsoft Store que não rodam nada); no Linux e no macOS, `python3`. Use esse nome onde os exemplos abaixo dizem `python`. Teste com **uma chamada simples** (`py --version`) e rode cada script também **numa chamada simples**: caminho completo do script, caminho do arquivo relativo ao diretório de trabalho (o cofre) e **sem** `cd … &&`, `||`, `for`, parênteses ou `command -v`. Comando composto pede aprovação extra e costuma ser barrado. Se a chamada simples falhar, tente o outro nome em outra chamada simples. **Só caia para o plano B à mão depois disso** e diga o que testou. Só o `render.py` ainda precisa de um navegador (Chrome ou Edge) e de rede. Sem Python, ou se um script falhar: **faça à mão pelo plano B de cada seção e diga que foi à mão** — a skill nunca trava por isso. Para conferir que tudo está certo: `python <pasta>/selftest.py` (deve dizer que todas as verificações passaram).
+**Requisito:** Python 3.8+ no PATH. **Qual comando:** no **Windows**, `py` (`python` e `python3` costumam ser só atalhos da Microsoft Store que não rodam nada); no Linux e no macOS, `python3`. Use esse nome onde os exemplos abaixo dizem `python`. Teste com **uma chamada simples** (`py --version`) e rode cada script também **numa chamada simples**: caminho completo do script, caminho do arquivo relativo ao diretório de trabalho (a pasta de estudos) e **sem** `cd … &&`, `||`, `for`, parênteses ou `command -v`. Comando composto pede aprovação extra e costuma ser barrado. Se a chamada simples falhar, tente o outro nome em outra chamada simples. **Só caia para o plano B à mão depois disso** e diga o que testou. Só o `render.py` ainda precisa de um navegador (Chrome ou Edge) e de rede. Sem Python, ou se um script falhar: **faça à mão pelo plano B de cada seção e diga que foi à mão** — a skill nunca trava por isso. Para conferir que tudo está certo: `python <pasta>/selftest.py` (deve dizer que todas as verificações passaram).
 
 ### Quiz (`quiz.py`)
 
@@ -112,11 +102,11 @@ Linhas: `P:` pergunta, `C:` contexto, `T:` conceito testado, `+` certa, `-` erra
 1. `montar` devolve `ID`, as **opções já sorteadas** (com "Não sei" no fim) e `AVISOS`. **Se houver aviso, refaça a pergunta e rode de novo.** Nunca mostre a certa: o script nem a imprime.
 2. Mostre as opções **exatamente na ordem devolvida** (pergunta com opções; em prova e sondagem, junto com a confiança).
 3. Com a resposta: `python "<pasta>/quiz.py" corrigir ID NÚMERO --confianca verde|amarela|vermelha` (ou `nao-sei`; em seleção múltipla, `1,3`). Ele devolve `RESULTADO` (acerto, erro ou lacuna), a `CLASSE` (erro confiante, acerto frágil), a `CERTA`, o `EQUIVOCO_REVELADO` e a `EXPLICACAO`. **Use esse resultado como está**; não corrija de cabeça.
-4. Ao fim da prova: `python "<pasta>/quiz.py" placar p1 --topico T1 --parte 1a --fechar`. Devolve o **percentual, a decisão (aprovado, reforço seletivo ou completo) e o bloco pronto para o `progresso.md`** (que você acrescenta com `Edit`); a conta e os limites de 80% e 50% são do código. **Sempre feche com `--fechar`** (senão a prova continua aberta e uma nova tentativa se soma à anterior); a **reprova usa outro nome** (`p1-reprova`). Se a prova tiver menos de 5 questões, o script avisa que o resultado é provisório. Uma prova parada por mais de 12 h recomeça do zero sozinha. O estado das perguntas e provas em andamento fica na pasta temporária do sistema (ou em `TUTOR_STATE`), **nunca dentro do cofre**.
+4. Ao fim da prova: `python "<pasta>/quiz.py" placar p1 --topico T1 --parte 1a --fechar`. Devolve o **percentual, a decisão (aprovado, reforço seletivo ou completo) e o bloco pronto para o `progresso.md`** (que você acrescenta com `Edit`); a conta e os limites de 80% e 50% são do código. **Sempre feche com `--fechar`** (senão a prova continua aberta e uma nova tentativa se soma à anterior); a **reprova usa outro nome** (`p1-reprova`). Se a prova tiver menos de 5 questões, o script avisa que o resultado é provisório. Uma prova parada por mais de 12 h recomeça do zero sozinha. O estado das perguntas e provas em andamento fica na pasta temporária do sistema (ou em `TUTOR_STATE`), **nunca dentro da pasta de estudos**.
 
 ### Fila de revisão (`fila.py`)
 
-O arquivo vive no cofre e **nenhum script o regrava**. Há dois jeitos de dar o texto ao script; **prefira o primeiro**, que é um comando simples (sem pipe nem heredoc, logo sem pedido extra de permissão):
+O arquivo vive na pasta de estudos e **nenhum script o regrava**. Há dois jeitos de dar o texto ao script; **prefira o primeiro**, que é um comando simples (sem pipe nem heredoc, logo sem pedido extra de permissão):
 
 1. **Caminho do arquivo + `--sem-gravar`**: `python "<pasta>/fila.py" registrar "{RAIZ}/{sg}/registros-da-skill/conhecimento.md" --conceito "git commit" --resultado novo --parte "T1 / 1a" --sem-gravar`. O script só **lê** o arquivo e imprime o resultado. `vencidos` e `mostrar` com caminho de arquivo também só leem.
 2. **Texto pelo stdin** (`-` no lugar do arquivo), se o caminho não for acessível ao script. Cole a seção `## Fila de revisão espaçada` do `conhecimento.md` (ou o arquivo todo):
@@ -132,17 +122,25 @@ EOF
 
 - `vencidos` lista até 3 conceitos da Revisão do dia (o resto continua vencido).
 - `registrar - --conceito "git commit" --resultado acerto` (mesma seção no stdin) aceita `--resultado novo|acerto|acerto-fragil|erro|erro-confiante` e `--parte "T1 / 1a"` no `novo`. Intervalos: 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado; erro volta para 1d; **acerto frágil** (acertei, mas com 🔴) repete o mesmo intervalo, sem avançar. **Com `-` ou com `--sem-gravar` ele não grava nada:** imprime `SECAO:` (o nome do cabeçalho), `CONTEUDO:` (a seção inteira já atualizada, com a tabela recalculada) e `FIM`. Aplique com **um** `Edit` (`old_string` = a seção atual da fila, como acabou de ler; `new_string` = o `CONTEUDO`) e confira a seção ao fim da sessão.
-- `mostrar -` imprime a fila. **Sem `--sem-gravar`**, `registrar` com caminho de arquivo regrava o arquivo no disco: não use dentro do cofre.
+- `mostrar -` imprime a fila. **Sem `--sem-gravar`**, `registrar` com caminho de arquivo regrava o arquivo no disco: não use dentro da pasta de estudos.
 - **Quando o script é indispensável:** para `acerto`, `acerto-fragil`, `erro` e `erro-confiante` (o intervalo depende do estado da linha). Para um conceito **`novo`** a conta é sempre intervalo `1d` e revisão no dia seguinte, e pode ser feita à mão sem drama.
 - Plano B: a tabela de `references/pedagogia.md` → "Fila de revisão espaçada (dentro do `conhecimento.md`)".
 
 ### Diagramas (`render.py`)
 
-`python "<pasta>/render.py" mermaid entrada.mmd saida.png` (ou `svg`) usa o Chrome ou o Edge que já estão instalados. Ele **valida a sintaxe e devolve a mensagem exata do erro** (linha e ponto), e só gera o PNG quando está válido; aí você **olha** a imagem. Precisa de rede para carregar o Mermaid 11.17.2 (versão fixa, com verificação de integridade; ou `--mermaid-js` com um arquivo local). O que vai para a nota é o **código validado** (bloco mermaid ou SVG); o PNG só vai ao cofre se houver acesso ao disco (`references/obsidian.md` → "Visuais e imagens"). Sem navegador: só verificação por leitura, e diga isso. `render.py detectar` mostra o que está disponível. **Atenção:** o Obsidian embute o Mermaid 11.4.1, mais antigo que o 11.17.2 do `render.py`. Para validar contra ele, passe `--mermaid-js` com o `mermaid.min.js` dessa versão (`references/visuais-modelos.md` → "Compatibilidade com o Obsidian"). `--mermaid-js` com arquivo local funciona offline. O `render.py` corrige sozinho a janela do navegador (no Linux ela vem ~88 px menor) e recorta o PNG no tamanho exato.
+`python "<pasta>/render.py" mermaid entrada.mmd saida.png` (ou `svg`) usa o Chrome ou o Edge que já estão instalados. Ele **valida a sintaxe e devolve a mensagem exata do erro** (linha e ponto), e só gera o PNG quando está válido; aí você **olha** a imagem. Precisa de rede para carregar o Mermaid 11.17.2 (versão fixa, com verificação de integridade; ou `--mermaid-js` com um arquivo local, que funciona offline). É a mesma versão que o `ver.py` usa para mostrar os diagramas, então o que passa aqui aparece igual na leitura. O que vai para a nota é o **código validado** (bloco mermaid ou SVG); o PNG vai à pasta de estudos por cópia (`references/arquivos.md` → "Visuais e imagens"). Sem navegador: só verificação por leitura, e diga isso. `render.py detectar` mostra o que está disponível. O `render.py` corrige sozinho a janela do navegador (no Linux ela vem ~88 px menor) e recorta o PNG no tamanho exato.
+
+### Boletim (`boletim.py`)
+
+`python "<pasta>/boletim.py" "{RAIZ}/{sg}" --sem-gravar` **lê** o `progresso.md` (histórico de provas, posição, pendências), as notas de `exercicios/` (campos `tipo`, `parte`, `status` do frontmatter) e a lista de `sessoes/`, e imprime `SECAO:`, `CONTEUDO:` e `FIM`. O `CONTEUDO` é o bloco do boletim (entre `<!-- boletim:inicio -->` e `<!-- boletim:fim -->`): situação, tabela de provas com a **média calculada**, tabela de exercícios com "feitos X de Y" e as sessões mais recentes. Quem grava é o `Edit` (receita "Boletim" de `references/arquivos.md`). Plano B: tabela à mão, com a média conferida duas vezes, dizendo que foi à mão.
+
+### Leitor no navegador (`ver.py`)
+
+`python "<pasta>/ver.py" "{RAIZ}" "{sg}/_painel-{sg}.md" --abrir` converte **todas** as notas `.md` da pasta de estudos em páginas HTML numa pasta temporária (nada é gravado nos estudos), com tabelas, dicas dobráveis (`<details>`), fórmulas LaTeX e diagramas Mermaid (carregados do jsDelivr com versão fixa e integridade; sem rede ficam como texto), imagens e links entre notas, mais um `index.html` com as matérias. `--abrir` abre a página pedida no navegador padrão; sem o segundo argumento abre o índice. Devolve uma linha JSON (`html`, `paginas`, `aberto`). Plano B: o `.md` abre em qualquer editor de texto.
 
 ## Arquivos: com e sem acesso
 
-- **Com acesso** (a pasta do cofre aberta no Claudian ou no Claude Code): crie e atualize a estrutura e os registros de `references/sessao.md` → "Estrutura de pastas" e grave a nota da sessão ao fim de cada sessão, seguindo `references/obsidian.md`. É o que espelha a conversa num arquivo para eu ler no Obsidian — **só o que vale reler**, não a transcrição.
+- **Com acesso** (o Claude Code aberto na pasta de estudos): crie e atualize a estrutura e os registros de `references/sessao.md` → "Estrutura de pastas" e grave a nota da sessão ao fim de cada sessão, seguindo `references/arquivos.md`. É o que espelha a conversa num arquivo para eu ler no navegador (`ver.py`) — **só o que vale reler**, não a transcrição.
 - **Sem acesso** (chat do claude.ai): não há onde gravar. Entregue o **Cartão de retomada** (`references/sessao.md` → "Sem acesso a arquivos — Cartão de retomada").
 
 Nos dois casos, **nunca apague nem sobrescreva** arquivos meus em `pratica/`. Antes de atualizar um registro, leia a versão atual.
@@ -151,4 +149,4 @@ Nos dois casos, **nunca apague nem sobrescreva** arquivos meus em `pratica/`. An
 
 - **Markdown** para tudo. Código em blocos com a linguagem.
 - **LaTeX** sempre que houver matemática: `$f(x) = x^2$` em linha e `$$` em bloco próprio. Não escreva `f(x) = x^2` em texto simples quando LaTeX resolve.
-- **Mermaid** em bloco ```` ```mermaid ````. Renderiza no Obsidian e no GitHub. Em algumas interfaces de chat o bloco aparece como código; nesse caso, o diagrama também vai para a nota da sessão, onde renderiza (`references/visuais.md`).
+- **Mermaid** em bloco ```` ```mermaid ````. Renderiza no `ver.py` e no GitHub. Em algumas interfaces de chat o bloco aparece como código; nesse caso, o diagrama também vai para a nota da sessão, onde renderiza (`references/visuais.md`).
