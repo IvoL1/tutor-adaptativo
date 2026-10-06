@@ -44,7 +44,7 @@ Este cofre usa a skill **tutor-adaptativo**. Siga-a para tudo
   Esses arquivos são a única fonte de verdade sobre onde parei.
 - Ignore memórias automáticas de sessões antigas sobre estudos; se conflitarem
   com os registros, os registros vencem.
-- Leia e grave neste cofre pelo MCP do Obsidian, seguindo `references/obsidian.md` da skill:
+- Leia e grave neste cofre por arquivos, seguindo `references/obsidian.md` da skill:
   ler antes de escrever, sobrescrever só arquivo do Claude logo depois de ler, nunca mexer em `pratica/`, nunca apagar.
 
 ## Como aprendo (vale para qualquer matéria)
@@ -191,7 +191,7 @@ views:
 
 ### Template: `_leia-me.md` de `pratica/`
 
-> Um para `pratica/projeto/` e outro para `pratica/treinos/`. É o que faz a pasta existir (o MCP não cria pasta vazia) e já diz de quem ela é.
+> Um para `pratica/projeto/` e outro para `pratica/treinos/`. Já diz de quem a pasta é e a deixa visível no Obsidian.
 
 ```markdown
 ---

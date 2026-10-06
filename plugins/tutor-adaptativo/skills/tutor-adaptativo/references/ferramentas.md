@@ -9,7 +9,7 @@
 > **2. Quiz interativo**
 > **3. Subagentes**
 >     · Sem subagentes
-> **4. Obsidian pelo MCP**
+> **4. Cofre Obsidian por arquivos**
 > **5. Scripts da skill (o código decide)**
 >     · Quiz (`quiz.py`)
 >     · Fila de revisão (`fila.py`)
@@ -56,7 +56,7 @@ Diferença entre escolha e quiz: `references/avaliacao.md` → "Perguntas com re
 | `tutor-pesquisador` | Pesquisar na web e devolver um relatório curto com fontes, links e datas | Na menor dúvida sobre um fato (`references/ensino.md` → "Precisão inegociável"); ao mapear um campo novo; ao levantar fonte e versão na entrevista |
 | `tutor-diagramador` | Criar **um** diagrama correto e mínimo e verificá-lo olhando o resultado | Quando uma ideia é melhor como desenho (`references/visuais.md`) |
 
-**Como chamar:** descreva a tarefa por **completo** — o subagente roda isolado e **não conhece a conversa**. Inclua o que precisa saber, o que quer de volta e o que já foi descartado — e, para o `tutor-diagramador`, **o caminho completo da pasta `scripts/`** (do `SKILL.md`), onde ele acha o `render.py`. O subagente devolve o **código** do visual; quem grava no cofre é você, pelo MCP do Obsidian (`references/obsidian.md`). Se a skill foi instalada como plugin, o nome aparece com o prefixo do plugin (`tutor-adaptativo:tutor-pesquisador`); a descrição do subagente basta para o Claude escolher certo.
+**Como chamar:** descreva a tarefa por **completo** — o subagente roda isolado e **não conhece a conversa**. Inclua o que precisa saber, o que quer de volta e o que já foi descartado — e, para o `tutor-diagramador`, **o caminho completo da pasta `scripts/`** (do `SKILL.md`), onde ele acha o `render.py`. O subagente devolve o **código** do visual; quem grava no cofre é você, por arquivos (`references/obsidian.md`). Se a skill foi instalada como plugin, o nome aparece com o prefixo do plugin (`tutor-adaptativo:tutor-pesquisador`); a descrição do subagente basta para o Claude escolher certo.
 
 **Nunca confie cegamente no retorno:** o pesquisador devolve veredito e fonte; leia a fonte quando a afirmação for central para a aula. Se o subagente voltar sem achar fonte oficial, o fato é **não verificável** e **não entra na aula**.
 
@@ -66,9 +66,9 @@ Quando os subagentes não existirem no ambiente (app do claude.ai, instalação 
 - **Pesquisa:** use a busca e a leitura de páginas da web, se existirem, seguindo a mesma hierarquia de fontes (`references/pedagogia.md` → "Fontes e versão — regra permanente"). Sem acesso à web, **diga que não conseguiu verificar** e marque o fato como não verificado na aula — nunca ensine de memória como se fosse certo.
 - **Diagramas:** escreva você mesmo um bloco mermaid simples (`references/visuais.md` → "Como fazer").
 
-## Obsidian pelo MCP
+## Cofre Obsidian por arquivos
 
-**O que é:** o cofre de estudos é lido e escrito pelas ferramentas do **MCP do Obsidian** (`obsidian_get_file_contents`, `obsidian_batch_get_file_contents`, `obsidian_put_content`, `obsidian_append_content`, `obsidian_patch_content`, `obsidian_list_files_in_dir`, `obsidian_simple_search`… são 15 no `mcp-obsidian`). Não há mais script de cofre: o que o antigo `cofre.py` fazia agora é receita, em `references/obsidian.md`:
+**O que é:** o cofre de estudos é uma pasta de Markdown, lida e escrita pelas ferramentas de arquivo (`Read`, `Write`, `Edit`, `Glob`, `Grep`), em geral pelo plugin **Claudian** do Obsidian. Não há script de cofre: o que o antigo `cofre.py` fazia agora é receita, em `references/obsidian.md`:
 
 | Antes (`cofre.py`) | Agora |
 |---|---|
@@ -82,11 +82,11 @@ Quando os subagentes não existirem no ambiente (app do claude.ai, instalação 
 | `validar` | lista "Conferir o cofre" |
 | `diario` (hook `Stop`) | removido: a nota da sessão já guarda o que vale reler |
 
-**Plano B:** sem o MCP, arquivos diretos (`Read`/`Write`/`Edit`) com as mesmas regras; sem acesso a arquivos, o Cartão de retomada (`references/obsidian.md` → "Sem o MCP"). **Nunca apague nem sobrescreva** arquivo meu; **nunca escreva em `pratica/`** (regras de segurança em `references/obsidian.md`).
+**Plano B:** sem acesso à pasta do cofre, o Cartão de retomada (`references/obsidian.md` → "Sem acesso a arquivos"). **Nunca apague nem sobrescreva** arquivo meu; **nunca escreva em `pratica/`** (regras de segurança em `references/obsidian.md`).
 
 ## Scripts da skill (o código decide)
 
-**O que são:** scripts em Python que fazem o que **não deve depender de eu obedecer a uma instrução**: sorteio, verificação, contas, datas e renderização. O Claude os chama pelo Bash. Ficam na pasta `scripts/`, ao lado do `SKILL.md` (o `SKILL.md` mostra o caminho completo; use-o no lugar de `<pasta>` abaixo). **Nenhum deles toca o cofre:** ler e gravar notas é com o MCP do Obsidian.
+**O que são:** scripts em Python que fazem o que **não deve depender de eu obedecer a uma instrução**: sorteio, verificação, contas, datas e renderização. O Claude os chama pelo Bash. Ficam na pasta `scripts/`, ao lado do `SKILL.md` (o `SKILL.md` mostra o caminho completo; use-o no lugar de `<pasta>` abaixo). **Nenhum deles toca o cofre:** ler e gravar notas é com as ferramentas de arquivo.
 
 **Requisito:** Python 3.8+ no PATH (`python` ou `python3`; use o que existir). Só o `render.py` ainda precisa de um navegador (Chrome ou Edge) e de rede. Sem Python, ou se um script falhar: **faça à mão pelo plano B de cada seção e diga que foi à mão** — a skill nunca trava por isso. Para conferir que tudo está certo: `python <pasta>/selftest.py` (deve dizer que todas as verificações passaram).
 
@@ -112,11 +112,11 @@ Linhas: `P:` pergunta, `C:` contexto, `T:` conceito testado, `+` certa, `-` erra
 1. `montar` devolve `ID`, as **opções já sorteadas** (com "Não sei" no fim) e `AVISOS`. **Se houver aviso, refaça a pergunta e rode de novo.** Nunca mostre a certa: o script nem a imprime.
 2. Mostre as opções **exatamente na ordem devolvida** (pergunta com opções; em prova e sondagem, junto com a confiança).
 3. Com a resposta: `python "<pasta>/quiz.py" corrigir ID NÚMERO --confianca verde|amarela|vermelha` (ou `nao-sei`; em seleção múltipla, `1,3`). Ele devolve `RESULTADO` (acerto, erro ou lacuna), a `CLASSE` (erro confiante, acerto frágil), a `CERTA`, o `EQUIVOCO_REVELADO` e a `EXPLICACAO`. **Use esse resultado como está**; não corrija de cabeça.
-4. Ao fim da prova: `python "<pasta>/quiz.py" placar p1 --topico T1 --parte 1a --fechar`. Devolve o **percentual, a decisão (aprovado, reforço seletivo ou completo) e o bloco pronto para o `progresso.md`** (que você acrescenta pelo MCP); a conta e os limites de 80% e 50% são do código. **Sempre feche com `--fechar`** (senão a prova continua aberta e uma nova tentativa se soma à anterior); a **reprova usa outro nome** (`p1-reprova`). Se a prova tiver menos de 5 questões, o script avisa que o resultado é provisório. Uma prova parada por mais de 12 h recomeça do zero sozinha. O estado das perguntas e provas em andamento fica na pasta temporária do sistema (ou em `TUTOR_STATE`), **nunca dentro do cofre**.
+4. Ao fim da prova: `python "<pasta>/quiz.py" placar p1 --topico T1 --parte 1a --fechar`. Devolve o **percentual, a decisão (aprovado, reforço seletivo ou completo) e o bloco pronto para o `progresso.md`** (que você acrescenta com `Edit`); a conta e os limites de 80% e 50% são do código. **Sempre feche com `--fechar`** (senão a prova continua aberta e uma nova tentativa se soma à anterior); a **reprova usa outro nome** (`p1-reprova`). Se a prova tiver menos de 5 questões, o script avisa que o resultado é provisório. Uma prova parada por mais de 12 h recomeça do zero sozinha. O estado das perguntas e provas em andamento fica na pasta temporária do sistema (ou em `TUTOR_STATE`), **nunca dentro do cofre**.
 
 ### Fila de revisão (`fila.py`)
 
-O arquivo vive no cofre e é lido pelo MCP; o script recebe o texto pelo **stdin** (`-` no lugar do arquivo). Cole a seção `## Fila de revisão espaçada` do `conhecimento.md` (ou o arquivo todo):
+O arquivo vive no cofre e é lido com `Read`; o script recebe o texto pelo **stdin** (`-` no lugar do arquivo). Cole a seção `## Fila de revisão espaçada` do `conhecimento.md` (ou o arquivo todo):
 
 ```bash
 python "<pasta>/fila.py" vencidos - --max 3 <<'EOF'
@@ -128,7 +128,7 @@ EOF
 ```
 
 - `vencidos` lista até 3 conceitos da Revisão do dia (o resto continua vencido).
-- `registrar - --conceito "git commit" --resultado acerto` (mesma seção no stdin) aceita `--resultado novo|acerto|acerto-fragil|erro|erro-confiante` e `--parte "T1 / 1a"` no `novo`. Intervalos: 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado; erro volta para 1d; **acerto frágil** (acertei, mas com 🔴) repete o mesmo intervalo, sem avançar. **No modo `-` ele não grava nada:** imprime `SECAO:` (o nome do cabeçalho), `CONTEUDO:` (a seção inteira já atualizada, com a tabela recalculada) e `FIM`. Aplique com **uma** chamada `obsidian_patch_content` (`operation=replace`, `target_type=heading`, `target=` o valor de `SECAO`, `content=` o `CONTEUDO` mais uma linha em branco) e releia a seção.
+- `registrar - --conceito "git commit" --resultado acerto` (mesma seção no stdin) aceita `--resultado novo|acerto|acerto-fragil|erro|erro-confiante` e `--parte "T1 / 1a"` no `novo`. Intervalos: 1d → 3d → 7d → 16d → 35d → 60d → 120d → arquivado; erro volta para 1d; **acerto frágil** (acertei, mas com 🔴) repete o mesmo intervalo, sem avançar. **No modo `-` ele não grava nada:** imprime `SECAO:` (o nome do cabeçalho), `CONTEUDO:` (a seção inteira já atualizada, com a tabela recalculada) e `FIM`. Aplique com **um** `Edit` (`old_string` = a seção atual da fila, como acabou de ler; `new_string` = o `CONTEUDO`) e releia a seção.
 - `mostrar -` imprime a fila. Com um caminho no lugar do `-`, o script lê e grava o arquivo direto no disco (útil só fora do cofre).
 - Plano B: a tabela de `references/pedagogia.md` → "Fila de revisão espaçada (dentro do `conhecimento.md`)".
 
@@ -138,7 +138,7 @@ EOF
 
 ## Arquivos: com e sem acesso
 
-- **Com acesso** (o MCP do Obsidian conectado, ou o disco aberto no Claude Code): crie e atualize a estrutura e os registros de `references/sessao.md` → "Estrutura de pastas" e grave a nota da sessão ao fim de cada sessão, seguindo `references/obsidian.md`. É o que espelha a conversa num arquivo para eu ler no Obsidian — **só o que vale reler**, não a transcrição.
+- **Com acesso** (a pasta do cofre aberta no Claudian ou no Claude Code): crie e atualize a estrutura e os registros de `references/sessao.md` → "Estrutura de pastas" e grave a nota da sessão ao fim de cada sessão, seguindo `references/obsidian.md`. É o que espelha a conversa num arquivo para eu ler no Obsidian — **só o que vale reler**, não a transcrição.
 - **Sem acesso** (chat do claude.ai): não há onde gravar. Entregue o **Cartão de retomada** (`references/sessao.md` → "Sem acesso a arquivos — Cartão de retomada").
 
 Nos dois casos, **nunca apague nem sobrescreva** arquivos meus em `pratica/`. Antes de atualizar um registro, leia a versão atual.

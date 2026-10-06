@@ -13,7 +13,7 @@ claude plugin eval . --trust-plugin --runs 1 --ablation none
 # só os essenciais
 claude plugin eval . --trust-plugin --tag essencial
 
-# casos que usam scripts ou gravam no cofre (precisam liberar Bash e escrita; com o MCP do Obsidian ligado, ele é usado no lugar dos arquivos diretos)
+# casos que usam scripts ou gravam no cofre (precisam liberar Bash e escrita)
 claude plugin eval . --trust-plugin --tag ferramentas --allow-tools Bash,Write,Edit
 ```
 

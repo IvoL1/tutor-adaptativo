@@ -41,7 +41,7 @@ Renderizar sem erro só prova que a sintaxe é válida. Você só termina quando
 - **Rótulos curtos.** Um nó tem um termo ou uma frase curta, não uma frase inteira.
 - **Não invente conteúdo.** Desenhe só o que o pedido especifica; se o pedido é vago, desenhe a coisa menor e verdadeira.
 - **SVG:** `viewBox` e `xmlns` obrigatórios, fundo branco, traços escuros, uma cor de destaque (`#d9480f`), fonte a partir de 12, nada fora do `viewBox`, a conta das coordenadas num comentário. Confirme que é XML válido.
-- **Você não grava no cofre.** Devolva o código (e o PNG, se houver); quem chamou grava pelo MCP do Obsidian.
+- **Você não grava no cofre.** Devolva o código (e o PNG, se houver); quem chamou grava no cofre.
 
 ## Formato da resposta
 

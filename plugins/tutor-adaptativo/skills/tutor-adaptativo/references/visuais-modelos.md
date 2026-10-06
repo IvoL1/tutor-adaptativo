@@ -160,7 +160,7 @@ gantt
 
 ## SVG: modelos prontos para adaptar
 
-SVG é texto: dá para gravar como `anexos/AAAA-MM-DD-nome.svg` pelo MCP e embutir com `![[…svg]]`, ou colar num bloco ```` ```svg ```` quando o ambiente renderizar. Regras do desenhista: fundo branco, traço escuro, **uma** cor de destaque (`#d9480f`), fonte a partir de 12, nada fora do `viewBox`. **Coordenadas se calculam, não se estimam:** guarde a conta num comentário (`<!-- 50 px por unidade, zero em x=200 -->`) e, para muitos pontos, calcule no Bash (`awk`).
+SVG é texto: dá para gravar como `anexos/AAAA-MM-DD-nome.svg` com `Write` e embutir com `![[…svg]]`, ou colar num bloco ```` ```svg ```` quando o ambiente renderizar. Regras do desenhista: fundo branco, traço escuro, **uma** cor de destaque (`#d9480f`), fonte a partir de 12, nada fora do `viewBox`. **Coordenadas se calculam, não se estimam:** guarde a conta num comentário (`<!-- 50 px por unidade, zero em x=200 -->`) e, para muitos pontos, calcule no Bash (`awk`).
 
 **Reta numérica** (50 px por unidade; zero em x = 200; ponto em 2 → x = 300):
 

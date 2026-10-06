@@ -78,7 +78,7 @@ Todos os comandos estão na tabela de `SKILL.md`.
 
 ## Ferramentas: o código decide o que não pode depender de obediência
 
-Sorteio, verificação, contas, datas e renderização ficam em scripts Python (3.8+, só biblioteca padrão, sem rede, exceto o `render.py`). **Nenhum deles toca o cofre do Obsidian** (isso é com o MCP, abaixo):
+Sorteio, verificação, contas, datas e renderização ficam em scripts Python (3.8+, só biblioteca padrão, sem rede, exceto o `render.py`). **Nenhum deles toca o cofre do Obsidian** (isso é com as ferramentas de arquivo, abaixo):
 
 | Script | O que faz por código |
 |---|---|
@@ -90,40 +90,37 @@ Sorteio, verificação, contas, datas e renderização ficam em scripts Python (
 
 **Permissões:** na primeira vez, o Claude Code pede permissão para rodar `python`. Para não ser perguntado a cada quiz, depois de ler o código (está todo neste repositório) você pode liberar só estes scripts nas suas permissões (`settings.json`): `"Bash(python *tutor-adaptativo/scripts/*)"` e `"Bash(python3 *tutor-adaptativo/scripts/*)"`. O campo `allowed-tools` da skill só vale no turno em que ela é chamada, por isso não o usei.
 
-## Obsidian MCP (o cofre é lido e escrito por ele)
+## Obsidian (o cofre é lido e escrito por arquivos)
 
-A skill usa o **MCP do Obsidian** para tudo que toca o cofre. Foi escrita e conferida para o servidor [`mcp-obsidian`](https://pypi.org/project/mcp-obsidian/) (15 ferramentas: `obsidian_get_file_contents`, `obsidian_batch_get_file_contents`, `obsidian_put_content`, `obsidian_append_content`, `obsidian_patch_content`, `obsidian_list_files_in_dir`, `obsidian_simple_search`…). As receitas e as regras de segurança estão em [`references/obsidian.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/obsidian.md); outros servidores têm tabela de equivalência lá.
+O cofre do Obsidian é uma **pasta de arquivos Markdown**. A skill lê e grava nele com as ferramentas de arquivo do Claude (`Read`, `Write`, `Edit`, `Glob`, `Grep`), sem servidor MCP. O jeito mais cômodo de usar é o plugin da comunidade **[Claudian](https://github.com/YishenTu/claudian)**, que roda o Claude Code dentro do Obsidian com o cofre como diretório de trabalho. Também funciona abrindo o Claude Code no terminal, dentro da pasta do cofre. As receitas e as regras de segurança estão em [`references/obsidian.md`](plugins/tutor-adaptativo/skills/tutor-adaptativo/references/obsidian.md).
 
-Com esse servidor **não há busca-e-troca de texto**: as edições vão por `append`, por troca do corpo de uma seção (`patch` por cabeçalho) ou por ler e regravar o arquivo inteiro, sempre só em arquivo do Claude e sempre conferindo a releitura.
+As edições usam `Edit` (troca de trecho exato) e, só em arquivo do Claude, ler e regravar com `Write`, sempre conferindo a releitura.
 
 ### Configurar (uma vez, por você)
 
-1. No Obsidian: Configurações → Plugins da comunidade → instale e ative o **Local REST API** e copie a chave de API que ele mostra. O plugin precisa estar ativo (o Obsidian aberto) para o MCP funcionar. A porta padrão dele é 27124 (HTTPS com certificado próprio; o servidor já aceita isso).
-2. Tenha o [`uv`](https://docs.astral.sh/uv/) instalado (o `uvx` roda o servidor) e, no Claude Code, registre-o (a chave é sua; **não** a coloque neste repositório):
+1. No Obsidian: Configurações → Plugins da comunidade → desligue o modo restrito → Procurar → **Claudian** → Instalar → Ativar. Plugin da comunidade é código que roda dentro do Obsidian com acesso ao cofre: a instalação fica com você.
+2. Tenha o **Claude Code** instalado (o Claudian usa o `claude` do seu PC) e o plugin deste repositório (`/plugin install tutor-adaptativo@tutor-adaptativo`).
+3. Abra o painel do Claudian e diga "quero estudar X". Se a skill não for reconhecida lá, use o Claude Code no terminal, dentro da pasta do cofre.
 
-```bash
-claude mcp add obsidian -e OBSIDIAN_API_KEY=SUA_CHAVE -e OBSIDIAN_HOST=127.0.0.1 -e OBSIDIAN_PORT=27124 -- uvx mcp-obsidian
-```
-
-Essas variáveis (`OBSIDIAN_API_KEY`, `OBSIDIAN_HOST`, `OBSIDIAN_PORT`, e `OBSIDIAN_PROTOCOL=http` se você usar a porta sem HTTPS) foram conferidas no código do `mcp-obsidian` 0.2.3, que sobe e lista as 15 ferramentas. `claude mcp list` mostra se conectou. No app de desktop do Claude, adicione o mesmo servidor ao arquivo de configuração de MCP (servidores locais não funcionam no claude.ai pelo navegador).
+Sem o Claudian, basta `cd` para a pasta do cofre e rodar `claude`.
 
 ### O que o Claude faz por você
 
 | O que você quer | Como (o Claude faz sozinho; você só pede) |
 |---|---|
-| Retomar | `"retomar"`: lê `progresso.md`, `conquistas.md` e `conhecimento.md` da matéria numa chamada só e faz a Revisão do dia (as datas vêm do `fila.py`) |
+| Retomar | `"retomar"`: lê `progresso.md`, `conquistas.md` e `conhecimento.md` da matéria e faz a Revisão do dia (as datas vêm do `fila.py`) |
 | Começar uma matéria com tudo no lugar | depois do seu "ok" no plano, grava os 4 registros, painel, Base de sessões e `pratica/`, e põe no `README.md`. Nunca sobrescreve |
 | Anotar a sessão | cria `sessoes/AAAA-MM-DD-título.md` com frontmatter, acrescenta se já houver nota do dia e lista no painel |
-| Diagrama ou gráfico | bloco Mermaid na própria nota; SVG como arquivo em `anexos/`; PNG copiado para `anexos/` se o Claude rodar na mesma máquina do Obsidian (acha a pasta do cofre no `obsidian.json` do Obsidian) |
-| Colar um print | cole direto na nota no Obsidian (o MCP grava texto, e o Claude não vê a sua área de transferência) |
+| Diagrama ou gráfico | bloco Mermaid na própria nota; SVG e PNG como arquivos em `anexos/` |
+| Colar um print | cole direto na nota no Obsidian (o Claude não vê a sua área de transferência) |
 | Abrir a nota no Obsidian | `"abrir"`: o Claude entrega o link `obsidian://open?…` para você clicar |
 | Estudar a partir de um vídeo | `"transcreve"`: cole a legenda, indique um `.vtt`/`.srt` ou dê o link (com o `yt-dlp` instalado, baixa só a legenda). Grava em `fontes/` com aviso: **transcrição é pista, não fonte para ensinar** |
 | Ver todas as sessões numa tabela | cada matéria nasce com `_sessoes-[matéria].base` (Bases do Obsidian, recurso nativo) ligada ao painel |
 | Revisar no celular (opcional) | `"cartões"`: grava `cartoes.md` no formato do plugin **Spaced Repetition** (`pergunta::resposta`). A fila do `fila.py` continua sendo a única fonte da Revisão do dia |
 
-**Regras de segurança** (valem sempre): o Claude lê antes de escrever, só regrava arquivo que é dele (registros, painel, notas) logo depois de ler e conferindo a releitura, nunca escreve em `pratica/` (é seu) e nunca apaga. Sem o MCP, a skill usa arquivos diretos; sem acesso a arquivos, entrega o **Cartão de retomada**.
+**Regras de segurança** (valem sempre): o Claude lê antes de escrever, só regrava arquivo que é dele (registros, painel, notas) logo depois de ler e conferindo a releitura, nunca escreve em `pratica/` (é seu), nunca escreve em `.obsidian/` e nunca apaga. Sem acesso à pasta do cofre, entrega o **Cartão de retomada**. Para reforçar por código, bloqueie `rm` e a escrita em `pratica/` nas permissões (`settings.json`, `deny`).
 
-**O que mudou na 4.0:** saíram o `cofre.py` e os dois hooks (abertura da sessão e diário automático), porque dependiam de script e um hook não chama MCP. Em troca, a abertura é feita no `"retomar"`, e a nota da sessão guarda o que vale reler.
+**O que mudou na 5.0:** o MCP do Obsidian foi removido; o cofre passou a ser lido e gravado por arquivos (Claudian ou Claude Code na pasta do cofre).
 
 ### Passos que só você pode fazer no Obsidian (opcionais)
 
@@ -147,11 +144,11 @@ Limite honesto: o Obsidian embute o Mermaid 11.4.1 (o `render.py` usa o 11.17.2 
 
 - **Estilo de resposta "Tutor" (opcional):** `/output-style` e escolha o estilo do plugin, para a voz de professor valer a sessão toda (frases completas, uma coisa por vez). Se o nome não aparecer na lista, use `/plugin` para conferir se o estilo foi carregado.
 - **Plugins que brigam com o estudo:** estilos que mandam responder em fragmentos ou com o mínimo de código (por exemplo `caveman` ou `ponytail`) atrapalham a aula. No cofre, desligue-os em `.claude/settings.json` (`"enabledPlugins": {"nome@marketplace": false}`). Skills de aprendizado concorrentes (como a `learn` da Anthropic, que vem do app) podem ser escondidas com `"skillOverrides": {"anthropic-skills:learn": "off"}`; eu não consegui testar o efeito dessas duas chaves numa sessão real.
-- **Lembrete da Revisão do dia:** as tarefas agendadas do app desktop rodam na sua máquina e persistem entre sessões. Peça ao Claude uma tarefa diária que leia o `conhecimento.md` pelo MCP e avise quando houver conceitos vencidos. (Ideia não testada.)
+- **Lembrete da Revisão do dia:** as tarefas agendadas do app desktop rodam na sua máquina e persistem entre sessões. Peça ao Claude uma tarefa diária que leia o `conhecimento.md` e avise quando houver conceitos vencidos. (Ideia não testada.)
 
 ## Testes automáticos
 
-`plugins/tutor-adaptativo/evals/` tem 9 casos para o `claude plugin eval` (entrevista, dúvida curta, retomar sem registros, dica sem entregar a resposta, frustração, sondagem, quiz por script, criar a matéria sem MCP nem cofre (não inventa) e "não sequestrar tarefa de código"). Rodam com e sem o plugin para medir o que ele acrescenta. Comandos e custo em [`evals/README.md`](plugins/tutor-adaptativo/evals/README.md). Eles usam a sua cota, então não rodam sozinhos.
+`plugins/tutor-adaptativo/evals/` tem 9 casos para o `claude plugin eval` (entrevista, dúvida curta, retomar sem registros, dica sem entregar a resposta, frustração, sondagem, quiz por script, criar a matéria sem cofre (não inventa) e "não sequestrar tarefa de código"). Rodam com e sem o plugin para medir o que ele acrescenta. Comandos e custo em [`evals/README.md`](plugins/tutor-adaptativo/evals/README.md). Eles usam a sua cota, então não rodam sozinhos.
 
 ## Sobre ser pessoal
 

@@ -68,7 +68,7 @@ Se você consegue renderizar (o subagente tenta), **olhe** a imagem. Se não con
 
 - **No chat:** o bloco mermaid, com uma frase de introdução. Em algumas interfaces ele aparece como código — sem problema, o desenho está na nota da sessão. SVG: mostre o PNG renderizado, se houver, ou o código.
 - **Na nota da sessão e no painel** (`references/templates.md`): o mesmo bloco mermaid, que o Obsidian e o GitHub renderizam nativamente. É o caminho padrão e o único que dispensa arquivo.
-- **Arquivo em `anexos/`** (SVG sempre que o visual precisar existir fora de um bloco; PNG só com acesso ao disco): como gravar, nomear e embutir com `![[arquivo.svg]]` está em `references/obsidian.md` → "Visuais e imagens". O MCP do Obsidian grava texto, não binário.
+- **Arquivo em `anexos/`** (SVG sempre que o visual precisar existir fora de um bloco; PNG por `cp` no disco): como gravar, nomear e embutir com `![[arquivo.svg]]` está em `references/obsidian.md` → "Visuais e imagens".
 - **Um print que eu copiei:** o Claude não enxerga a minha área de transferência; eu colo direto na nota no Obsidian. Se o Claude precisa **olhar** a imagem, eu a anexo na conversa.
 - **Depois de gravar, não dá para ver como o Obsidian renderiza.** Em tipo `-beta` ou pouco comum, diga ao Ivo para conferir a nota e deixe a alternativa pronta (`references/visuais-modelos.md` → "Compatibilidade com o Obsidian").
 - Apresente o visual numa frase e deixe-o carregar a ideia; **não narre cada elemento de volta em texto**.

@@ -3,6 +3,18 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 5.0 — 2026-10-06
+
+**Cofre por arquivos, sem MCP** (pensado para o plugin Claudian, que roda o Claude Code com o cofre como diretório de trabalho)
+- `references/obsidian.md` reescrito: toda leitura e escrita no cofre usa `Read`, `Write`, `Edit`, `Glob` e `Grep` (e `mkdir`/`cp` no Bash). Saíram a tabela de ferramentas do `mcp-obsidian`, a tabela de outros servidores e a descoberta de `DISCO` pelo `obsidian.json`.
+- Nova regra de ouro de edição: `Edit` com trecho exato e único; `Write` do arquivo inteiro só em arquivo do Claude, logo após ler. Releitura obrigatória continua.
+- Regras de segurança: nunca `rm`/`mv`, nunca escrever em `.obsidian/`, `pratica/` continua só do Ivo.
+- Raiz do cofre: o diretório de trabalho que tem `.obsidian/` é o cofre; o nome do cofre (para o link `obsidian://`) é o nome dessa pasta.
+- PNG vai direto por `cp` para `anexos/`; pastas nascem com `Write`/`mkdir`.
+- `fila.py registrar -` não mudou: continua devolvendo `SECAO`/`CONTEUDO`/`FIM`; a aplicação agora é um `Edit` (antes, `patch_content`).
+- README: instalação pelo Claudian no lugar do `mcp-obsidian` (`uv`, Local REST API e chave de API deixam de ser necessários).
+- Eval `cria-materia-sem-mcp` virou `cria-materia-sem-cofre`.
+
 ## 4.1 — 2026-10-05
 
 **Servidor certo, conferido no código** (a 4.0 foi escrita para o `obsidian-mcp-server`; o do Ivo é o `mcp-obsidian`, 15 ferramentas)

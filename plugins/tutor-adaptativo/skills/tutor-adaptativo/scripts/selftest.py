@@ -142,7 +142,7 @@ def testa_fila():
 
 
 def testa_fila_stdin():
-    """Modo '-': o texto vem do stdin (nota lida pelo MCP do Obsidian) e 'registrar' devolve a seção atualizada em vez de gravar."""
+    """Modo '-': o texto vem do stdin (nota lida pelo Claude) e 'registrar' devolve a seção atualizada em vez de gravar."""
     ent = "# c\n\n" + TABELA + "\n## Outra\n"
     cod, saida = rodar(fila.main, ["registrar", "-", "--conceito", "git commit", "--resultado", "novo", "--parte", "T1 / 1a", "--hoje", "2026-10-01"], ent)
     ok(cod == 0 and saida.startswith("SECAO: Fila de revisão espaçada\nCONTEUDO:\n> nota\n") and "| git commit | T1 / 1a" in saida and "2026-10-02" in saida and "—" not in saida.split("FIM")[0], "stdin: conceito novo gera a seção sem a linha de exemplo")
