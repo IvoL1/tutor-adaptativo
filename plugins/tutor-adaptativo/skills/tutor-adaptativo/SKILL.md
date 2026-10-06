@@ -118,6 +118,7 @@ flowchart LR
 32. **Persistência sempre** — como não há memória entre conversas, toda sessão termina com os registros atualizados ou com o Cartão de retomada entregue. A posição atual vem só dos registros, nunca de memória automática.
 33. **Ferramentas com plano B** — use perguntas com opções, scripts, subagentes e busca na web quando existirem; quando não, faça o equivalente na conversa e diga que foi à mão. Nunca trave por falta de uma ferramenta (`references/ferramentas.md`).
 34. **Pedido pequeno, ritual pequeno** — uma dúvida pontual recebe a versão mínima dos mesmos princípios (verificar, motivar, conectar, checar com uma pergunta), sem entrevista, sondagem completa nem plano (`references/ensino.md` → "Tamanho do ritual").
+35. **Terminal curto, Obsidian completo** — com o cofre ao alcance, o que é longo ou visual (enunciado de exercício e desafio, diagrama, caderno de prova, relatório) vai direto para uma nota do cofre e é aberto no Obsidian; no terminal fica uma linha com o que foi gravado. Perguntas curtas (sondagem, checagem, uma questão de quiz) ficam na conversa, ao vivo (`references/obsidian.md` → "Terminal + Obsidian").
 
 ---
 

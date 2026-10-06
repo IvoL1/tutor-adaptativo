@@ -9,6 +9,8 @@
 - Pastas novas `exercicios/` e `provas/` na matéria, escritas só pelo Claude; a resposta do Ivo continua em `pratica/treinos/` (regra de que `pratica/` é dele não muda).
 - Templates novos em `templates.md`: exercício/desafio (callouts `todo`, `check` e dicas `hint` dobradas, **sem a solução**) e relatório de prova (tabela por pergunta, montada só com o que o `quiz.py` devolveu).
 - Receita nova em `obsidian.md`; nomes canônicos e a tabela "quem mexe no quê" em `sessao.md` atualizados.
+- **Modo cofre ("terminal curto, Obsidian completo", Regra 35):** com o cofre ao alcance, enunciados de exercício e desafio e visuais vão sozinhos para uma nota, que é aberta no Obsidian (`cmd.exe //c start "" "obsidian://…"` no Windows, testado); o terminal só recebe uma linha. Perguntas curtas e a correção continuam ao vivo. "Prova em nota" (a pedido): caderno com todas as questões montadas pelo `quiz.py`, resposta em lote no terminal, correção por código e relatório.
+- A raiz do cofre, quando o Claude roda fora dele, é descoberta pelo `obsidian.json` do Obsidian (com o "ok" do Ivo). O atalho `estudar` (`~/.local/bin/estudar.cmd`) abre o Claude Code já dentro do cofre. Excalidraw: o Ivo desenha e exporta PNG/SVG para `pratica/treinos/`; o Claude lê a imagem com `Read` para revisar, mas não gera `.excalidraw`.
 - Testado numa cópia do cofre real com o plugin instalado no Windows 11 (Obsidian 1.14.4, Claudian 2.3.13): criar matéria sem nenhum pedido de permissão e `"exportar"` gerando a nota correta.
 
 ## 5.0.3 — 2026-10-06

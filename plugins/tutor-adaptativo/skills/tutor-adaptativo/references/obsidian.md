@@ -16,6 +16,7 @@
 >     · Gravar a nota da sessão
 >     · Visuais e imagens (`"anexa"`)
 >     · Transcrever um vídeo (`"transcreve"`)
+>     · Terminal + Obsidian (modo cofre)
 >     · Exercícios, desafios e provas como nota (`"exportar"`)
 >     · Cartões (`"cartões"`)
 >     · Abrir no Obsidian (`"abrir"`)
@@ -71,7 +72,7 @@ Detalhes que mordem:
 
 A **raiz de estudos** (`RAIZ`) é a pasta do cofre Obsidian que contém o `CLAUDE.md` ponteiro, o `README.md` e as pastas das matérias. Pode ser uma subpasta (`estudos/`) ou o próprio cofre (`RAIZ` vazia).
 
-1. **Onde estou?** Se o diretório de trabalho tem uma pasta `.obsidian/`, ele **é** o cofre (caso normal do Claudian). Se não tem, veja se alguma pasta acima ou abaixo a tem; se nenhuma, pergunte o caminho do cofre (pergunta com opções) e use-o a partir daí.
+1. **Onde estou?** Se o diretório de trabalho tem uma pasta `.obsidian/`, ele **é** o cofre (caso normal do Claudian e do atalho `estudar`, que abre o Claude Code já dentro do cofre). Se não tem, veja se alguma pasta acima ou abaixo a tem. Se nenhuma, descubra o cofre aberto no Obsidian lendo (`Read`) o `obsidian.json` (Windows: `%APPDATA%\obsidian\obsidian.json`, no Git Bash `~/AppData/Roaming/obsidian/obsidian.json`; macOS: `~/Library/Application Support/obsidian/obsidian.json`; Linux: `~/.config/obsidian/obsidian.json`): cada item de `vaults` tem `path` e o aberto traz `"open": true`. **Mostre o caminho e peça meu "ok"** antes de gravar. Como esse caminho fica fora do diretório de trabalho, o Claude Code pode pedir permissão de escrita; o jeito de evitar é abrir com o atalho `estudar` (ou `claude` dentro da pasta do cofre). Sem `obsidian.json` legível, pergunte o caminho (pergunta com opções).
 2. `Glob` por `*` na raiz do cofre (e `**/CLAUDE.md`, `**/registros-da-skill`) para achar a candidata: pasta com `CLAUDE.md` que cite `tutor-adaptativo` (leia para conferir) ou com subpastas que tenham `registros-da-skill/`. Uma candidata: use-a. Mais de uma: pergunte qual (pergunta com opções).
 3. **Nada encontrado:** é cofre novo. Proponha `estudos/` (ou a raiz do cofre, se for um cofre só de estudos), peça meu "ok" e crie na primeira matéria.
 4. Guarde `RAIZ` para a sessão inteira e **mostre-a uma vez** ("Cofre: `estudos/`") para eu corrigir se estiver errada. Registre-a no `trilha.md` (campo "Raiz dos estudos no cofre").
@@ -166,9 +167,19 @@ Só se eu uso o plugin **Spaced Repetition** e pedi. A fila do `conhecimento.md`
 2. Não existe: `Write` com frontmatter (`tipo: cartoes`, `materia`, `tags`), o título `# Cartões — Nome` e a linha `#flashcards/{sg}`.
 3. Existe: `Edit` ancorado na última linha, acrescentando os novos, **uma linha cada**, no formato `pergunta::resposta` (sem espaços em volta de `::`), pulando os que já existem.
 
+### Terminal + Obsidian (modo cofre)
+
+Meu jeito de estudar é conversar com o Claude Code no terminal e **ler e guardar no Obsidian**: ler texto longo no terminal cansa e some quando a janela rola. Por isso, com o cofre ao alcance (seção 4):
+
+1. **Vai direto para uma nota, sem eu pedir:** o enunciado de cada **exercício e desafio** (template "exercício ou desafio"), cada **visual** que valha guardar (receita "Visuais e imagens") e o **caderno** de uma prova em nota (abaixo). Grave a nota e, em seguida, **abra-a no Obsidian** (receita "Abrir no Obsidian"). No terminal, diga em **uma ou duas linhas** o que gravou, o caminho e o que eu devo fazer ("abri o exercício no Obsidian; faça e me diga quando terminar"). **Não repita o enunciado, o critério nem as dicas no terminal**: eles estão na nota. Confirme a gravação com um `Glob` antes de dizer que gravou.
+2. **Continua na conversa, ao vivo:** sondagem, checagens de uma pergunta, cada questão de quiz, dica, correção, celebração, o próximo passo. São curtos e dependem da minha última resposta (Regra 2).
+3. **A resposta é minha e vai em `pratica/treinos/t[N]-[parte]/`.** Eu escrevo lá (código, texto ou um desenho do Excalidraw). Para o Claude revisar um **desenho**, exporte o Excalidraw como PNG ou SVG para essa pasta e diga o nome: o Claude lê a imagem com `Read`. O Claude **não gera** `.excalidraw`: seus diagramas são Mermaid ou SVG verificados pelo `render.py`.
+4. **Prova em nota (só se eu pedir "prova em nota"):** é a única exceção ao "uma pergunta por vez", escolhida por mim. Monte **todas** as questões com `quiz.py montar` (uma chamada por questão, cada uma com a mesma `--prova`), grave `provas/AAAA-MM-DD-{tópico}-{parte}-caderno.md` com as perguntas e as opções **na ordem devolvida**, sem a certa e sem a explicação, e abra no Obsidian. Eu respondo no terminal de uma vez (`1B 🟢, 2A 🔴, 3 não sei`). Corrija cada uma com `quiz.py corrigir`, feche com `placar --fechar` e grave o relatório (template "relatório de prova"). Nunca mostre a certa antes de eu responder.
+5. **Sem cofre ao alcance** (sem acesso à pasta ou sem permissão de escrita): tudo volta para a conversa, curto, e diga isso (seção 6).
+
 ### Exercícios, desafios e provas como nota (`"exportar"`)
 
-Só quando eu peço (`"exportar"`, ou "põe esse exercício numa nota"). A aula, o quiz e a prova continuam **ao vivo na conversa** (Regra 2); a nota é para eu abrir no Obsidian, reler e refazer.
+No modo cofre isto já acontece sozinho para o exercício e o desafio. `"exportar"` serve para gravar **depois** algo que ficou só na conversa, e para o relatório da última prova ("põe esse exercício numa nota"). A aula, o quiz e a prova continuam **ao vivo na conversa** (Regra 2); a nota é para eu abrir no Obsidian, reler e refazer.
 
 1. **Exercício ou desafio atual:** caminho `{RAIZ}/{sg}/exercicios/AAAA-MM-DD-{tópico}-{parte}-{nome-em-slug}.md` (slug: minúsculo, sem acento, só letras, números e hifens). Se já existe (`Glob`), não sobrescreva: acrescente `-2`. Grave com `Write` a partir do template "exercício ou desafio" de `references/templates.md`: enunciado, critério de pronto e a escada de dicas **dobrada**, **sem a solução**. Dê o `[[link]]` e diga que a minha resposta vai em `pratica/treinos/t{N}-{parte}/` (essa pasta é minha; não crie nada nela).
 2. **Última prova fechada:** caminho `{RAIZ}/{sg}/provas/AAAA-MM-DD-{tópico}-{parte}-{nome-da-prova}.md`, template "relatório de prova". Preencha **só** com os resultados que o `quiz.py` devolveu nesta conversa e com o bloco do `placar`. Se faltar algum (a conversa foi cortada), deixe a linha de fora e diga qual faltou; nunca reconstrua de memória. A pasta `provas/` e o `progresso.md` não se substituem: o resultado oficial continua no `progresso.md`.
@@ -177,7 +188,9 @@ Só quando eu peço (`"exportar"`, ou "põe esse exercício numa nota"). A aula,
 
 ### Abrir no Obsidian (`"abrir"`)
 
-O Claude não abre a nota na tela. Entregue o **link** para eu clicar: `obsidian://open?vault={nome-do-cofre}&file={caminho-sem-.md}`, com o caminho codificado (`/` vira `%2F`, espaço vira `%20`). O `nome-do-cofre` é o da seção 4, passo 5. Exemplo: `obsidian://open?vault=Estudos&file=estudos%2Fingles%2F_painel-ingles`. No Claudian, eu também posso clicar no `[[link]]` da nota.
+O endereço é `obsidian://open?vault={nome-do-cofre}&file={caminho-sem-.md}`, com o caminho codificado (`/` vira `%2F`, espaço vira `%20`). O `nome-do-cofre` é o da seção 4, passo 5. Exemplo: `obsidian://open?vault=Estudos&file=ingles%2F_painel-ingles`.
+
+**Abrir sozinho no Obsidian** (testado no Windows 11: abre o app, se estiver fechado, e a nota): no Windows, `cmd.exe //c start "" "obsidian://open?vault=Estudos&file=…"` pelo Bash (ou `Start-Process "obsidian://…"` pela ferramenta PowerShell, se houver); macOS: `open "obsidian://…"`; Linux: `xdg-open "obsidian://…"`. Mantenha o endereço entre aspas por causa do `&`. A nota já tem de existir. Se a chamada for barrada ou falhar, entregue o **link** para eu clicar e diga que não abriu. No Claudian, eu também posso clicar no `[[link]]` da nota.
 
 ### Buscar no cofre
 
