@@ -312,10 +312,106 @@ def testa_ver():
     ok(rodar(ver.main, [str(raiz), str(TMP / "fora.md")])[0] == 2, "arquivo fora da pasta de estudos é recusado")
     ok(rodar(ver.main, [str(TMP / "nao-existe")])[0] == 2, "pasta inexistente dá erro limpo")
     ok(not list(raiz.rglob("*.html")), "ver.py não grava nada nos estudos")
+    (mat / "_simples.md").write_text("# Simples\n\nTexto, R$ 5 e R$ 10, sem fórmula.\n", encoding="utf-8")
+    info = json.loads(rodar(ver.main, [str(raiz), "mat/_simples.md"])[1])
+    h2 = pathlib.Path(info["html"]).read_text(encoding="utf-8")
+    ok("<script" not in h2 and "jsdelivr" not in h2, "nota sem fórmula nem diagrama não pede nada da internet")
+
+
+CURRICULO = {"materia": "Teste", "horas_por_dia": 2, "topicos": [
+    {"id": "t03", "titulo": "Três", "parte": "B", "dificuldade": 3, "pre": ["t02"], "blocos": [{"tipo": "ler", "min": 40}, {"tipo": "exercicios", "min": 50}]},
+    {"id": "t01", "titulo": "Um", "parte": "A", "dificuldade": 1, "pre": [], "blocos": [{"tipo": "ler", "min": 30}, {"tipo": "junto", "min": 30}, {"tipo": "exercicios", "min": 40}]},
+    {"id": "t02", "titulo": "Dois", "parte": "A", "dificuldade": 2, "pre": ["t01"], "blocos": [{"tipo": "ler", "min": 30}, {"tipo": "exercicios", "min": 40}, {"tipo": "prova", "min": 20}]}]}
+
+
+def testa_pacote():
+    pacote = importlib.import_module("pacote")
+    cj = TMP / "curriculo.json"
+    cj.write_text(json.dumps(CURRICULO), encoding="utf-8")
+    cod, saida = rodar(pacote.main, ["planejar", str(cj), "--json"])
+    d = json.loads(saida)
+    ok(cod == 0 and d["ordem"] == ["t01", "t02", "t03"], "pacote.py põe os tópicos na ordem dos pré-requisitos (t03 escrito primeiro vai por último)")
+    conteudo = [x for x in d["dias"] if not x.get("fechamento")]
+    ok(all(x["minutos"] >= 120 * 0.97 for x in conteudo[:-1]), "dias de conteúdo (menos o último) fecham o orçamento de 120 min")
+    ok(all(x["minutos"] <= 120 * 1.30 for x in d["dias"]), "nenhum dia estoura muito o orçamento")
+    ordem_blocos = [(i["topico"], i["bloco"]) for x in d["dias"] for i in x["itens"]]
+    ok(ordem_blocos == sorted(ordem_blocos, key=lambda b: (["t01", "t02", "t03"].index(b[0]), b[1])), "blocos de cada tópico em ordem e nenhum tópico antes dos pré-requisitos")
+    todos = sum(i["min"] for x in d["dias"] for i in x["itens"])
+    ok(todos == sum(b["min"] for t in CURRICULO["topicos"] for b in t["blocos"]), "todos os minutos do currículo entram no cronograma, sem perder nem repetir")
+    ok(any("t01" in x["revisao"] for x in d["dias"]), "revisão espaçada reserva tópicos que já acabaram")
+    ok(d["cobertura"][-1]["topicos_concluidos"] == 3, "a tabela 'até onde cabe' chega ao fim")
+    cod, md = rodar(pacote.main, ["planejar", str(cj), "--horas", "1"])
+    ok(cod == 0 and "Até onde cabe" in md and "(1 h por dia)" in md, "cronograma em Markdown com 'Até onde cabe' e horas do argumento")
+    cod, saida = rodar(pacote.main, ["planejar", str(cj), "--ja-sei", "t01", "--json"])
+    ok(json.loads(saida)["ordem"] == ["t02", "t03"], "--ja-sei tira o tópico e libera quem dependia dele")
+    ciclo = json.loads(json.dumps(CURRICULO))
+    ciclo["topicos"][1]["pre"] = ["t03"]
+    cc = TMP / "ciclo.json"
+    cc.write_text(json.dumps(ciclo), encoding="utf-8")
+    ok(rodar(pacote.main, ["planejar", str(cc)])[0] == 1, "ciclo de pré-requisitos é recusado")
+    ruim = json.loads(json.dumps(CURRICULO))
+    ruim["topicos"][0]["pre"] = ["t99"]
+    ruim["topicos"][1]["blocos"][0]["min"] = 200
+    cr = TMP / "ruim.json"
+    cr.write_text(json.dumps(ruim), encoding="utf-8")
+    cod, saida = rodar(pacote.main, ["planejar", str(cr)])
+    ok(cod == 1 and "t99" in saida and "entre 5 e 90" in saida, "pré-requisito inexistente e bloco gigante dão erro claro")
+    salto = json.loads(json.dumps(CURRICULO))
+    salto["topicos"][0]["dificuldade"] = 5
+    cs = TMP / "salto.json"
+    cs.write_text(json.dumps(salto), encoding="utf-8")
+    ok("salto de dificuldade" in rodar(pacote.main, ["planejar", str(cs)])[1], "salto de dificuldade gera aviso")
+    # conferir
+    pk = TMP / "pk"
+    (pk / "dias").mkdir(parents=True)
+    (pk / "gabaritos").mkdir()
+    (pk / "plano.md").write_text("---\nhoras_por_dia: 1\n---\n# Plano\n", encoding="utf-8")
+    texto = " ".join(["palavra"] * 300)
+    bom = f"---\ndia: 1\nminutos: 60\n---\n# Dia 1\n\n## Roteiro\n| 1 | 20 | Ler |\n\n## 1. Ler — Tipos (20 min)\n\n{texto}\n\n## 2. Exercícios — Praticar (40 min)\n\n**Critério de pronto:** roda.\n"
+    (pk / "dias" / "dia-01.md").write_text(bom, encoding="utf-8")
+    (pk / "gabaritos" / "dia-01.md").write_text("# Gabarito\n", encoding="utf-8")
+    cod, saida = rodar(pacote.main, ["conferir", str(pk)])
+    ok(cod == 0 and "OK   dia-01.md: 60 min" in saida, "conferir aceita um dia que fecha o tempo")
+    longo = bom.replace(texto, " ".join(["palavra"] * 5000)).replace("minutos: 60", "minutos: 50")
+    (pk / "dias" / "dia-02.md").write_text(longo + "\nFórmula $x^2$ e ![f](nada.svg)\n", encoding="utf-8")
+    cod, saida = rodar(pacote.main, ["conferir", str(pk)])
+    ok(cod == 1 and "frontmatter diz 50" in saida and "palavras levam" in saida and "gabaritos/dia-02.md" in saida, "conferir acusa minutos, leitura longa e gabarito ausente")
+    ok("LaTeX" in saida and "imagem não encontrada: nada.svg" in saida, "conferir acusa fórmula LaTeX e imagem que falta")
+    curto = bom.replace("(40 min)", "(10 min)").replace("minutos: 60", "minutos: 30")
+    (pk / "dias" / "dia-02.md").write_text(curto, encoding="utf-8")
+    ok("abaixo do orçamento" in rodar(pacote.main, ["conferir", str(pk)])[1], "conferir acusa dia abaixo do orçamento")
+
+
+def testa_apostila():
+    apostila = importlib.import_module("apostila")
+    pk = TMP / "pk2"
+    (pk / "dias").mkdir(parents=True)
+    (pk / "gabaritos").mkdir()
+    (pk / "plano.md").write_text("---\nhoras_por_dia: 1\n---\n# Plano\n\nVeja o [dia](dias/dia-01.md).\n", encoding="utf-8")
+    (pk / "dias" / "dia-01.md").write_text("# Dia 1\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n<details>\n<summary>Dica 1</summary>\n\nPense.\n\n</details>\n", encoding="utf-8")
+    (pk / "gabaritos" / "dia-01.md").write_text("# Gabarito\n\nResposta [site](https://exemplo.com).\n", encoding="utf-8")
+    h = apostila.html_de([pk / "plano.md", pk / "dias" / "dia-01.md"], "t")
+    ok("<table>" in h and "<details open>" in h, "apostila: tabela e dicas abertas no papel")
+    ok("Veja o dia." in h and "dia-01.html" not in h, "apostila: link entre notas vira texto")
+    ok("<script" not in h and "cdn." not in h and "https://" not in h, "apostila: nada é carregado da internet")
+    antigo = apostila.render.navegador
+    apostila.render.navegador = lambda: None  # força "sem navegador": o plano B grava .html
+    try:
+        cod, saida = rodar(apostila.main, ["--pacote", str(pk)])
+    finally:
+        apostila.render.navegador = antigo
+    r = json.loads(saida)
+    ok(cod == 0 and r["formato"] == "html" and (pk / "pdf" / "dia-01.html").is_file() and (pk / "pdf" / "gabarito-dia-01.html").is_file(), "apostila --pacote sem navegador grava .html para imprimir")
+    ok((pk / "dias" / "dia-01.md").read_text(encoding="utf-8").startswith("# Dia 1"), "apostila não altera os .md")
+    apostila.render.navegador = lambda: None
+    try:
+        ok(rodar(apostila.main, ["--pacote", str(TMP / "vazio-pk")])[0] == 1, "pasta sem pacote dá erro limpo")
+    finally:
+        apostila.render.navegador = antigo
 
 
 if __name__ == "__main__":
-    for t in (testa_quiz, testa_fila, testa_fila_stdin, testa_png, testa_entrada, testa_boletim, testa_ver):
+    for t in (testa_quiz, testa_fila, testa_fila_stdin, testa_png, testa_entrada, testa_boletim, testa_ver, testa_pacote, testa_apostila):
         try:
             t()
         except Exception as e:  # um erro inesperado também conta como falha

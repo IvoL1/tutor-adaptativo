@@ -3,337 +3,45 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 7.0.0 — 2026-10-21
+
+**Estudar sozinho: pacote de estudo autônomo.** Novo modo, ao lado da aula ao vivo (que continua igual): eu digo a matéria e quantas horas por dia tenho, e a skill monta **uma vez** (com a fonte oficial e atual da internet e os anexos que eu der) um pacote fechado em Markdown e PDF que eu estudo **sem o Claude e sem internet**.
+- **`references/pacote.md` (novo):** o passo a passo (entender o pedido com perguntas de opções, fontes, currículo, cronograma, escrita, conferência, PDF, entrega), a tabela de tempos por tipo de bloco, como escrever para quem estuda sozinho (dúvidas antecipadas, "se travar", fazer junto com resultado esperado, escada de 3 dicas, gabarito à parte, prova com correção e "qual seção reler"), os modelos dos arquivos e o que fazer se eu atrasar, pular tópico ou mudar as horas.
+- **`scripts/pacote.py` (novo):** `planejar` valida o currículo (ids, pré-requisitos existentes e sem ciclo, dificuldade 1–5, blocos de 5 a 90 min), põe os tópicos na ordem dos pré-requisitos, distribui os blocos em dias que somam **pelo menos** as horas por dia (passa até 10% para não cortar um bloco ao meio), reserva a revisão espaçada (1, 3, 7 e 16 dias depois de cada tópico, até 15% do dia), avisa salto de dificuldade e mostra **até onde a matéria chega** em cada quantidade de dias; `--ja-sei` tira o que já domino. `conferir` mede o material escrito contra o tempo prometido (soma dos minutos, leitura longa demais, falta de gabarito e de "Critério de pronto", imagem inexistente, fórmula LaTeX ou diagrama que não aparecem sem internet).
+- **`scripts/apostila.py` (novo):** gera `pdf/plano.pdf`, `pdf/dia-NN.pdf` e `pdf/gabarito-dia-NN.pdf`, sem internet, com o Chrome ou o Edge já instalados; sem eles, `.html` prontos para imprimir (Ctrl+P → Salvar como PDF). Dicas dobráveis saem abertas no papel; gabarito sai separado.
+- **`ver.py`:** só carrega fórmulas e diagramas da internet quando a nota realmente os usa; uma nota comum, e todo pacote, abre sem rede.
+- **`SKILL.md`:** Regra 36 (o tempo manda, o código calcula, nada depende de internet depois de pronto); comandos `"pacote"`, `"gerar mais dias"` e `"atualizar pacote"`; o perfil ganhou "me expresso mal por escrito": a skill pergunta com opções, uma coisa por vez, e repete o que entendeu antes de um trabalho grande. A Regra 2 (ao vivo) ganhou a exceção do pacote, que eu peço de propósito.
+- `sessao.md`/`templates.md`/`ferramentas.md`: pasta `pacote/` nos nomes canônicos, `acompanhamento.md` como único arquivo meu dentro dela, uso dos scripts.
+- `selftest.py`: 117 verificações (23 novas para `pacote.py`, `apostila.py` e o `ver.py` sem internet).
+- **Limpeza:** o histórico deste arquivo foi reescrito sem citar nenhum programa de terceiros. A skill nunca depende de nenhum programa ou plugin para guardar notas: só pastas de arquivos Markdown comuns.
+
 ## 6.0.0 — 2026-10-06
 
-**A skill ficou autossuficiente: nada de Obsidian, de plugin do Obsidian nem de Claudian.** A pasta de estudos (`Estudos/`, uma subpasta por matéria) é Markdown comum, lida e escrita pelo Claude Code com as ferramentas de arquivo.
-- **Removido de propósito:** `references/obsidian.md` (virou `references/arquivos.md`), tabelas `.base`, callouts `> [!tipo]`, `[[wikilinks]]` e `![[embeds]]`, links `obsidian://`, detecção por `.obsidian/` e `obsidian.json`, `cartoes.md` (comando `"cartões"` e plugin Spaced Repetition), mapa `.canvas`, nota de compatibilidade com o Mermaid do Obsidian, `cofre.py` na documentação. Não reintroduzir.
-- **Convenções novas dos arquivos:** links Markdown relativos ao arquivo, destaques em citação com emoji (`> ▶ **Próximo passo** …`), dicas dobráveis com `<details>`, imagens `![descrição](caminho)`.
-- **`scripts/ver.py` (novo): o leitor.** Converte todas as notas `.md` em páginas HTML numa pasta temporária (nada é gravado nos estudos) e abre no navegador padrão (`webbrowser`, sem `cmd.exe`): tabelas, listas e tarefas, citações, `<details>`, imagens, links entre notas, fórmulas (KaTeX 0.16.11) e diagramas (Mermaid 11.17.2, o mesmo do `render.py`), os dois com versão fixa e SRI; sem rede abrem como texto. Comando `"abrir"`.
-- **`scripts/boletim.py` (novo):** o código calcula a média das provas, os exercícios feitos de quantos e as pendências a partir do `progresso.md`, de `exercicios/` e de `sessoes/`, e devolve o bloco entre `<!-- boletim:inicio -->` e `<!-- boletim:fim -->` do `_boletim-[matéria].md`; o Claude só aplica com `Edit`. Substitui as Bases do Obsidian.
-- `selftest.py`: 94 verificações (24 novas para `boletim.py` e `ver.py`).
-- Mantido da 5.1: `"exportar"`, exercícios e desafios em nota com dicas dobráveis, correção com `status: feito`, prova em nota, `"boletim"`; o modo pasta (Regra 35) agora abre as notas pelo `ver.py`.
+**A skill ficou autossuficiente.** A pasta de estudos (`Estudos/`, uma subpasta por matéria) é Markdown comum, lida e escrita pelo Claude Code com as ferramentas de arquivo (`Read`, `Write`, `Edit`, `Glob`, `Grep`).
+- **Removido de propósito:** tabelas dinâmicas e destaques em sintaxe de programas de terceiros, links entre notas em colchetes duplos, links de abrir programa, detecção de programa pelo nome de pastas ocultas, `cartoes.md` (o comando `"cartões"`).
+- **Convenções dos arquivos:** links Markdown relativos ao arquivo, destaques em citação com emoji (`> ▶ **Próximo passo** …`), dicas dobráveis com `<details>`, imagens `![descrição](caminho)`.
+- **`scripts/ver.py` (novo): o leitor.** Converte as notas `.md` em páginas HTML numa pasta temporária (nada é gravado nos estudos) e abre no navegador padrão: tabelas, listas e tarefas, citações, `<details>`, imagens, links entre notas, fórmulas e diagramas.
+- **`scripts/boletim.py` (novo):** o código calcula a média das provas, os exercícios feitos de quantos e as pendências a partir do `progresso.md`, de `exercicios/` e de `sessoes/`.
+- Mantidos: `"exportar"`, exercícios e desafios em nota com dicas dobráveis, correção com `status: feito`, prova em nota, `"boletim"` e o modo pasta (Regra 35).
 
-## 5.1.0 — 2026-10-06
+## 5.x — 2026-10-06
 
-**Exercícios, desafios e provas como notas no Obsidian** (novo comando `"exportar"`, sempre a pedido)
-- Pastas novas `exercicios/` e `provas/` na matéria, escritas só pelo Claude; a resposta do Ivo continua em `pratica/treinos/` (regra de que `pratica/` é dele não muda).
-- Templates novos em `templates.md`: exercício/desafio (callouts `todo`, `check` e dicas `hint` dobradas, **sem a solução**) e relatório de prova (tabela por pergunta, montada só com o que o `quiz.py` devolveu).
-- Receita nova em `obsidian.md`; nomes canônicos e a tabela "quem mexe no quê" em `sessao.md` atualizados.
-- **Modo cofre ("terminal curto, Obsidian completo", Regra 35):** com o cofre ao alcance, enunciados de exercício e desafio e visuais vão sozinhos para uma nota, que é aberta no Obsidian (`cmd.exe //c start "" "obsidian://…"` no Windows, testado); o terminal só recebe uma linha. Perguntas curtas e a correção continuam ao vivo. "Prova em nota" (a pedido): caderno com todas as questões montadas pelo `quiz.py`, resposta em lote no terminal, correção por código e relatório.
-- A raiz do cofre, quando o Claude roda fora dele, é descoberta pelo `obsidian.json` do Obsidian (com o "ok" do Ivo). O atalho `estudar` (`~/.local/bin/estudar.cmd`) abre o Claude Code já dentro do cofre. Excalidraw: o Ivo desenha e exporta PNG/SVG para `pratica/treinos/`; o Claude lê a imagem com `Read` para revisar, mas não gera `.excalidraw`.
-- **Boletim e correções:** `_boletim-[matéria].md` com as tabelas das provas (com a média, resumo `Average` da própria Base), dos exercícios (status pendente/feito) e das sessões; criado junto com a matéria, com `_provas-` e `_exercicios-[matéria].base`. Comando `"boletim"`. Exercício feito ganha a seção "Correção" (uma melhoria) e `status: feito`. A sintaxe das Bases (`summaries`, `Average`, `inFolder`) foi conferida no código do Obsidian 1.14.4; a renderização na tela não foi vista.
-- **Funciona sem Obsidian** (testado numa pasta `Estudos` comum, sem `.obsidian`): matéria, painel, boletim e exercício em Markdown, sem erro. As partes só do Obsidian (`.base`, abrir a nota pelo link) têm plano B e ficam de fora se der problema; a pasta `Estudos` com uma subpasta por matéria é a estrutura padrão.
-- Claudian virou **opcional** (README): o caminho recomendado é Claude Code no terminal + Obsidian como caderno, com o atalho `estudar`.
-- Testado numa cópia do cofre real com o plugin instalado no Windows 11 (Obsidian 1.14.4, Claudian 2.3.13): criar matéria sem nenhum pedido de permissão e `"exportar"` gerando a nota correta.
+- **5.1:** exercícios, desafios e provas como notas na pasta da matéria (`exercicios/`, `provas/`), com o comando `"exportar"`; boletim com a média das provas; modo "terminal curto, notas completas" (Regra 35).
+- **5.0.x:** toda leitura e escrita nos estudos passou a usar as ferramentas de arquivo, com a regra de ouro de edição (`Edit` com trecho exato e único; `Write` do arquivo inteiro só em arquivo do Claude, logo após ler), regras de segurança (nunca apagar, nunca escrever em `pratica/`) e `fila.py … --sem-gravar` (lê o arquivo e só imprime). `"retomar"` faz uma rodada só de `Glob` e, sem registros, pergunta pelo Cartão de retomada. No Windows o comando do Python é `py`. `quiz.py`: o aviso de tamanho só vale quando a maior alternativa passa de 15 caracteres. `render.py`: validação do PNG pela assinatura. Evals: 8 de 8 casos que rodam sem sandbox passam.
 
-## 5.0.3 — 2026-10-06
+## 4.x — 2026-10-04 a 05
 
-**Dois evals que oscilavam diagnosticados e corrigidos** (suíte: 8 de 8 casos que rodam aqui, 1,00 em todos; `quiz-com-ferramenta` não roda no Windows sem sandbox e foi testado direto no script)
-- `sondagem-nao-vale-nota`: a skill abria com entrevista de duas perguntas (Regra 3) mesmo quando o pedido era explicitamente "descobrir meu nível", e às vezes esquecia de avisar que não vale nota. Agora o pedido explícito de sondar (`"sondar"`) vai direto à Sondagem: aviso de "não vale nota" + uma pergunta acessível com "Não sei"; a meta e o resto da entrevista vêm depois. Ajustes na Regra 3, no comando `"sondar"` e em `ensino.md` (Fase 1 e "Tamanho do ritual"). 1/3 → 3/3.
-- `retomar-sem-registros`: a busca do cofre podia estourar o limite de turnos e terminar sem resposta. A receita "Retomar" agora faz uma rodada só de `Glob` em paralelo e, se vier vazio, para e pergunta pelo Cartão de retomada. 1/2 → 4/4.
-- `ritual-curto-variavel`: 3/3 sem mudança (era variância).
-- `quiz.py`: o aviso de tamanho ("a certa é bem mais curta/longa", "tamanhos desiguais") disparava em respostas curtíssimas (`5` contra `23`) e obrigava a refazer perguntas boas. Agora só vale quando a maior alternativa passa de 15 caracteres. `selftest.py`: 70 verificações.
-- Auditoria final da 5.0.3 (sem mudança de código): manifestos válidos, `selftest.py` 70/70, referências cruzadas e seções citadas conferidas, sem resto do `mcp-obsidian`. `fila.py` (`acerto` 3d→7d, `acerto-fragil` repete, `erro` e `erro-confiante` voltam a 1d, `novo` 1d, conceito inexistente com erro e arquivo intacto), `quiz.py` (montar, corrigir com erro confiante e lacuna, placar com `--fechar`, ID inválido) e `render.py` (Mermaid válido, erro de sintaxe com linha, SVG simples) rodados à mão; evals: 8 de 8 casos que rodam aqui com 1,00. Com `TUTOR_STATE` definido, o `quiz.py` ainda consulta a pasta temporária do sistema de propósito (o quiz não se perde se o estado mudar no meio); em teste manual, use um `--prova` com nome novo.
-- Teste com o Claude conduzindo a conversa (`claude -p` com o plugin local, três mensagens): o quiz foi montado e corrigido por `quiz.py` (erro com 🟢 saiu como erro confiante, com reforço para o dia seguinte). Ao atualizar a fila, o Claude usou `python`, que no Windows é só o atalho da Loja, e a chamada falhou. A regra do `py` morava só em `ferramentas.md`; agora está também no `SKILL.md`, junto da regra do `fila.py`. Reteste: usou `py` e gravou a linha certa (1d, +1 dia, status com a nota de erro confiante). Nesse modo de teste a leitura de `ferramentas.md` foi negada, então a conta foi feita à mão e avisada; no Claudian a leitura de arquivos da skill não deve pedir aprovação.
-- `fila.py`: testado em `acerto`, `acerto-fragil`, `erro`, `erro-confiante`, encadeado (1d→3d→7d→16d) e conceito inexistente; `--sem-gravar` não altera o arquivo. `quiz.py` testado de ponta a ponta (montar, corrigir com erro confiante, placar). `SKILL.md` deixa explícito que `fila.py` é obrigatório fora do `novo`.
+- Catálogo de visuais (`references/visuais-modelos.md`): Mermaid, SVG pronto, gráficos de função e de dados, imagem de fonte confiável, visual interativo.
+- `render.py`: Mermaid local (`--mermaid-js`), recorte exato do PNG, janela do Linux, mensagem exata do erro de sintaxe.
+- `fila.py registrar -` devolve a seção da fila inteira (`SECAO`/`CONTEUDO`/`FIM`).
+- Evals rodados de verdade; 7 de 9 casos passavam.
 
-## 5.0.2 — 2026-10-06
+## 3.x — 2026-09-30 a 10-01
 
-**Testado de verdade com o Claudian 2.3.13** (Claude Code com o cofre como diretório de trabalho; criar matéria, `"retomar"` e `"salva"` num cofre de teste): estrutura, frontmatter, `.base` e edições saíram corretos. Ajustes que o teste pediu:
-- `fila.py registrar|vencidos|mostrar CAMINHO --sem-gravar`: lê o arquivo direto e só imprime `SECAO`/`CONTEUDO`/`FIM`. É um comando simples, sem pipe nem heredoc, que não gera pedido extra de permissão (antes, o comando composto era barrado e o Claude calculava a fila à mão). Receitas de `obsidian.md` e `ferramentas.md` passam a usá-lo; o modo stdin continua. `selftest.py`: 69 verificações.
-- Python no Windows: `python` e `python3` podem ser só atalhos da Loja; a skill usa `py` no Windows e `python3` nos outros, testando com uma chamada simples (comando composto com `||`/`for` é barrado pelas permissões) antes de recorrer ao plano B à mão.
-- `obsidian.md`: a linha do dashboard é `- **Última sessão:** AAAA-MM-DD` (o template grava em negrito, as receitas citavam sem). Releitura proporcional: `Edit`/`Write` já falham com erro; releitura após `Write` sobre arquivo existente e **uma conferência final** em criação e `"salva"` (a regra antiga, reler depois de toda edição, não era seguida e o Claude admitia não ter relido).
-- README: seção "Testado com o Claudian" (modelo padrão `haiku` do Claudian, `py` no Windows, raiz do cofre) e permissão `Bash(py …)`.
+- **3.0 — virada de "programação, offline" para "qualquer matéria, ao vivo":** entrevista, sondagem (a fronteira só está achada quando está cercada), plano com mapa de dependências e meu "ok", ciclo por ideia (motivar, estabelecer, conectar, checar), prova que fecha cada parte, reforço, repetição espaçada, calibração de confiança, protocolo antifrustração.
+- **3.1:** o código decide o que não deve depender de obediência (`quiz.py`, `fila.py`): sorteio da posição da certa, alerta de alternativa que se entrega pela forma, correção e percentual, datas da revisão.
+- **3.2–3.3:** correções de varredura, subagentes `tutor-pesquisador` e `tutor-diagramador`, ritual pequeno para dúvida pontual (Regra 34), quiz com ferramenta de perguntas.
 
-## 5.0.1 — 2026-10-06
+## 2.x
 
-**Correção em `render.py` (sem mudança de comportamento da aula)**
-- `_png_ok` rejeitava qualquer PNG com menos de 1 KB, então um SVG simples (reta numérica, figura chapada) renderizava certo mas voltava `"ok": false`, sem dizer o motivo. Agora confere a assinatura e o IHDR do PNG, e a falha do `svg` passa a trazer o campo `erro`.
-- `selftest.py`: 68 verificações (2 novas para `_png_ok`).
-- Auditoria geral: manifestos válidos (`claude plugin validate`), referências cruzadas e seções citadas conferidas, 17 modelos de `visuais-modelos.md` renderizam, evals rodados (6 de 9; `quiz-com-ferramenta` exige Bash e não roda no Windows sem sandbox; `sondagem-nao-vale-nota` e `ritual-curto-variavel` oscilam, ver 4.1).
-
-## 5.0 — 2026-10-06
-
-**Cofre por arquivos, sem MCP** (pensado para o plugin Claudian, que roda o Claude Code com o cofre como diretório de trabalho)
-- `references/obsidian.md` reescrito: toda leitura e escrita no cofre usa `Read`, `Write`, `Edit`, `Glob` e `Grep` (e `mkdir`/`cp` no Bash). Saíram a tabela de ferramentas do `mcp-obsidian`, a tabela de outros servidores e a descoberta de `DISCO` pelo `obsidian.json`.
-- Nova regra de ouro de edição: `Edit` com trecho exato e único; `Write` do arquivo inteiro só em arquivo do Claude, logo após ler. Releitura obrigatória continua.
-- Regras de segurança: nunca `rm`/`mv`, nunca escrever em `.obsidian/`, `pratica/` continua só do Ivo.
-- Raiz do cofre: o diretório de trabalho que tem `.obsidian/` é o cofre; o nome do cofre (para o link `obsidian://`) é o nome dessa pasta.
-- PNG vai direto por `cp` para `anexos/`; pastas nascem com `Write`/`mkdir`.
-- `fila.py registrar -` não mudou: continua devolvendo `SECAO`/`CONTEUDO`/`FIM`; a aplicação agora é um `Edit` (antes, `patch_content`).
-- README: instalação pelo Claudian no lugar do `mcp-obsidian` (`uv`, Local REST API e chave de API deixam de ser necessários).
-- Eval `cria-materia-sem-mcp` virou `cria-materia-sem-cofre`.
-
-## 4.1 — 2026-10-05
-
-**Servidor certo, conferido no código** (a 4.0 foi escrita para o `obsidian-mcp-server`; o do Ivo é o `mcp-obsidian`, 15 ferramentas)
-- `references/obsidian.md` reescrito sobre as ferramentas reais (`obsidian_put_content`, `obsidian_append_content`,
-  `obsidian_patch_content`, `obsidian_batch_get_file_contents`, `obsidian_list_files_in_dir`…). Esse servidor **não tem
-  busca-e-troca**: nova "regra de ouro" para editar (criar, acrescentar, trocar o corpo de uma seção por cabeçalho,
-  campo do frontmatter, ou ler e regravar o arquivo inteiro só quando é do Claude), com releitura obrigatória.
-  Existência de arquivo se checa por `list_files_in_dir` (pasta inexistente dá erro 40400).
-- `"retomar"` lê os três registros numa chamada só (`batch_get_file_contents`).
-- `fila.py registrar -` devolve a seção da fila inteira (`SECAO`/`CONTEUDO`/`FIM`) para uma única chamada `patch_content`.
-- PNG volta a ser possível quando o Claude roda na mesma máquina do Obsidian: a pasta do cofre sai do `obsidian.json` do Obsidian e a
-  imagem vai por `cp`.
-- README: comando de instalação do `mcp-obsidian` (`uvx`, `OBSIDIAN_API_KEY/HOST/PORT`), conferido subindo o servidor.
-
-**Visuais conferidos contra o Mermaid do Obsidian (11.4.1)**
-- Todos os modelos passam no analisador do 11.4.1 e do 11.17.2. Achado: `quadrantChart` não aceita acento nos rótulos no 11.4.1.
-
-**`render.py`** corrigido (arquivo local do Mermaid, janela do Linux, recorte exato do PNG; ver 4.0) e testado no `selftest.py` (66 verificações).
-
-**Evals rodados de verdade** (`claude plugin eval`): 7 de 9 casos passam. `sondagem-nao-vale-nota` oscila também na 3.3 (a skill
-entrevista antes de sondar matéria nova, Regra 3, e o eval espera a sondagem direta) e `quiz-com-ferramenta` falha em parte das rodadas
-tanto na 3.3 (0/3) quanto aqui (1/3). O eval da criação de matéria foi refeito para o caso sem MCP.
-
-## 4.0 — 2026-10-04
-
-**O cofre Obsidian passa a ser lido e escrito pelo MCP do Obsidian, não por Python** (mudança de comportamento)
-- Novo `references/obsidian.md`: as 15 ferramentas do `mcp-obsidian` (conferidas no código do servidor),
-  uma regra de ouro para editar (sem busca-e-troca: `append`, `patch` por cabeçalho ou ler e regravar),
-  regras de segurança (ler antes de escrever, regravar só arquivo do Claude, nunca tocar em `pratica/`,
-  nunca apagar), como achar a raiz do cofre (e a pasta no disco, via `obsidian.json`) e uma
-  receita para cada coisa que o `cofre.py` fazia: retomar, criar matéria, atualizar registros, nota da
-  sessão, visuais e imagens, transcrever, cartões, abrir, buscar e conferir o cofre. Tabela de equivalência
-  para outros dois servidores MCP do Obsidian. Plano B: arquivos diretos, depois o Cartão de retomada.
-- **Removidos:** `scripts/cofre.py` e `hooks/hooks.json` (os dois hooks, abertura e diário, rodavam o
-  `cofre.py`; um hook não chama MCP). `"retomar"` agora lê os registros pelo MCP. O diário automático
-  da conversa acabou: a nota da sessão guarda o que vale reler.
-- `quiz.py` não depende mais do `cofre.py`; o estado das perguntas e provas fica na pasta temporária
-  (ou em `TUTOR_STATE`), nunca dentro do cofre (a pasta `.tutor/` deixou de existir).
-- `fila.py` aceita `-` no lugar do arquivo: lê o texto pelo stdin e, em `registrar`, **não grava**: imprime
-  `SECAO`/`CONTEUDO`/`FIM` (a seção da fila inteira, já atualizada) para uma chamada `obsidian_patch_content`.
-  O modo com caminho continua.
-- Novos templates em `references/templates.md`: Painel inicial, `_sessoes-[matéria].base` e `_leia-me.md`
-  de `pratica/` (o MCP não cria pasta vazia, então `pratica/projeto/` e `pratica/treinos/` nascem com ele).
-  `sessoes/`, `anexos/` e `fontes/` nascem com o primeiro arquivo.
-- Comandos `"abrir"`, `"anexa"`, `"transcreve"` e `"cartões"` reescritos sobre o MCP: `"abrir"` entrega o
-  link `obsidian://`; `"anexa"` grava Mermaid no corpo ou SVG em `anexos/` (PNG só com acesso ao disco);
-  `"transcreve"` lê texto colado ou `.vtt` (e usa o `yt-dlp` se existir).
-
-**Visuais: o que faltava para a skill gerar imagens, gráficos e diagramas**
-- Novo `references/visuais-modelos.md`: tabela "qual visual para qual ideia"; modelos Mermaid conferidos no
-  analisador do Mermaid 11.17.2 (fluxo, sequência, estado, ER, classes, mapa mental, linha do tempo, git,
-  quadrante, pizza, gantt, gráfico de linha e barra); SVG pronto (reta numérica, plano cartesiano, fração,
-  teclado de piano); gráficos de função e de dados com valores calculados por código; química com `\ce{}`;
-  Canvas opcional do Obsidian; imagem de fonte confiável com crédito; regra para ilustração gerada por IA
-  (só mnemônica, nunca fato); visual interativo; e a compatibilidade com o Mermaid do Obsidian, que pode ser
-  mais antigo que o do `render.py`.
-- `references/visuais.md` agora cobre visuais numéricos, imagem de fonte confiável e interativos, e diz
-  como gravar cada tipo no cofre. O `tutor-diagramador` conhece os novos tipos, os modelos de SVG e
-  devolve só o código (quem chama grava).
-- Eval `cria-materia-por-script` virou `cria-materia-sem-mcp`: sem MCP, sem cofre e sem plano na conversa, a skill não inventa, diz o que falta e não roda script de cofre.
-
-**Não feito, de propósito**
-- `quiz.py`, `fila.py` e `render.py` continuam em Python: são cálculo e renderização, não Obsidian.
-- Configurar o servidor MCP dentro do plugin: a chave da API do Obsidian é do Ivo; a configuração está no README.
-- Restaurar a injeção automática da posição ao abrir a sessão: hooks `mcp_tool` não rodam no `SessionStart` de
-  abertura (só depois de `/clear` ou compactação) e um hook não saberia qual matéria ler. O `"retomar"` faz isso numa chamada só.
-
-**Correções no `render.py`**
-- `--mermaid-js` com arquivo local nunca funcionou (a página `http://` não carrega `file://`); agora o arquivo é servido pelo servidor local.
-- No Linux o `--headless=new` entrega uma janela ~88 px menor que a pedida: imagens saíam cortadas ou em branco. Agora o script mede a
-  folga, pede a janela maior e recorta o PNG no tamanho exato (recorte em Python puro, testado no `selftest.py`). Como root, usa `--no-sandbox`.
-
-## 3.3 — 2026-10-01
-
-**Correções (achadas numa segunda varredura, reproduzidas em teste)**
-- Quiz e prova se perdiam se a pasta de trabalho mudasse entre `montar` e `corrigir` (o estado ia
-  para pastas diferentes). Agora a busca também olha a pasta temporária.
-- Entrada pelo PowerShell: BOM e UTF-16 quebravam o `P:`. Novo `--arquivo` em `quiz.py montar`,
-  `cofre.py nota` e `cofre.py cartoes`, e a leitura trata BOM, UTF-16 e CRLF.
-- `nova-materia` recusa nomes reservados do Windows (`con`, `nul`, `com1`...), limpa `|`, `[`, `]` e
-  afins do nome mostrado e limita o nome da pasta a 60 caracteres.
-- `nota` apagava linhas escritas à mão em "Sessões recentes" do painel; agora só as 8 notas mais
-  recentes ficam listadas e o resto nunca é tocado. O corpo da nota é gravado só com LF.
-
-**Novo**
-- `cofre.py transcrever`: legenda de vídeo (link, via `yt-dlp`) ou `.vtt`/`.srt` local para `fontes/`,
-  com marcas de tempo e aviso de que é pista e não fonte (Regra 8).
-- `_sessoes-[matéria].base`: tabela nativa (Bases do Obsidian) das sessões, ligada ao painel.
-- `cofre.py cartoes` e comando `"cartões"`: cartões `pergunta::resposta` para o plugin Spaced
-  Repetition, opcional; a fila do `fila.py` segue como única fonte da Revisão do dia.
-- Comando `"transcreve"`. Pasta `fontes/` por matéria. Eval novo (criar a matéria por script).
-
-**Não feito, de propósito**
-- Baixar o plugin Spaced Repetition: plugin da comunidade é código com acesso ao cofre; a instalação
-  fica pela loja do Obsidian, nas mãos do Ivo. O mesmo vale para ligar a CLI do Obsidian.
-- Transcrever áudio (Whisper/ffmpeg): sem legenda, o `transcrever` avisa em vez de adivinhar.
-
-## 3.2 — 2026-10-01
-
-**Correções (achadas numa varredura de erros, testadas)**
-- `quiz.py`: o separador ` | ` do equívoco cortava alternativas com pipe no texto (`ls | grep`).
-  Agora o equívoco vai numa linha própria que começa com `~`. **Mudança de formato.**
-- `quiz.py`: a prova acumulava entre a tentativa e a reprova. Agora a prova parada por mais de
-  12 h recomeça sozinha, `placar` avisa quando a prova ficou aberta e a reprova usa outro nome.
-- `quiz.py`: com `--sem-nao-sei`, o número seguinte era lido como "não sei"; `--max` inválido
-  quebrava com traceback; IDs com caminho eram aceitos.
-- O estado dos scripts saiu da pasta temporária: vive em `.tutor/estado/` dentro do cofre.
-- `acerto_fragil` deixou de ser órfão: `fila.py --resultado acerto-fragil` repete o intervalo.
-- O histórico de dificuldades passou a morar no `CLAUDE.md` do cofre (o arquivo da skill é
-  sobrescrito a cada atualização); o destino "Melhorado", que não existia, foi removido.
-- Hooks: procuram `python` e depois `python3` (macOS e Linux) e cobrem `fork`; o diário só lê o que o
-  transcript ganhou e só conta uma chamada real da skill (não uma conversa que a cita).
-- `render.py`: Mermaid com versão exata (11.17.2) e verificação de integridade (SRI).
-- Wikilinks entre matérias com caminho completo (`[[matéria/registros-da-skill/conquistas|...]]`),
-  porque `conquistas` e `progresso` se repetem em toda matéria.
-
-**Decisões de design (aplicadas a pedido)**
-- Prova rápida passou de 3–5 para **5 questões**: com corte de 80%, 3 ou 4 questões exigiam 100%.
-- Acerto com 🔴 (frágil) não avança o intervalo da fila.
-- Distratores de quiz são equívocos conceituais, nunca prática depreciada (preserva a Regra 25).
-- Fio novo para quem é iniciante: exemplo resolvido → com lacunas → problema (heurística da literatura
-  de carga cognitiva; a confirmar na fonte).
-- Estilo de resposta opcional `Tutor` (`output-styles/`), sem forçar.
-- `LICENSE` MIT e campos de manifesto (`license`, `keywords`, `displayName`).
-
-**Obsidian**
-- `cofre.py nova-materia`, `nota`, `anexar` (arquivo ou área de transferência), `abrir` e `status`.
-- Pasta `anexos/` por matéria e embed `![[...]]`; os templates são lidos de `references/`, sem cópia.
-
-**Não feito**
-- Trocar a escada fixa por FSRS: o ganho com poucas revisões é modesto e o `py-fsrs` exige Python 3.10+.
-- Editar o `app.json` do Obsidian: o valor exato da configuração de anexos não foi confirmado em fonte oficial.
-
-## 3.1 — 2026-09-30
-
-**Robustez: o código decide o que não deve depender de obediência.**
-O `learn` faz sorteio, correção, registro e renderização por código (extensões em
-TypeScript para o agente pi). Aqui o equivalente são scripts Python, hooks do
-Claude Code e testes automáticos — e alguns itens vão além do `learn`.
-
-**Adicionado**
-- `scripts/quiz.py`: sorteia a posição da certa sem repetir em sequência
-  (sugestão 1); **verifica as alternativas** (tamanho, "porque", negrito
-  assimétrico, "todas as anteriores", ressalva só na certa); corrige, inclusive
-  seleção múltipla por conjunto exato; revela o equívoco da errada escolhida;
-  calcula o percentual e a decisão da prova (80% e 50%) e gera o bloco do
-  `progresso.md`. Plano B sem Python: posição `1 + (n mod N)`.
-- **"O que você estava pensando?"** depois de um erro, uma vez e em uma linha,
-  com os cuidados antifrustração (sugestão 2).
-- `scripts/fila.py`: intervalos e datas da repetição espaçada por código.
-- `scripts/cofre.py`: acha o cofre, resume posição, pendências e revisão do dia,
-  valida a estrutura e (opt-in) registra o diário.
-- `scripts/render.py`: valida Mermaid/SVG e gera PNG com o Chrome ou o Edge já
-  instalados, devolvendo a **mensagem exata de erro de sintaxe**. Funciona nos
-  dois navegadores (o Edge entrega o trabalho a outro processo; esperamos pelo
-  arquivo, não pelo processo).
-- `scripts/selftest.py`: 45 verificações, incluindo as fronteiras de 80% e 50%.
-  Validado por mutação: estragar a lógica de propósito em cinco pontos faz o
-  autoteste falhar em todos.
-- **Hooks** no plugin: abertura da sessão (posição e revisão do dia, sem saída
-  fora de um cofre) e diário da conversa, desligado por padrão.
-- **Testes automáticos** (`evals/`, 8 casos) para o `claude plugin eval`
-  (sugestão 3).
-- O subagente `tutor-diagramador` passou a usar o `render.py`.
-
-**Não feito, de propósito**
-- Uma interface própria de quiz (o `learn` tem uma no pi). No Claude Code o quiz
-  continua usando a pergunta com opções nativa; o que foi para código é tudo o
-  que não é interface.
-- Rodar a suíte de evals: exige login ativo e usa a cota do Ivo.
-
-## 3.0 — 2026-09-30
-
-**Virada: de "programação, offline" para "qualquer matéria, ao vivo".**
-Fusão com as ideias do sistema `learn` de Amos Blomqvist
-(<https://github.com/amosblomqvist/learn>), reescritas com palavras e exemplos
-próprios — o repositório original não tem licença, então nada foi copiado.
-
-**Mudou de nome e de escopo**
-- `academia-adaptativa-programacao-ivo` → `tutor-adaptativo`. A matéria
-  deixou de ser só programação: idiomas, matemática, música, concursos, cursos.
-- O que só vale para código foi isolado em `references/programacao.md`
-  (clean code, git, scaffold, documentação da versão, fechamento Ship it).
-
-**Removido de propósito**
-- Todo o modo offline: módulos em pastas, aulas e provas para fazer sozinho,
-  avaliação em lote, `"lote offline"`, `[PULEI]`, pastas `1-estudar-agora/` e
-  `3-concluidos/`, `_capa-`, `aula-`, `exercicio-`, `prova-t[N]-[parte]`.
-- Comandos `"avaliar"`, `"lote offline"`, `"nivelamento"` e `"docs"`
-  (viraram `"retomar"`, `"sondar"`, `"fonte"` e o fluxo ao vivo).
-- Entrevista: a pergunta "vou estudar offline?" saiu; 16 → 15 perguntas.
-- `references/modo-assincrono.md`, substituído por `avaliacao.md`.
-
-**Adotado do `learn`, adaptado**
-- **Sondagem ao vivo** no lugar do teste de nivelamento: achar piso e teto em
-  cada fio do assunto; tudo certo = pergunta fácil demais; um erro não basta
-  para concluir; concepção errada confiante é desfeita, não complementada.
-  Adaptação minha: a sondagem nunca vale nota e para de escalar quando há
-  sinal de cansaço (por causa do Protocolo Antifrustração).
-- **Plano com mapa de dependências** em mermaid, raízes testadas e o "ok" do
-  Ivo antes de qualquer aula.
-- **Ciclo por nó:** motivar → estabelecer → conectar → checar, com o "problema
-  antes da solução". Conciliado com "prática > teoria": o chão é mostrado em
-  ação. Tensão com a Regra 25 (nada desatualizado) resolvida: o "sem isso" é
-  a tarefa à mão, nunca um método antigo.
-- **Dois princípios de ensino:** começar pelo que é sempre verdade, e "como eu
-  poderia ter descoberto isso?".
-- **Escrita de alternativas por construção**, com exemplo próprio e base em
-  Haladyna, Downing e Rodriguez (2002).
-- **"Não sei"** como resposta legítima e distinta de erro (lacuna, reensino
-  sem peso).
-- **Precisão inegociável** e subagentes `tutor-pesquisador` e
-  `tutor-diagramador`, com plano B quando não existirem.
-- **Perguntas com opções** e **quiz corrigido na hora**, com plano B em texto.
-- **Nota da sessão** (o papel do `md-log`) e mermaid/LaTeX nas convenções.
-- Distinção entre **pergunta com resposta certa** (quiz) e **sem resposta
-  certa** (escolha).
-
-**Adicionado do meu lado (não vem do `learn`)**
-- **Cartão de retomada** para ambientes sem acesso a arquivos (chat do
-  claude.ai), já que não há memória entre conversas.
-- **Tamanho do ritual** (Regra 34): pedido pequeno recebe a versão mínima,
-  sem entrevista nem plano.
-- Erro confiante volta à fila de revisão a 1 dia depois do reforço
-  (Metcalfe e Miele, 2014).
-- Empacotamento como **plugin do Claude Code** (skill + 2 subagentes) e
-  `marketplace.json`, para instalar direto do GitHub.
-
-**Correções feitas na auditoria final da 3.0**
-- A regra "prova é obrigatória" tinha caído na reescrita; voltou na Regra 17.
-- O orçamento de tempo por sessão (estimativas por exercício e por prova) tinha
-  caído; voltou em `sessao.md`.
-- Faltavam três casos: `"retomar"` sem registros nem cartão; sessão interrompida
-  antes do "ok" no plano (agora vira rascunho); vocabulário de nó, parte,
-  tópico e trilha.
-- Os marcadores `[travei]` e 🟢🟡🔴 ainda diziam "eu escrevo à mão" (resto do
-  modo offline).
-- Caminho de upload no app corrigido para **Customize → Skills**.
-- Next.js: a página da documentação agora é da versão 16.3.8.
-- Atribuição do procedimento de alternativas e redação do Haladyna ajustadas ao
-  que foi verificado.
-- **Nome final:** `tutor-adaptativo` (skill, plugin, marketplace e repositório);
-  subagentes `tutor-pesquisador` e `tutor-diagramador`. "Academia" soava como
-  academia de ginástica, e o sufixo "-ivo" prendia a skill a uma pessoa.
-- **Ortografia**, conferida com o corretor pt-BR do Windows: `antifrustração`,
-  `reensinar`, `miniprojeto`, `miniaula`, `hifens`, `ex.:`, "ponto perdido" no
-  lugar de "não-acerto" e "seleção múltipla" no lugar de "multisseleção".
-- Validado com `claude plugin validate --strict` (plugin e marketplace).
-
-**Decidido**
-- Só `pratica/projeto/` entra em git; `pratica/treinos/` não.
-- Pergunta de aquecimento só na volta de uma pausa; a Revisão do dia, em
-  toda sessão.
-- Confiança 🟢🟡🔴 obrigatória em prova e sondagem; opcional na checagem de nó.
-- Com a ferramenta de perguntas, quiz tem até 3 alternativas + "Não sei"
-  (a ferramenta limita a 4 opções).
-
-## 2.1 — 2026-09-23
-
-Auditoria completa. Corrigidos: `vite create` (não existe), MDN classificada
-como especificação, módulo de reforço como arquivo solto, referências
-quebradas, `## Minha resposta` vs `## ✍️ Minha resposta`, Regra 4 sobre mini
-projeto, comando `"prova"`, acentuação da `description`. Adicionados:
-"Nomes canônicos", pasta e template de prova de tópico, Pendências abertas,
-data da última sessão, índice de seções, coluna `Status` na fila de revisão.
-Última versão offline.
-
-## 2.0
-
-Reescrita para "Academia Adaptativa". Substituiu a skill antiga de estudos.
-"Pacote" passou a se chamar "módulo"; `ASSUNTO.md` virou `trilha.md`;
-`anotacoes.md` e `revisao.md` viraram `conhecimento.md`; cada módulo passou a
-ser uma pasta.
+- 2.0–2.1: primeira versão, centrada em programação e em trilhas fixas.

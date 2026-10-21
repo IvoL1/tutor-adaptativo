@@ -8,7 +8,8 @@ RAIZ é a pasta de estudos (a que tem as matérias). O script LÊ a pasta e escr
 links entre notas funcionando, e um index.html. Imprime uma linha JSON com o caminho da página pedida
 (ARQUIVO.md; sem ele, o index). Com --abrir, abre essa página no navegador padrão.
 
-Sem rede, as notas ainda abrem: só as fórmulas ($...$) e os diagramas (```mermaid) aparecem como texto.
+Sem rede, as notas ainda abrem: só as fórmulas ($...$) e os diagramas (```mermaid) aparecem como texto; uma nota
+sem fórmula nem diagrama não pede nada da internet (é o caso de todo pacote de estudo autônomo).
 Só biblioteca padrão. O Markdown aceito é o que as notas da skill usam: títulos, parágrafos, listas (com tarefas),
 tabelas, citações, código, <details>, imagens, links, negrito, itálico, código em linha e fórmulas.
 """
@@ -223,15 +224,17 @@ def pagina(arq, raiz, saida):
     m = ""  # o frontmatter é metadado para os scripts: não aparece na leitura
     titulo = re.search(r"^#\s+(.+)$", corpo, re.M)
     idx = urllib.parse.quote(os.path.relpath(saida / "index.html", destino.parent).replace("\\", "/"))
+    tem_mat = bool(re.search(r"\$\$|(?<![\$\w])\$(?=\S)[^$\n]+?(?<=\S)\$(?!\d)", corpo))  # só carrega da internet o que a nota realmente usa
+    tem_dia = "```mermaid" in corpo
+    css_math = f'<link rel="stylesheet" href="{KATEX}katex.min.css" integrity="{KATEX_SRI["katex.min.css"]}" crossorigin="anonymous">' if tem_mat else ""
+    js_math = (f'<script defer src="{KATEX}katex.min.js" integrity="{KATEX_SRI["katex.min.js"]}" crossorigin="anonymous"></script>'
+               f'<script defer src="{KATEX}contrib/auto-render.min.js" integrity="{KATEX_SRI["contrib/auto-render.min.js"]}" crossorigin="anonymous" '
+               f'onload="renderMathInElement(document.body,{{delimiters:[{{left:\'$$\',right:\'$$\',display:true}},{{left:\'$\',right:\'$\',display:false}}]}})"></script>') if tem_mat else ""
+    js_dia = (f'<script src="{MERMAID}" integrity="{MERMAID_SRI}" crossorigin="anonymous"></script>'
+              '<script>window.mermaid&&mermaid.initialize({startOnLoad:true,securityLevel:"strict"})</script>') if tem_dia else ""
     doc = (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-           f"<title>{esc(titulo.group(1) if titulo else arq.stem)}</title><style>{CSS}</style>"
-           f'<link rel="stylesheet" href="{KATEX}katex.min.css" integrity="{KATEX_SRI["katex.min.css"]}" crossorigin="anonymous"></head><body>'
-           f'<nav><a href="{idx}">📚 Estudos</a> · {esc(str(arq.relative_to(raiz)).replace(chr(92), "/"))}</nav><main>{m}{h}</main>'
-           f'<script defer src="{KATEX}katex.min.js" integrity="{KATEX_SRI["katex.min.js"]}" crossorigin="anonymous"></script>'
-           f'<script defer src="{KATEX}contrib/auto-render.min.js" integrity="{KATEX_SRI["contrib/auto-render.min.js"]}" crossorigin="anonymous" '
-           f'onload="renderMathInElement(document.body,{{delimiters:[{{left:\'$$\',right:\'$$\',display:true}},{{left:\'$\',right:\'$\',display:false}}]}})"></script>'
-           f'<script src="{MERMAID}" integrity="{MERMAID_SRI}" crossorigin="anonymous"></script>'
-           f'<script>window.mermaid&&mermaid.initialize({{startOnLoad:true,securityLevel:"strict"}})</script></body></html>')
+           f"<title>{esc(titulo.group(1) if titulo else arq.stem)}</title><style>{CSS}</style>{css_math}</head><body>"
+           f'<nav><a href="{idx}">📚 Estudos</a> · {esc(str(arq.relative_to(raiz)).replace(chr(92), "/"))}</nav><main>{m}{h}</main>{js_math}{js_dia}</body></html>')
     destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(doc, encoding="utf-8")
     return destino

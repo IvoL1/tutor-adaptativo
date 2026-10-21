@@ -4,7 +4,7 @@ Cada pasta é um caso: `prompt.md` (o que a pessoa digita) mais `graders/*.md` (
 Rodam com `claude plugin eval`, em sessões isoladas, **com e sem o plugin**, para medir o que ele acrescenta.
 
 ```bash
-# todos os casos (9 casos x 3 rodadas x 2 braços = 54 execuções; usa a sua cota/créditos)
+# todos os casos (10 casos x 3 rodadas x 2 braços = 54 execuções; usa a sua cota/créditos)
 claude plugin eval . --trust-plugin
 
 # barato: 1 rodada, sem o braço sem-plugin

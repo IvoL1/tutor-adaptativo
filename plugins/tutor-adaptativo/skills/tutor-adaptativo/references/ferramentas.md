@@ -2,6 +2,8 @@
 
 > Leia ao fazer uma pergunta com opções, aplicar um quiz, delegar pesquisa ou diagrama a um subagente, rodar um script, ou quando uma ferramenta não existir no ambiente. Para ler ou gravar na pasta de estudos, vá direto a `references/arquivos.md`.
 
+> Para montar material de estudo autônomo (`"pacote"`), o fluxo completo e os scripts `pacote.py` e `apostila.py` estão em `references/pacote.md`.
+
 > **Princípio (Regra 33):** use a ferramenta quando ela existir e faça o equivalente na conversa quando não existir. **Nunca** trave por falta de ferramenta, e nunca diga "não consigo" se a conversa resolve.
 
 > **Nesta referência:**
@@ -15,6 +17,7 @@
 >     · Fila de revisão (`fila.py`)
 >     · Diagramas (`render.py`)
 >     · Boletim (`boletim.py`)
+>     · Pacote autônomo (`pacote.py`, `apostila.py`)
 >     · Leitor no navegador (`ver.py`)
 > **6. Arquivos: com e sem acesso**
 > **7. Formatação**
@@ -134,9 +137,18 @@ EOF
 
 `python "<pasta>/boletim.py" "{RAIZ}/{sg}" --sem-gravar` **lê** o `progresso.md` (histórico de provas, posição, pendências), as notas de `exercicios/` (campos `tipo`, `parte`, `status` do frontmatter) e a lista de `sessoes/`, e imprime `SECAO:`, `CONTEUDO:` e `FIM`. O `CONTEUDO` é o bloco do boletim (entre `<!-- boletim:inicio -->` e `<!-- boletim:fim -->`): situação, tabela de provas com a **média calculada**, tabela de exercícios com "feitos X de Y" e as sessões mais recentes. Quem grava é o `Edit` (receita "Boletim" de `references/arquivos.md`). Plano B: tabela à mão, com a média conferida duas vezes, dizendo que foi à mão.
 
+### Pacote autônomo (`pacote.py`, `apostila.py`)
+
+O fluxo completo está em `references/pacote.md`; aqui só o uso dos scripts. **Nenhum regrava os estudos** (o `apostila.py` escreve só os PDFs/HTML em `pacote/pdf/`).
+
+- `python "<pasta>/pacote.py" planejar caminho/curriculo.json --horas 4` valida o currículo (ids, pré-requisitos existentes e sem ciclo, dificuldade de 1 a 5, blocos de 5 a 90 min), põe os tópicos **na ordem dos pré-requisitos**, distribui os blocos em dias que somam **pelo menos** as horas por dia (passa até 10% para não cortar um bloco), reserva a revisão espaçada (1, 3, 7 e 16 dias depois de cada tópico, até 15% do dia) e imprime o cronograma com a tabela **"Até onde cabe"**. `--ja-sei t01,t02` tira tópicos que já domino (contam como pré-requisito cumprido); `--json` devolve os dados para você escrever os dias.
+- `python "<pasta>/pacote.py" conferir "{RAIZ}/{matéria}/pacote"` mede o que foi escrito: minutos por dia contra o orçamento, leitura longa demais, exercício sem "Critério de pronto", falta de gabarito, imagem inexistente, fórmula LaTeX ou mermaid (não aparecem offline). Sai com 1 se houver `FALHA`.
+- `python "<pasta>/apostila.py" --pacote "{RAIZ}/{matéria}/pacote"` gera `pdf/plano.pdf`, `pdf/dia-NN.pdf` e `pdf/gabarito-dia-NN.pdf`, **sem internet**, com o Chrome ou o Edge instalados; sem eles gera `.html` prontos para imprimir (Ctrl+P → Salvar como PDF). `apostila.py SAIDA.pdf a.md b.md` junta notas avulsas.
+- Plano B sem Python: monte os dias à mão, somando os minutos duas vezes, e diga que foi à mão; o PDF sai de qualquer navegador (`ver.py` ou abrir o `.md` num editor, Imprimir → Salvar como PDF).
+
 ### Leitor no navegador (`ver.py`)
 
-`python "<pasta>/ver.py" "{RAIZ}" "{sg}/_painel-{sg}.md" --abrir` converte **todas** as notas `.md` da pasta de estudos em páginas HTML numa pasta temporária (nada é gravado nos estudos), com tabelas, dicas dobráveis (`<details>`), fórmulas LaTeX e diagramas Mermaid (carregados do jsDelivr com versão fixa e integridade; sem rede ficam como texto), imagens e links entre notas, mais um `index.html` com as matérias. `--abrir` abre a página pedida no navegador padrão; sem o segundo argumento abre o índice. Devolve uma linha JSON (`html`, `paginas`, `aberto`). Plano B: o `.md` abre em qualquer editor de texto.
+`python "<pasta>/ver.py" "{RAIZ}" "{sg}/_painel-{sg}.md" --abrir` converte **todas** as notas `.md` da pasta de estudos em páginas HTML numa pasta temporária (nada é gravado nos estudos), com tabelas, dicas dobráveis (`<details>`), fórmulas LaTeX e diagramas Mermaid (carregados do jsDelivr com versão fixa e integridade; sem rede ficam como texto; uma nota sem fórmula nem diagrama não usa a internet), imagens e links entre notas, mais um `index.html` com as matérias. `--abrir` abre a página pedida no navegador padrão; sem o segundo argumento abre o índice. Devolve uma linha JSON (`html`, `paginas`, `aberto`). Plano B: o `.md` abre em qualquer editor de texto.
 
 ## Arquivos: com e sem acesso
 
