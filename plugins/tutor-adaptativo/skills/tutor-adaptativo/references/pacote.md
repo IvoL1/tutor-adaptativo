@@ -8,7 +8,8 @@
 > **3. Quanto cabe em um dia (tempos)**
 > **4. Como escrever o material para quem estuda sozinho**
 > **5. Modelos dos arquivos**
-> **6. Se algo mudar depois**
+> **6. Depois da prova: eu corrijo sozinho e, se quiser, peço mais**
+> **7. Se algo mudar depois**
 
 ## 1. A ideia
 
@@ -17,7 +18,7 @@
 - **O tempo é o eixo.** Eu digo quantas horas por dia tenho (ex.: 4). O pacote é montado em **dias que fecham essas horas** (ler, entender, tirar dúvida, fazer junto, exercícios, desafio, projeto, prova), na **ordem correta de pré-requisitos e dificuldade**, e diz **até onde a matéria chega** em N dias. Nenhum dia exige algo que só um tópico ainda não estudado ensina.
 - **A matéria inteira, de uma vez.** O pacote cobre o currículo todo, do primeiro ao último dia, na mesma montagem. Não entregue "os primeiros dias" esperando eu pedir o resto, e não pare no meio para perguntar se continua.
 - **Quem calcula é o código.** `pacote.py planejar` ordena pelos pré-requisitos, distribui os blocos nos dias, reserva a revisão espaçada e mostra até onde cabe; `pacote.py conferir` mede o material escrito contra o tempo prometido **e acusa o que me mandaria sair do pacote**. Não estime a mão nem diga "deve dar 4 horas".
-- **Sem conversa depois.** Nada de "quer que eu continue?", "me diga o que achou", quiz que espera resposta no terminal ou menu de próximos passos. A avaliação é feita **por mim, no papel**, com o gabarito do pacote. A aula ao vivo continua existindo como modo opcional (só se eu pedir); o pacote é o padrão.
+- **Sem conversa depois.** Nada de "quer que eu continue?", "me diga o que achou", quiz que espera resposta no terminal ou menu de próximos passos. **Provas, exercícios, desafios e projetos são corrigidos por mim, sozinho**, com o gabarito do pacote: o Claude nunca espera eu responder para corrigir na hora. O pacote traz cada prova num **arquivo próprio** (`provas/`) e o gabarito dela em **outro** (`gabaritos/`), com o passo a passo de como me corrigir e onde anotar os erros. **Só se eu quiser**, depois, peço ao Claude para analisar o que errei e gerar mais material em cima disso (seção 6); o pacote é completo sem esse pedido. A aula ao vivo continua existindo como modo opcional (só se eu pedir); o pacote é o padrão.
 
 ## 2. As etapas
 
@@ -27,7 +28,7 @@ Eu me expresso mal quando preciso descrever com palavras livres, e **cada pergun
 
 1. **Horas por dia** — a única pergunta que vale parar para fazer, **uma só, com opções** (`references/ferramentas.md` → "Perguntas com opções"): 1, 2, 3, 4, 6 ou "não sei: assuma 2 h". Se eu já disse as horas (ou dias da semana/prazo) no pedido, **não pergunte nada**: vá direto ao trabalho. Se eu não responder ou escolher "não sei", assuma 2 h e escreva isso no `00-LEIA-ME.md`.
 2. **O que quero ao final (a meta):** deduza do pedido ("quero ler código", "passar na prova X"); sem pista, assuma a meta mais comum da matéria (usar o assunto de forma prática) e **escreva a meta assumida** no `01-plano.md`. Não pergunte.
-3. **Meu ponto de partida:** assuma "do zero" quando eu não disser. O pacote começa então com o **Dia 0 — teste de nível**, que eu corrijo sozinho e que diz quais tópicos posso pular (regra de pulo por tópico; ver seção 6 para pular).
+3. **Meu ponto de partida:** assuma "do zero" quando eu não disser. O pacote começa então com o **Dia 0 — teste de nível**, que eu corrijo sozinho e que diz quais tópicos posso pular (regra de pulo por tópico; ver seção 7 para pular).
 4. **Anexos:** use o que eu citei no pedido e o que houver em `fontes/` da matéria (`Glob`). Não pergunte "tem anexo?".
 5. **Versão ou edição**, se a matéria tiver (Regra 28): confirme a atual estável na pesquisa e congele. Não pergunte.
 
@@ -70,12 +71,19 @@ pacote/
 ├── 01-plano.md                ← o mapa, o cronograma, "até onde cabe" e as fontes
 ├── 02-acompanhamento.md       ← ✍️ o único arquivo MEU: o que fiz, confiança, notas, dúvidas
 ├── 03-glossario.md            ← todo termo novo, em ordem alfabética, com o dia em que aparece
+├── 04-duvidas.md              ← banco de dúvidas: as perguntas que costumam aparecer, por parte, com resposta
 ├── dias/
 │   ├── dia-01-tipos-basicos.md        ← o dia completo (soma as minhas horas)
 │   └── dia-02-funcoes.md
+├── provas/                    ← 📝 cada prova em arquivo próprio, SEM respostas (caderno + folha de respostas)
+│   ├── prova-02-funcoes.md            ← prova do dia/da parte (a seção "Prova" do dia só aponta para ela)
+│   └── prova-final.md                 ← prova integradora da matéria inteira
 ├── gabaritos/                 ← separados, para eu não ver sem querer
 │   ├── dia-01-tipos-basicos.md        ← MESMO nome do dia
-│   └── dia-02-funcoes.md
+│   ├── dia-02-funcoes.md
+│   ├── prova-02-funcoes.md            ← MESMO nome do caderno: chave, pontuação, como me corrigir
+│   └── prova-final.md
+├── reforco/                   ← nasce vazia; só se eu pedir mais material (seção 6): reforco-NN-tema.md, extra-NN-tema.md
 ├── resumos/
 │   └── parte-1-fundamentos.md         ← uma página por parte, para revisar antes da prova
 ├── anexos/                    ← imagens e diagramas locais (SVG/PNG)
@@ -85,21 +93,23 @@ pacote/
 
 - **Nomes:** `dia-NN-assunto.md`, onde `NN` tem zeros à esquerda na largura do total de dias (`01` até `30`, `001` se passar de 99) e `assunto` é o slug do tópico principal do dia. O gabarito tem **exatamente o mesmo nome** do dia. Os resumos são `parte-N-nome.md`. Nada de nome genérico (`nota1.md`, `final.md`).
 - **`dias/dia-NN-assunto.md`:** um arquivo por dia, **com todo o texto necessário para estudar o dia**, em seções `## N. Tipo — título (M min)` que somam o tempo do dia, e links "← anterior · próximo →" no fim.
-- **`gabaritos/dia-NN-assunto.md`:** soluções, correção das provas e erros comuns.
+- **`provas/prova-NN-assunto.md`:** o caderno da prova (enunciados, "Não sei" em toda questão, **Folha de respostas** para eu marcar resposta e confiança), **sem nenhuma resposta, dica ou `<details>`**. A seção "Prova" do dia só diz o tempo e aponta para ele. Uma prova no fim de cada parte, de cada tópico grande e a **prova final** (Regra 17). Modelo na seção 5.
+- **`gabaritos/dia-NN-assunto.md`:** soluções dos exercícios, desafios e do projeto (com a **solução de referência**) e erros comuns. **`gabaritos/prova-NN-assunto.md`:** o gabarito de cada prova, com o mesmo nome do caderno.
 - **`resumos/parte-N-nome.md`:** os conceitos da parte em uma página (definição em uma linha, um exemplo mínimo e o erro mais comum de cada um); é o que eu releio antes da prova da parte.
+- **`04-duvidas.md`:** o banco de dúvidas: 5 ou mais perguntas por parte (`### … ?`), as que um aluno de verdade faria, com resposta curta e a seção do dia onde o assunto é ensinado. É o substituto de "perguntar ao Claude" e de "pesquisar".
 - **Sem PDF.** O pacote é só Markdown (eu converto para PDF quando quiser). Não gere `pdf/`; `apostila.py` só roda se eu pedir.
 - **`01-plano.md`** leva `horas_por_dia` no frontmatter e uma tabela "Dias" com o link de cada dia.
 - **Minha área de prática:** crie também `{RAIZ}/{matéria}/pratica/projeto/` e `pratica/treinos/` **com o `_leia-me.md` de cada uma** (única escrita permitida do pacote em `pratica/`; modelos em `references/templates.md`), para eu saber onde fazer as respostas e o projeto sem criar pasta nenhuma. O `00-LEIA-ME.md` diz isso.
 
-Escreva o conteúdo conforme a seção 4. Mantenha cada dia **dentro dos minutos que o cronograma deu**: os blocos e os minutos de cada dia vêm do `pacote.py planejar` (use `--json`), **não da sua cabeça**. Escreva por dia, conferindo (Etapa 5) a cada lote.
+A pasta `reforco/` só nasce na seção 6. Escreva o conteúdo conforme a seção 4. Mantenha cada dia **dentro dos minutos que o cronograma deu**: os blocos e os minutos de cada dia vêm do `pacote.py planejar` (use `--json`), **não da sua cabeça**. Escreva por dia, conferindo (Etapa 5) a cada lote.
 - **Matéria que exige instalar ou ter algo** (programa, ferramenta, material, instrumento): o `00-LEIA-ME.md` → "Antes de começar" lista **exatamente** o que preciso ter e como conferir que está funcionando, tudo escrito dentro do pacote. Instalar costuma precisar de internet uma vez; diga isso com franqueza ali, em vez de me mandar procurar. Prefira exemplos que rodem com o mínimo possível instalado.
 
-- **Dia 0 (opcional, se eu não sei meu nível):** teste de nível de 20–40 min, em ordem de dificuldade, com gabarito e **uma regra de pulo por tópico** ("acertou 4 de 5 em t01 → pule t01"). O próprio teste traz a tabela "se acertou X, pule Y" e o `00-LEIA-ME.md` explica como pular sozinho (seção 6).
+- **Dia 0 (opcional, se eu não sei meu nível):** teste de nível de 20–40 min (caderno em `provas/teste-de-nivel.md` e gabarito de mesmo nome, como toda prova), em ordem de dificuldade, com gabarito e **uma regra de pulo por tópico** ("acertou 4 de 5 em t01 → pule t01"). O próprio teste traz a tabela "se acertou X, pule Y" e o `00-LEIA-ME.md` explica como pular sozinho (seção 7).
 - **Diagramas:** gere o SVG/PNG **agora, com internet**, validando com `render.py` (`references/visuais.md`), e salve em `anexos/`, referenciando com `![descrição](../anexos/arquivo.svg)`. **Nunca** bloco ` ```mermaid ` nem fórmula `$…$` no pacote: sem internet eles não aparecem. Fórmula vai em texto/Unicode (`x² + y² = r²`) ou numa imagem.
 
 ### Etapa 5 — Conferir e revisar a qualidade (o código mede; depois um leitor de verdade)
 
-**1. O código mede.** `python "<pasta>/pacote.py" conferir "{RAIZ}/{matéria}/pacote"` checa, por dia: a soma dos minutos contra as horas por dia; frontmatter igual à soma; leitura longa demais para o tempo declarado; **a estrutura didática** (cada leitura com “Por que isso importa”, “Exemplo”, “Checagem” com resposta dobrada e “Dúvidas que costumam aparecer”; cada exercício com “Critério de pronto” e 3 dicas; “Se travar”; prova com 5 ou mais questões, todas com “Não sei”; revisão com resposta dobrada; “Hoje você vai conseguir” no começo do dia); **o gabarito** (existe com o mesmo nome do dia, resolve cada exercício, diz “Se você errou assim”, tem a “Pontuação” da prova); dia faltando na sequência; link quebrado; imagem inexistente; fórmula LaTeX ou mermaid; texto provisório (“TODO”), “é fácil”/“óbvio”; e a **autossuficiência** (link, “pesquise”, “pergunte ao Claude”, scripts da skill). **Corrija até não sobrar `FALHA`** e diga o resultado como veio.
+**1. O código mede.** `python "<pasta>/pacote.py" conferir "{RAIZ}/{matéria}/pacote"` checa, por dia: a soma dos minutos contra as horas por dia; frontmatter igual à soma; leitura longa demais para o tempo declarado; **a estrutura didática** (cada leitura com “Por que isso importa”, “Exemplo”, “Checagem” com resposta dobrada e “Dúvidas que costumam aparecer”; cada exercício com “Critério de pronto” e 3 dicas; “Se travar”; prova **em `provas/`** com 5 ou mais questões, todas com “Não sei”, **folha de respostas** e **nenhuma resposta à vista**; revisão com resposta dobrada; projeto com “Checklist de autoavaliação”; “Hoje você vai conseguir” no começo do dia); **o gabarito** (existe com o mesmo nome do dia, resolve cada exercício, diz “Se você errou assim”, traz a “Solução de referência” do projeto; o gabarito de cada prova existe com o mesmo nome do caderno e tem “Como corrigir sozinho”, “Pontuação”, “Reler” e o aviso do “Registro de erros”); o `02-acompanhamento.md` com o “Registro de erros” e o `04-duvidas.md`; dia faltando na sequência; link quebrado; imagem inexistente; fórmula LaTeX ou mermaid; texto provisório (“TODO”), “é fácil”/“óbvio”; e a **autossuficiência** (link, “pesquise”, “pergunte ao Claude”, scripts da skill). **Corrija até não sobrar `FALHA`** e diga o resultado como veio.
 
 **2. Verifique os fatos e os exemplos (o que o código não vê).** Antes de dar um dia por pronto:
 - **Todo exemplo de código roda e dá o resultado que o texto diz.** Rode com `Bash` quando houver o interpretador (uma conta, uma saída, um erro de propósito: o texto mostra exatamente o que aparece). Sem como rodar, diga no `01-plano.md` que aquele trecho não foi executado.
@@ -130,7 +140,7 @@ Estime os blocos com estes valores e **corrija pelo meu ritmo** quando eu disser
 | `exercicios` | 30–60 min | 4–8 exercícios, reprodução → modificação → extensão; ~10–15 min cada, ~20–25 os de criação | enunciado + critério + dicas |
 | `desafio` | 20–40 min | uma variação mais difícil, para tópicos de dificuldade 3+ | um enunciado |
 | `projeto` | 60–90 min | um passo do projeto de prática (nunca o projeto inteiro) | roteiro do passo |
-| `prova` | 15–30 min | 8–15 questões de múltipla escolha ou aplicadas, sem consulta | caderno + gabarito à parte |
+| `prova` | 15–30 min | 8–15 questões de múltipla escolha ou aplicadas, sem consulta | caderno em `provas/` + gabarito em `gabaritos/` |
 
 - **Revisão espaçada:** o código reserva ~6 min por tópico que acabou há 1, 3, 7 e 16 dias (no máximo 15% do dia) e diz quais. Escreva 2–3 perguntas por tópico no bloco "Revisão" do dia, com a resposta dobrada.
 - **Pausas:** 10 min a cada 50 min de estudo; **não entram** nos minutos do dia (o dia mostra quantas).
@@ -147,7 +157,7 @@ Sem ninguém para perguntar, **o texto precisa responder as perguntas que o Clau
 4. **Fazer junto:** cada passo diz **o que fazer** e **o que deve aparecer/acontecer**. Se eu errar, eu comparo e vejo na hora, sem ninguém.
 5. **Exercícios:** enunciado sem ambiguidade, **texto de apoio pronto** quando pedir texto (Regra 27), **Critério de pronto** (o que devo conseguir/observar ao acertar, sem dar a solução) e **escada de 3 dicas dobradas** (`<details><summary>Dica 1</summary>…</details>`), a última ainda sem a solução (Regra 9). Resposta e solução **só** no `gabaritos/dia-NN.md`.
 6. **Gabarito:** a solução, **por que** funciona, **o erro mais comum** e **uma melhoria** (Regra 29). Para cada exercício, "se você errou assim, o problema é isto". Antes de olhar, eu marco 🟢🟡🔴 no `02-acompanhamento.md` (calibração, Regra 19).
-7. **Provas e quizzes:** alternativas pelo procedimento de `references/avaliacao.md`; **a posição da certa varia sem padrão**; cada errada tem o **equívoco que revela** no gabarito; use `quiz.py montar` para receber os avisos de alternativa que se entrega pela forma e refaça o que ele acusar. "Não sei" é resposta válida e distinta de erro. Correção no gabarito: a certa, o porquê e **qual seção reler** para cada erro. **Regra: 80% ou mais, passo; abaixo, refaço o bloco indicado e repito a prova** (Regras 16–17).
+7. **Provas e quizzes (arquivo próprio, correção minha):** o caderno vai em `provas/`, **sem nenhuma resposta**; o gabarito em `gabaritos/` com o mesmo nome. Alternativas pelo procedimento de `references/avaliacao.md`; **a posição da certa varia sem padrão**; cada errada tem o **equívoco que revela** no gabarito; use `quiz.py montar` para receber os avisos de alternativa que se entrega pela forma e refaça o que ele acusar. "Não sei" é resposta válida e distinta de erro. Correção no gabarito: a chave (tabela questão → certa), o porquê, **qual seção reler** para cada erro e o **Como corrigir sozinho** (conferir a chave, contar, marcar 🟢🟡🔴 contra o resultado, escrever cada erro no Registro de erros do `02-acompanhamento.md`, aplicar a regra dos 80%). **Regra: 80% ou mais, passo; abaixo, refaço o bloco indicado e repito a prova** (Regras 16–17).
 8. **Fonte e versão:** o `01-plano.md` diz a versão congelada; o texto ensina só o que é atual (Regras 25–28). Nada de "antigamente se fazia assim".
 9. **Prática antes da teoria** quando der (Regra 14): mostre rodando/fazendo, depois nomeie.
 10. **Tom:** português do Brasil, frases completas, sem pressa e sem condescendência; celebre antes de corrigir mesmo no papel ("se você chegou aqui, já tem X"). Nunca "é fácil" nem "óbvio".
@@ -214,7 +224,7 @@ verificado: sim
 
 ### `00-LEIA-ME.md`
 
-Para quem abre a pasta pela primeira vez: **"Este pacote é completo: você não precisa de internet, do Claude nem de terminal para estudá-lo"** logo no começo; o que é; como começar; **como estudar um dia** (ordem das seções, pausas, o que fazer ao travar); como usar o gabarito (só depois de tentar); como preencher o `02-acompanhamento.md`; o que fazer se atrasar ou faltar tempo (seção 6); a data de criação, a versão congelada e se a fonte foi verificada; o que foi assumido (horas por dia, meta, ponto de partida); **"Antes de começar"** (o que preciso saber/ter, com como conferir); **"Mapa da pasta"** (uma linha para cada arquivo e pasta do pacote, na ordem de leitura); onde fazer as respostas e o projeto (`pratica/`); o que significa **"terminei"** (média das provas ≥ 80% e projeto funcionando) e o que estudar a seguir. Curto: cabe em uma tela e meia. Sem link para a internet nem tarefa de internet.
+Para quem abre a pasta pela primeira vez: **"Este pacote é completo: você não precisa de internet, do Claude nem de terminal para estudá-lo"** logo no começo; o que é; como começar; **como estudar um dia** (ordem das seções, pausas, o que fazer ao travar); como usar o gabarito (só depois de tentar); como preencher o `02-acompanhamento.md`; o que fazer se atrasar ou faltar tempo (seção 7); a data de criação, a versão congelada e se a fonte foi verificada; o que foi assumido (horas por dia, meta, ponto de partida); **"Antes de começar"** (o que preciso saber/ter, com como conferir); **"Mapa da pasta"** (uma linha para cada arquivo e pasta do pacote, na ordem de leitura); onde fazer as respostas e o projeto (`pratica/`); o que significa **"terminei"** (média das provas ≥ 80% e projeto funcionando) e o que estudar a seguir. Curto: cabe em uma tela e meia. Sem link para a internet nem tarefa de internet.
 
 ### `dias/dia-NN-assunto.md`
 
@@ -268,10 +278,7 @@ Enunciado sem ambiguidade (texto de apoio já pronto, se pedir texto).
 …
 
 ## 5. Prova — … (20 min)
-> Sem consulta. “Não sei” é resposta válida e vale zero, mas me diz o que reler.
-### Questão 1
-Enunciado.
-A) … B) … C) … D) … E) Não sei
+> Sem consulta, com cronômetro. Abra o caderno [prova-03-funcoes](../provas/prova-03-funcoes.md), responda na folha de respostas dele e **só depois** corrija com [o gabarito da prova](../gabaritos/prova-03-funcoes.md).
 
 ## Fechamento do dia
 - [ ] Marquei no `02-acompanhamento.md` o que fiz e a confiança (🟢🟡🔴).
@@ -279,6 +286,8 @@ A) … B) … C) … D) … E) Não sei
 
 [← Dia anterior](dia-02-tipos.md) · [Próximo dia →](dia-04-classes.md) · Gabarito (só depois de tentar): [dia 3](../gabaritos/dia-03-funcoes.md)
 ```
+
+Seção **Projeto** do dia: roteiro do passo, **Critério de pronto** e **Checklist de autoavaliação** (`- [ ] …`, itens que eu consigo verificar sozinho). O gabarito do dia traz a **Solução de referência** do passo e "como comparar o meu com ela".
 
 Os títulos das seções seguem **exatamente** `## N. Tipo — título (M min)` com o Tipo começando por *Revisão, Ler, Fazer junto, Exercícios, Desafio, Projeto* ou *Prova*: é o que o `conferir` lê. Dia de **fechamento** (só revisão): coloque `fechamento: sim` no frontmatter.
 
@@ -296,17 +305,83 @@ Os títulos das seções seguem **exatamente** `## N. Tipo — título (M min)` 
 
 (um bloco `## Exercício N` para cada exercício do dia, com o mesmo número)
 
-## Prova
+## Projeto (se o dia tiver)
+**Solução de referência:** … (um projeto pronto, com o resultado esperado)
+**Como comparar o meu com ela:** … (o que deve ser igual, o que pode variar)
+```
+
+### `provas/prova-NN-assunto.md` (caderno: sem respostas)
+
+```markdown
+# Prova — Dia 3 — Funções
+> Sem consulta, com cronômetro (20 min). “Não sei” vale zero, mas me diz o que reler. Corrija só depois, com `gabaritos/prova-03-funcoes.md`.
+
+## Folha de respostas
+| Q | Minha resposta | Confiança (🟢🟡🔴) |
+|---|---|---|
+| 1 | | |
+
+## Questões
+### Questão 1
+Enunciado (um conceito por questão).
+A) … B) … C) … D) … E) Não sei
+```
+
+### `gabaritos/prova-NN-assunto.md` (gabarito da prova, à parte)
+
+```markdown
+# Gabarito da prova — Dia 3 — Funções
+> Só abra depois de terminar a prova.
+
+## Como corrigir sozinho
+1. Compare cada resposta da sua folha com a coluna “Certa”.
+2. Conte: acertos ÷ total = %. “Não sei” e erro contam como ponto perdido.
+3. Veja a confiança: 🟢 + erro = **erro confiante** (o mais importante de estudar). 🔴 + acerto = acerto frágil.
+4. Para cada erro ou “Não sei”, leia a linha da questão abaixo e **releia** a seção indicada.
+5. Copie os erros no “Registro de erros” do `02-acompanhamento.md`.
+6. Regra: **80% ou mais, passei**; abaixo, releio as seções da coluna “Reler” e repito a prova.
+
+## Chave e explicação
 | Questão | Certa | Por que cada errada está errada (o equívoco que revela) | Reler |
 |---|---|---|---|
-**Pontuação:** acertos/total = %. 80% ou mais: passei. Abaixo: reler as seções da coluna “Reler” e repetir a prova.
+| 1 | B | A: …; C: …; D: … | Dia 3, seção 2 |
+
+**Pontuação:** acertos/total = %. 80% ou mais: passei. Abaixo: reler a coluna “Reler” e repetir a prova.
 ```
 
 ### `02-acompanhamento.md`
 
-Tabela que **eu** preencho (por dia: feito, confiança, tempo real, dúvida em aberto), a tabela de provas (nota e data) com a média que eu calculo, e a lista "Dúvidas em aberto" (só para eu anotar; o pacote não manda levar a ninguém). É o único arquivo do pacote em que eu escrevo.
+Tabela que **eu** preencho (por dia: feito, confiança, tempo real, dúvida em aberto), a tabela de provas (nota e data) com a média que eu calculo, o **Registro de erros** e a lista "Dúvidas em aberto" (só para eu anotar; o pacote não manda levar a ninguém). É o único arquivo do pacote em que eu escrevo.
 
-## 6. Se algo mudar depois
+```markdown
+## Registro de erros
+Copio aqui cada erro ou “Não sei” de uma prova, exercício ou desafio. Tipo: **confiante** (🟢 e errei) · **lacuna** (não sei) · **distração** (sabia, errei na pressa) · **frágil** (acertei com 🔴).
+| Data | Prova/exercício | Questão | Conceito | Tipo | Reler | Refiz? |
+|---|---|---|---|---|---|---|
+```
+Regra para eu decidir sozinho: o mesmo conceito em **2 ou mais linhas** → releio a seção e refaço os exercícios do dia antes de seguir. Os de tipo **confiante** têm prioridade.
+
+## 6. Depois da prova: eu corrijo sozinho e, se quiser, peço mais
+
+O ciclo foi desenhado para **não ter o Claude no meio**:
+
+1. **Faço** a prova (ou exercício, desafio, projeto) no papel ou em `pratica/treinos/`, na folha de respostas.
+2. **Corrijo eu mesmo** com o gabarito de mesmo nome em `gabaritos/` ("Como corrigir sozinho"), conto a nota e comparo a confiança com o resultado.
+3. **Anoto os erros** no "Registro de erros" do `02-acompanhamento.md` e releio o que o gabarito indica. Passou (80% ou mais) → sigo. Não passou → releio e repito a prova.
+4. **Só se eu quiser**, peço ao Claude, quando abrir a conversa: `"analisar erros"`, ou "mais exercícios/desafios/provas/projetos sobre X". Ele faz o seguinte, **sem me fazer perguntas**:
+   - **Lê** o `02-acompanhamento.md` (Registro de erros, notas, dúvidas em aberto). Se eu colar os erros no pedido, usa o que colei.
+   - **Analisa**: agrupa os erros por conceito e por tipo (confiante, lacuna, distração, frágil), acha o equívoco por trás (não só a questão) e diz em poucas linhas onde está o problema, começando pelo que acertei.
+   - **Gera material novo, fechado e com gabarito**, no mesmo padrão do pacote, **sem apagar nem regravar nada que já existe**:
+     - `reforco/reforco-NN-tema.md`: uma aula curta **por outro ângulo** só dos conceitos fracos (por que importa, exemplo novo, erro típico, dúvidas), exercícios novos com critério de pronto e 3 dicas, um desafio e, se o tema pedir, um mini projeto com checklist; mais uma **prova de reprova** em `provas/reprova-NN-tema.md` (questões **diferentes**, mesmos conceitos);
+     - `gabaritos/reforco-NN-tema.md` e `gabaritos/reprova-NN-tema.md`, com o mesmo nome;
+     - `reforco/extra-NN-tema.md` quando eu pedir só "mais" de algo, sem ter errado.
+   - **Confere** com `pacote.py conferir` (reforço e reprova passam pela mesma estrutura didática, sem a conta de tempo do dia), corrige o que ele acusar e **entrega em poucas linhas**: o padrão dos meus erros, quais arquivos nasceram e por onde começar. Sem menu e sem "quer que eu…?".
+   - O reforço **também é completo em si**: nunca me manda voltar ao Claude.
+5. Repito o ciclo quando quiser. Os arquivos novos seguem numerados em sequência (`reforco-01…`, `reforco-02…`).
+
+Regras do reforço: outro ângulo, nunca as mesmas palavras nem as mesmas questões; começa um degrau **abaixo** do que errei; tom sem peso (errar é dado, não nota; Regra 12); erro **confiante** primeiro; tudo atual e verificado como no resto do pacote (Regras 8 e 25).
+
+## 7. Se algo mudar depois
 
 - **Atrasei ou faltei um dia:** não pule nada. Faço o dia seguinte; o calendário só desloca. Os dias de revisão continuam valendo.
 - **Já sei um tópico / quero pular:** sozinho (o jeito que o pacote ensina no `00-LEIA-ME.md`): pulo as seções do tópico e faço a prova dele; passando em 80%, sigo. Se eu pedir ao Claude, ele roda `pacote.py planejar --ja-sei …` e regera só os dias afetados (os arquivos antigos não são apagados; o Claude cria os novos e o `01-plano.md` aponta). O pacote não depende disso.

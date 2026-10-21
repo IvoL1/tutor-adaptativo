@@ -368,6 +368,9 @@ def testa_pacote():
     (pk / "plano.md").write_text("---\nhoras_por_dia: 1\n---\n# Plano\n", encoding="utf-8")
     (pk / "plano.md").rename(pk / "01-plano.md")  # nome novo; o antigo (plano.md) também é aceito
     (pk / "00-LEIA-ME.md").write_text("# Leia-me\n\nEste pacote é completo.\n", encoding="utf-8")
+    (pk / "02-acompanhamento.md").write_text("# Acompanhamento\n\n## Registro de erros\n| Prova | Questão | Conceito | Tipo | Reler |\n|---|---|---|---|---|\n", encoding="utf-8")
+    duvidas = "# Dúvidas\n\n" + "".join(f"### Dúvida {i}?\n\nResposta curta.\n\n" for i in range(1, 6))
+    (pk / "04-duvidas.md").write_text(duvidas, encoding="utf-8")
     texto = ("### Por que isso importa\n\n" + " ".join(["palavra"] * 150) + "\n\n### Exemplo\n\nVeja.\n\n### Checagem\n\nQual?\n\n<details><summary>Resposta</summary>Esta.</details>\n\n"
              "### Dúvidas que costumam aparecer\n\n**E se eu errar?** Releia.")
     dicas = "<details><summary>Dica 1</summary>a</details>\n<details><summary>Dica 2</summary>b</details>\n<details><summary>Dica 3</summary>c</details>\n"
@@ -415,6 +418,41 @@ def testa_pacote():
     curto = bom.replace("(40 min)", "(10 min)").replace("minutos: 60", "minutos: 30")
     (pk / "dias" / "dia-02-longo.md").write_text(curto, encoding="utf-8")
     ok("abaixo do orçamento" in rodar(pacote.main, ["conferir", str(pk)])[1], "conferir acusa dia abaixo do orçamento")
+    (pk / "dias" / "dia-02-longo.md").unlink()
+    (pk / "gabaritos" / "dia-02-longo.md").unlink(missing_ok=True)
+    # prova em arquivo próprio, gabarito à parte, reforço e complementos
+    (pk / "provas").mkdir()
+    (pk / "reforco").mkdir()
+    questoes = "".join(f"### Questão {i}\n\nQual?\n\nA) x\nB) y\nC) Não sei\n\n" for i in range(1, 6))
+    caderno = "# Prova — Tipos\n\n## Folha de respostas\n| Q | Resposta | Confiança |\n|---|---|---|\n\n## Questões\n\n" + questoes
+    gabprova = ("# Gabarito da prova\n\n## Como corrigir sozinho\n1. Compare.\n\n| Questão | Certa | Reler |\n|---|---|---|\n"
+                + "".join(f"| {i} | A | seção 2 |\n" for i in range(1, 6))
+                + "\n**Pontuação:** acertos/total = %. 80% ou mais: passei.\n\nCopie os erros no Registro de erros do 02-acompanhamento.md.\n")
+    (pk / "provas" / "prova-01-tipos.md").write_text(caderno, encoding="utf-8")
+    (pk / "gabaritos" / "prova-01-tipos.md").write_text(gabprova, encoding="utf-8")
+    dia_prova = bom.replace("## 2. Exercícios — Praticar (40 min)", "## 2. Prova — Tipos (40 min)").split("**Se travar:**")[0] + "Abra [a prova](../provas/prova-01-tipos.md).\n"
+    (pk / "dias" / "dia-02-prova.md").write_text(dia_prova, encoding="utf-8")
+    cod, saida = rodar(pacote.main, ["conferir", str(pk)])
+    ok(cod == 0 and "OK   provas/prova-01-tipos.md" in saida, "conferir aceita prova em provas/ com gabarito de mesmo nome (e o dia só aponta para ela)")
+    (pk / "provas" / "prova-01-tipos.md").write_text(caderno.replace("## Folha de respostas", "## Respostas").replace("Qual?", "<details>Qual?</details>", 1), encoding="utf-8")
+    (pk / "gabaritos" / "prova-01-tipos.md").write_text(gabprova.replace("**Pontuação:**", "").replace("| 3 | A | seção 2 |\n", ""), encoding="utf-8")
+    saida = rodar(pacote.main, ["conferir", str(pk)])[1]
+    ok("Folha de respostas" in saida and "não leva dica" in saida and "Pontuação" in saida and "não corrige a questão 3" in saida, "conferir acusa prova sem folha de respostas, com resposta à vista e gabarito incompleto")
+    (pk / "provas" / "prova-01-tipos.md").write_text(caderno, encoding="utf-8")
+    (pk / "gabaritos" / "prova-01-tipos.md").unlink()
+    ok("falta gabaritos/prova-01-tipos.md" in rodar(pacote.main, ["conferir", str(pk)])[1], "conferir acusa prova sem gabarito próprio")
+    (pk / "gabaritos" / "prova-01-tipos.md").write_text(gabprova, encoding="utf-8")
+    (pk / "dias" / "dia-02-prova.md").write_text(dia_prova.replace("Abra [a prova](../provas/prova-01-tipos.md).", "### Questão 1\n\nQual?\nA) x B) Não sei\n"), encoding="utf-8")
+    ok("arquivo próprio" in rodar(pacote.main, ["conferir", str(pk)])[1], "conferir exige que a prova esteja em arquivo próprio")
+    (pk / "dias" / "dia-02-prova.md").unlink()
+    (pk / "reforco" / "reforco-01-tipos.md").write_text(bom.replace("dia: 1\n", "").replace("(40 min)", "(10 min)").replace("minutos: 60", "minutos: 30"), encoding="utf-8")
+    (pk / "gabaritos" / "reforco-01-tipos.md").write_text(gabom, encoding="utf-8")
+    cod, saida = rodar(pacote.main, ["conferir", str(pk)])
+    ok("OK   reforco/reforco-01-tipos.md" in saida, "conferir lê reforco/ sem cobrar o orçamento do dia")
+    (pk / "04-duvidas.md").unlink()
+    (pk / "02-acompanhamento.md").write_text("# Acompanhamento\n", encoding="utf-8")
+    saida = rodar(pacote.main, ["conferir", str(pk)])[1]
+    ok("04-duvidas.md" in saida and "Registro de erros" in saida, "conferir exige banco de dúvidas e registro de erros no acompanhamento")
 
 
 def testa_apostila():

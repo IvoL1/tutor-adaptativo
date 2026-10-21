@@ -18,6 +18,10 @@ os scripts da skill) e a QUALIDADE DIDÁTICA que dá para medir: cada leitura te
 “Checagem” (com resposta dobrada) e “Dúvidas que costumam aparecer”; cada exercício tem “Critério de pronto” e 3 dicas;
 cada exercício tem sua solução no gabarito; cada prova tem questões com “Não sei”; nada de “TODO”, “é fácil” ou “óbvio”.
 
+Também confere provas/ (caderno sem respostas, com folha de respostas; gabarito de mesmo nome em gabaritos/ com pontuação, como
+corrigir sozinho, o que reler e o registro de erros), reforco/ (reforços e extras gerados depois, pela mesma estrutura didática,
+sem a conta de tempo do dia), 02-acompanhamento.md (registro de erros) e 04-duvidas.md (banco de dúvidas).
+
 Formato do currículo (JSON):
   {"materia": "TypeScript", "horas_por_dia": 4, "topicos": [
      {"id": "t01", "titulo": "Tipos básicos", "parte": "Fundamentos", "dificuldade": 1, "pre": [],
@@ -70,6 +74,11 @@ def numero_do_dia(arq):
 def dias_da_pasta(pasta, sub):
     """dia-*.md de dias/ ou gabaritos/, em ordem numérica (dia-9 antes de dia-10, mesmo sem zeros à esquerda)."""
     return sorted((pasta / sub).glob("dia-*.md"), key=lambda a: (numero_do_dia(a), a.name)) if (pasta / sub).is_dir() else []
+
+
+def arquivos_md(pasta, sub):
+    """Todos os .md de uma subpasta do pacote (provas/, reforco/, gabaritos/), em ordem de nome."""
+    return sorted((pasta / sub).glob("*.md")) if (pasta / sub).is_dir() else []
 
 
 def sem_acento(s):
@@ -327,6 +336,7 @@ VICIOS = (
     (re.compile(r"\b(todo|tbd|lorem|xxx|a completar|a definir|a preencher)\b|\[\s*\.\.\.\s*\]"), "texto provisório"),
     (re.compile(r"\b(e facil|e simples|facil demais|obvio|obviamente|trivial|claramente)\b"), "palavra que desanima ou condescende (“é fácil”, “óbvio”…)"),
 )
+RE_LINK_PROVA = re.compile(r"\]\(([^)\s#]*provas/[^)\s#]+\.md)")
 RE_EXERC = re.compile(r"(?m)^###\s+Exerc[ií]cio\s+(\d+)", re.I)
 
 
@@ -377,19 +387,39 @@ def qualidade_secao(s):
     elif s["tipo"] == "projeto":
         if "criterio de pronto" not in t:
             p.append(f"{ref}: o passo do projeto não diz o “Critério de pronto”")
+        if "checklist" not in t:
+            p.append(f"{ref}: falta o “Checklist de autoavaliação” (itens que marco para saber se o meu projeto está certo, sem o Claude)")
     elif s["tipo"] == "prova":
-        n = len(re.findall(r"(?m)^###\s+Quest[aã]o\s+\d+", txt))
-        if n < 5:
-            p.append(f"{ref}: só {n} questão(ões) com título “### Questão N” (use de 8 a 15)")
-        if t.count("nao sei") < n:
-            p.append(f"{ref}: toda questão precisa da alternativa “Não sei”")
+        if not RE_LINK_PROVA.search(txt):
+            p.append(f"{ref}: a prova deve ficar em arquivo próprio (provas/…md, caderno sem respostas) com o gabarito de mesmo nome em gabaritos/; esta seção só aponta para ele")
+            n = len(re.findall(r"(?m)^###\s+Quest[aã]o\s+\d+", txt))
+            if n < 5:
+                p.append(f"{ref}: só {n} questão(ões) com título “### Questão N” (use de 8 a 15)")
+            if t.count("nao sei") < n:
+                p.append(f"{ref}: toda questão precisa da alternativa “Não sei”")
     elif s["tipo"] == "revisao":
         if "<details" not in txt:
             p.append(f"{ref}: as perguntas da revisão precisam da resposta dobrada")
     return p, exs
 
 
-def conferir_dia(arq, orcamento, pasta):
+def checks_gerais(corpo, arq):
+    """Fórmula/diagrama sem internet, imagem que falta, o que manda sair do pacote e link quebrado."""
+    probs = []
+    if re.search(r"(?<![\\$\w])\$[^$\n]+\$", corpo) or "```mermaid" in corpo:
+        probs.append("tem fórmula LaTeX ($…$) ou bloco mermaid: não aparece sem internet; escreva a fórmula em texto/Unicode e use imagem em anexos/")
+    for alvo in re.findall(r"!\[[^\]]*\]\(([^)\s]+)\)", corpo):
+        if not re.match(r"^[a-z]+:", alvo) and not (arq.parent / alvo).resolve().is_file():
+            probs.append(f"imagem não encontrada: {alvo}")
+    probs += sai_do_pacote(corpo)
+    for alvo in re.findall(r"(?<!!)\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)", corpo):
+        if not re.match(r"^[a-z]+:", alvo) and not (arq.parent / alvo).resolve().exists():
+            probs.append(f"link quebrado: {alvo}")
+    return probs
+
+
+def conferir_dia(arq, orcamento, pasta, livre=False):
+    """livre=True para reforço/extra: mesma estrutura didática, sem a conta de tempo do dia."""
     txt = arq.read_text(encoding="utf-8-sig", errors="replace").replace("\r\n", "\n")
     meta, corpo = frontmatter(txt)
     probs, secs, atual, exercicios = [], [], None, []
@@ -409,9 +439,9 @@ def conferir_dia(arq, orcamento, pasta):
         probs.append("nenhuma seção no formato `## N. Tipo — título (M min)`")
     if "minutos" in meta and meta["minutos"].isdigit() and int(meta["minutos"]) != total:
         probs.append(f"frontmatter diz {meta['minutos']} min, mas as seções somam {total} min")
-    if secs and not fechamento and total < orcamento * 0.97:
+    if secs and not fechamento and not livre and total < orcamento * 0.97:
         probs.append(f"o dia soma {total} min, abaixo do orçamento de {orcamento} min")
-    if secs and total > orcamento * (FOLGA_ACIMA + 0.05):
+    if secs and not livre and total > orcamento * (FOLGA_ACIMA + 0.05):
         probs.append(f"o dia soma {total} min, mais de 15% acima do orçamento de {orcamento} min")
     for s in secs:
         if s["tipo"] == "ler" and s["palavras"] / PALAVRAS_POR_MIN > s["min"] * 1.25:
@@ -421,7 +451,8 @@ def conferir_dia(arq, orcamento, pasta):
         pq, ex = qualidade_secao(s)
         probs += pq
         exercicios += ex
-    pratica = any(s["tipo"] in ("exercicios", "desafio", "projeto", "prova") for s in secs)
+    prova_inline = any(s["tipo"] == "prova" and not RE_LINK_PROVA.search(s["texto"]) for s in secs)
+    pratica = any(s["tipo"] in ("exercicios", "desafio", "projeto") for s in secs) or prova_inline
     gab = pasta / "gabaritos" / arq.name
     if not gab.is_file():
         gab = next((g for g in dias_da_pasta(pasta, "gabaritos") if numero_do_dia(g) == numero_do_dia(arq)), None)
@@ -434,21 +465,63 @@ def conferir_dia(arq, orcamento, pasta):
                 probs.append(f"o gabarito não resolve o exercício {k}")
         if exercicios and "se voce errou" not in g:
             probs.append("o gabarito não diz “Se você errou assim: …” (o erro comum de cada exercício)")
-        if any(s["tipo"] == "prova" for s in secs) and "pontuacao" not in g:
+        if prova_inline and "pontuacao" not in g:
             probs.append("o gabarito da prova não traz a “Pontuação” (acertos, % e o que fazer abaixo de 80%)")
+        if any(s["tipo"] == "projeto" for s in secs) and "referencia" not in g:
+            probs.append("o gabarito não traz a “Solução de referência” do projeto (um projeto pronto para eu comparar com o meu)")
     if secs and not fechamento and "voce vai conseguir" not in sem_acento(corpo):
         probs.append("o dia não diz “Hoje você vai conseguir: …” no começo (o objetivo do dia)")
     probs += [f"{v}" for v in vicios(corpo)]
-    if re.search(r"(?<![\\$\w])\$[^$\n]+\$", corpo) or "```mermaid" in corpo:
-        probs.append("tem fórmula LaTeX ($…$) ou bloco mermaid: não aparece sem internet; escreva a fórmula em texto/Unicode e use imagem em anexos/")
-    for alvo in re.findall(r"!\[[^\]]*\]\(([^)\s]+)\)", corpo):
-        if not re.match(r"^[a-z]+:", alvo) and not (arq.parent / alvo).resolve().is_file():
-            probs.append(f"imagem não encontrada: {alvo}")
-    probs += sai_do_pacote(corpo)
-    for alvo in re.findall(r"(?<!!)\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)", corpo):
-        if not re.match(r"^[a-z]+:", alvo) and not (arq.parent / alvo).resolve().exists():
-            probs.append(f"link quebrado: {alvo}")
+    probs += checks_gerais(corpo, arq)
     return {"arquivo": arq.name, "minutos": total, "palavras": sum(s["palavras"] for s in secs), "problemas": probs}
+
+
+def conferir_prova(arq, pasta):
+    """Caderno de prova em provas/: questões com “Não sei”, folha de respostas, nenhuma resposta à vista; e o gabarito de mesmo nome."""
+    corpo = frontmatter(arq.read_text(encoding="utf-8-sig", errors="replace").replace("\r\n", "\n"))[1]
+    t, probs = sem_acento(corpo), []
+    n = len(re.findall(r"(?m)^###\s+Quest[aã]o\s+\d+", corpo))
+    if n < 5:
+        probs.append(f"só {n} questão(ões) com título “### Questão N” (use de 8 a 15)")
+    if t.count("nao sei") < n:
+        probs.append("toda questão precisa da alternativa “Não sei”")
+    if "folha de respostas" not in t:
+        probs.append("falta a “Folha de respostas” (onde marco a resposta e a confiança 🟢🟡🔴 antes de corrigir)")
+    if "<details" in corpo:
+        probs.append("tem <details>: prova não leva dica nem resposta dobrada; a resposta fica só em gabaritos/")
+    gab = pasta / "gabaritos" / arq.name
+    if not gab.is_file():
+        probs.append(f"falta gabaritos/{arq.name} (o gabarito da prova tem o mesmo nome do caderno)")
+    else:
+        g = sem_acento(gab.read_text(encoding="utf-8-sig", errors="replace").replace("\r\n", "\n"))
+        for chave, nome in (("pontuacao", "a “Pontuação” (acertos, % e o que fazer abaixo de 80%)"), ("como corrigir", "o “Como corrigir sozinho” (passo a passo)"),
+                            ("reler", "o que “Reler” em cada erro"), ("registro de erros", "o aviso para copiar os erros no “Registro de erros” do 02-acompanhamento.md")):
+            if chave not in g:
+                probs.append(f"o gabarito da prova não traz {nome}")
+        for k in range(1, n + 1):
+            if not re.search(rf"questao\s*{k}\b|^\|\s*{k}\s*\|", g, re.M):
+                probs.append(f"o gabarito não corrige a questão {k}")
+    probs += vicios(corpo) + checks_gerais(corpo, arq)
+    return {"arquivo": f"provas/{arq.name}", "minutos": 0, "palavras": len(re.findall(r"\w+", corpo)), "problemas": probs}
+
+
+def conferir_complementos(pasta):
+    """O que sustenta o estudo sem o Claude: acompanhamento (com registro de erros) e banco de dúvidas."""
+    res = []
+    acomp = achar(pasta, "02-acompanhamento.md")
+    if acomp is None:
+        res.append({"arquivo": "02-acompanhamento.md", "minutos": 0, "palavras": 0, "problemas": ["não existe: é onde anoto o que fiz, as notas e o registro de erros"]})
+    elif "registro de erros" not in sem_acento(acomp.read_text(encoding="utf-8-sig", errors="replace")):
+        res.append({"arquivo": acomp.name, "minutos": 0, "palavras": 0, "problemas": ["falta a seção “Registro de erros” (prova, questão, conceito, tipo de erro, o que reler)"]})
+    duv = achar(pasta, "04-duvidas.md")
+    if duv is None:
+        res.append({"arquivo": "04-duvidas.md", "minutos": 0, "palavras": 0, "problemas": ["não existe: o banco de dúvidas é o que substitui “perguntar ao Claude”"]})
+    else:
+        corpo = duv.read_text(encoding="utf-8-sig", errors="replace").replace("\r\n", "\n")
+        n = sum(1 for l in corpo.split("\n") if l.startswith("###") and "?" in l)
+        pr = [f"só {n} dúvida(s) com título “### …?” (escreva as perguntas mais comuns, agrupadas por parte)"] if n < 5 else []
+        res.append({"arquivo": duv.name, "minutos": 0, "palavras": len(re.findall(r"\w+", corpo)), "problemas": pr + sai_do_pacote(corpo) + vicios(corpo)})
+    return res
 
 
 def conferir(args):
@@ -472,7 +545,13 @@ def conferir(args):
         return 2
     res = [conferir_dia(a, orcamento, pasta) for a in arqs]
     leia = achar(pasta, "00-LEIA-ME.md", "LEIA-ME.md") or pasta / "00-LEIA-ME.md"
-    for rotulo, arq in [(leia.name, leia)] + [(f"gabaritos/{g.name}", g) for g in dias_da_pasta(pasta, "gabaritos")]:
+    res += [conferir_prova(a, pasta) for a in arquivos_md(pasta, "provas")]
+    for a in arquivos_md(pasta, "reforco"):
+        r = conferir_dia(a, orcamento, pasta, livre=True)
+        r["arquivo"] = f"reforco/{r['arquivo']}"
+        res.append(r)
+    res += conferir_complementos(pasta)
+    for rotulo, arq in [(leia.name, leia)] + [(f"gabaritos/{g.name}", g) for g in arquivos_md(pasta, "gabaritos")]:
         if arq.is_file():
             corpo = frontmatter(arq.read_text(encoding="utf-8-sig", errors="replace").replace("\r\n", "\n"))[1]
             res.append({"arquivo": rotulo, "minutos": 0, "palavras": len(re.findall(r"\w+", corpo)), "problemas": sai_do_pacote(corpo) + vicios(corpo)})

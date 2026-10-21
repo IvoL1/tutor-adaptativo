@@ -5,7 +5,7 @@
   apostila.py SAIDA.pdf ARQ1.md [ARQ2.md ...]     junta as notas, na ordem dada, num PDF (SAIDA.html com --html)
   apostila.py --pacote PASTA_DO_PACOTE            gera pdf/plano.pdf, pdf/dia-NN-assunto.pdf, pdf/gabarito-dia-NN-assunto.pdf e as apostilas
                                                   completas pdf/apostila-completa.pdf (LEIA-ME, plano e todos os dias) e
-                                                  pdf/gabaritos-completo.pdf (ou .html, sem Chrome/Edge)
+                                                  pdf/provas-completo.pdf e pdf/gabaritos-completo.pdf (ou .html, sem Chrome/Edge); cada prova e cada reforço também saem em PDF próprio
 
 Não precisa de internet: o PDF não carrega nada de fora (fórmulas e diagramas devem estar em texto ou em imagens locais,
 como o `pacote.py conferir` cobra). As dicas dobráveis (<details>) saem abertas no papel. Escreve só o PDF/HTML pedido
@@ -81,17 +81,24 @@ def pacote(pasta, nav):
     gabs = _pacote.dias_da_pasta(pasta, "gabaritos")
     resumos = sorted((pasta / "resumos").glob("*.md")) if (pasta / "resumos").is_dir() else []
     glossario = _pacote.achar(pasta, "03-glossario.md", "glossario.md")
+    provas = _pacote.arquivos_md(pasta, "provas")
+    reforcos = _pacote.arquivos_md(pasta, "reforco")
+    gabs_extra = [g for g in _pacote.arquivos_md(pasta, "gabaritos") if g not in gabs]
     if plano:
         trabalhos.append(("plano.pdf", [plano]))
     for a in dias:
         trabalhos.append((a.stem + ".pdf", [a]))
-    for a in gabs:
+    for a in provas + reforcos:
+        trabalhos.append((a.stem + ".pdf", [a]))
+    for a in gabs + gabs_extra:
         trabalhos.append(("gabarito-" + a.stem + ".pdf", [a]))
     ini = [x for x in (leia, plano) if x]
     if dias:
         trabalhos.append(("apostila-completa.pdf", ini + dias + resumos + ([glossario] if glossario else [])))
-    if gabs:
-        trabalhos.append(("gabaritos-completo.pdf", gabs))
+    if provas:
+        trabalhos.append(("provas-completo.pdf", provas))
+    if gabs or gabs_extra:
+        trabalhos.append(("gabaritos-completo.pdf", gabs + gabs_extra))
     if not trabalhos:
         return {"ok": False, "erro": "nada para converter: faltam 01-plano.md, dias/ e gabaritos/"}
     feitos, falhas = [], []

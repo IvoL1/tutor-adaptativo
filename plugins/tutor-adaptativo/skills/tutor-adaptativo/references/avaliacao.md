@@ -1,6 +1,6 @@
 # Referência — Avaliação: quiz, prova e reforço
 
-> Leia ao fazer qualquer pergunta com resposta certa (checagem de nó, sondagem, quiz, prova), ao escrever alternativas, ao corrigir e ao decidir entre avançar e reforçar.
+> **Padrão (pacote): prova em arquivo próprio e gabarito em outro; eu corrijo sozinho** (`references/pacote.md` → seções 4 a 6). Todo o resto desta referência (quiz e prova "na hora", pergunta a pergunta) vale só no modo **ao vivo**, ou quando eu mandar corrigir respostas que digitei. Leia ao fazer qualquer pergunta com resposta certa (checagem de nó, sondagem, quiz, prova), ao escrever alternativas, ao corrigir e ao decidir entre avançar e reforçar.
 
 > **Nesta referência:**
 > **1. Perguntas com resposta certa e sem resposta certa**
@@ -76,7 +76,7 @@ Quando eu errar ou marcar "não sei", **depois de corrigir**, pergunte **uma vez
 
 ## Prova (parte e tópico)
 
-> A prova é feita ao vivo, em sequência de quizzes, e vale o mesmo para qualquer matéria. O feedback vem pergunta a pergunta; a **nota** fecha no fim.
+> **Padrão:** o Claude escreve o caderno em `provas/` (sem respostas, com folha de respostas), o gabarito em `gabaritos/` (chave, "como corrigir sozinho", pontuação, o que reler, aviso do "Registro de erros") e **não corrige**: quem corrige sou eu. Se eu pedir `"analisar erros"`, ele gera o reforço e a reprova em arquivos (seção 6 do `pacote.md`). A descrição abaixo é a prova **ao vivo**, em sequência de quizzes (só se eu pedir), e vale o mesmo para qualquer matéria. O feedback vem pergunta a pergunta; a **nota** fecha no fim.
 
 ### Quando aplicar
 

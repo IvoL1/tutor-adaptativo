@@ -26,8 +26,11 @@ Abra o terminal numa pasta de estudos (ex.: `Documents\Estudos`), rode `claude` 
 | `quero estudar inglês do zero` | Pergunta só as horas por dia e monta o pacote inteiro |
 | `quero estudar inglês do zero, ao vivo` | Começa a aula ao vivo (entrevista, sondagem, plano) |
 | `retomar` | Continua de onde parou |
+| `analisar erros` | Lê o seu Registro de erros e gera reforço + prova de reprova, fechados e com gabarito |
+| `mais exercícios de X` · `outra prova de Y` · `um mini projeto de Z` | Gera material novo em `reforco/`, com gabarito à parte |
 | `gerar mais dias` | Só se uma montagem foi interrompida: continua até o fim |
-| `dica` · `travei` · `quiz` · `prova` · `boletim` | Dica, ajuda ao travar, quiz, prova, notas |
+| `prova` · `quiz` | Grava o caderno e o gabarito em arquivos separados (você corrige). Corrigir na hora só no `ao vivo` |
+| `dica` · `travei` · `boletim` | Dica, ajuda ao travar, notas (modo ao vivo) |
 
 Todos os comandos estão em `plugins/tutor-adaptativo/skills/tutor-adaptativo/SKILL.md`.
 
@@ -41,12 +44,22 @@ pacote/
 ├── 01-plano.md         ordem de estudo, cronograma e fontes
 ├── 02-acompanhamento.md  seu: o que fez, notas, dúvidas
 ├── 03-glossario.md     todo termo novo, com o dia em que aparece
+├── 04-duvidas.md       banco de dúvidas: o que costuma aparecer, com resposta
 ├── dias/dia-01-tipos-basicos.md …   o dia completo (soma as suas horas)
-├── gabaritos/…         respostas, com o mesmo nome do dia, separadas
+├── provas/…            cada prova em arquivo próprio, SEM respostas
+├── gabaritos/…         respostas de dias e provas, com o mesmo nome, separadas
+├── reforco/…           nasce vazia: reforços e extras gerados sob pedido
 ├── resumos/…           uma página por parte, para revisar
 ├── anexos/             imagens e diagramas
 └── _interno/           dados do cronograma (não precisa abrir)
 ```
+
+### Provas: você corrige, o Claude só analisa se você pedir
+
+1. Faça a prova do arquivo `provas/…` (folha de respostas incluída), sem olhar nada.
+2. Corrija com `gabaritos/…` do mesmo nome (traz o passo a passo, a pontuação e o que reler em cada erro).
+3. Anote os erros no **Registro de erros** do `02-acompanhamento.md`.
+4. Se quiser mais, abra o Claude e escreva `analisar erros` (ou `mais exercícios de X`, `outra prova de Y`, `um mini projeto de Z`). Ele lê o registro, acha o padrão dos seus erros e gera, em `reforco/` e `provas/`, aula curta por outro ângulo, exercícios, desafio, mini projeto e prova de reprova, **tudo com gabarito à parte**, sem fazer perguntas.
 
 Exemplo real do cronograma (4 h por dia):
 

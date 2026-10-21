@@ -3,6 +3,17 @@
 > Só o que muda o comportamento do sistema. Serve para eu saber em que versão
 > um material antigo foi gerado, e para não reintroduzir coisa já removida.
 
+## 9.0.0 — 2026-10-21
+
+**Prova em arquivo próprio, correção minha, reforço sob pedido.** Na 8.0.0 o pacote já era fechado, mas a prova ainda ficava dentro do dia e os comandos `"prova"`/`"quiz"` esperavam eu responder na conversa para o Claude corrigir; não havia caminho para "analisar o que errei e gerar mais".
+- **Provas em `provas/` (caderno sem respostas, com folha de respostas e "Não sei") e gabarito de mesmo nome em `gabaritos/`** (chave, "Como corrigir sozinho", pontuação, "Reler" por questão, aviso do Registro de erros). A seção "Prova" do dia só aponta para o caderno. `"prova"` e `"quiz"` gravam os arquivos e param; corrigir na hora só no `"ao vivo"` (Regras 16, 17 e 38; `avaliacao.md`).
+- **`02-acompanhamento.md` ganha o "Registro de erros"** (data, prova, questão, conceito, tipo: confiante, lacuna, distração ou frágil, o que reler, refiz) e uma regra para eu decidir sozinho quando refazer.
+- **Novos comandos `"analisar erros"` e `"mais"`:** o Claude lê o registro (ou os erros que eu colar), acha o equívoco por trás dos erros e gera, sem perguntas e sem apagar nada, `reforco/reforco-NN-tema.md` (aula curta por outro ângulo, exercícios com 3 dicas, desafio, mini projeto) + prova de reprova em `provas/` + gabaritos de mesmo nome; `reforco/extra-NN-tema.md` para "mais X" sem ter errado (`pacote.md` → seção 6).
+- **`04-duvidas.md` (novo):** banco de dúvidas, 5 ou mais por parte; substitui "perguntar ao Claude".
+- **Projetos e mini projetos:** todo passo de projeto traz "Checklist de autoavaliação" e o gabarito traz a "Solução de referência" para eu comparar.
+- **`pacote.py conferir`:** confere `provas/` (questões, "Não sei", folha de respostas, nenhuma resposta ou `<details>` à vista), o gabarito de cada prova (pontuação, como corrigir, reler, registro de erros, uma linha por questão), `reforco/` (mesma estrutura didática, sem a conta de tempo), o `04-duvidas.md`, o registro de erros e o checklist/solução de referência do projeto; prova escrita dentro do dia é acusada. **`apostila.py`** gera também PDF de cada prova e reforço e `provas-completo`.
+- `selftest.py`: 130 verificações. Novo eval: `prova-em-arquivo-com-gabarito`.
+
 ## 8.0.0 — 2026-10-21
 
 **O padrão agora é material fechado: estudar sem o Claude, sem terminal e sem internet.** Ao testar a 7.0.0, o estudo ainda dependia da conversa (a aula ao vivo era o padrão), do terminal (várias perguntas, pausa para aprovar o cronograma, "gerar os primeiros 7 dias e perguntar se continua", ofertas ao final) e da internet (pesquisa "obrigatória", dúvidas para "levar ao Claude").
