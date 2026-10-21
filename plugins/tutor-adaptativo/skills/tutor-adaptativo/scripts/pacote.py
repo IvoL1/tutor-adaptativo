@@ -10,9 +10,13 @@ correta (nenhum tópico antes dos seus pré-requisitos), distribui os blocos em 
 menos o orçamento: nunca sobra dia curto, a não ser o último), reserva tempo de revisão espaçada (1, 3, 7 e 16 dias
 depois de cada tópico acabar) e diz até onde a matéria chega em cada dia. Imprime o cronograma em Markdown (ou JSON).
 
-conferir: lê a pasta do pacote já escrita (plano.md e dias/dia-NN.md) e confere o que dá para medir por código: a soma
+conferir: lê a pasta do pacote já escrita (01-plano.md e dias/dia-NN-assunto.md; aceita também os nomes antigos plano.md e dia-NN.md) e confere o que dá para medir por código: a soma
 dos minutos de cada dia contra as horas por dia, o texto de leitura contra o tempo declarado, o gabarito de cada dia
-com exercício, imagens que faltam e fórmulas/diagramas que não aparecem sem internet.
+com exercício, imagens que faltam e fórmulas/diagramas que não aparecem sem internet. Confere também a AUTOSSUFICIÊNCIA:
+o pacote não pode mandar quem estuda sair dele (link, "pesquise na internet", "pergunte ao Claude", "veja a documentação",
+os scripts da skill) e a QUALIDADE DIDÁTICA que dá para medir: cada leitura tem “Por que isso importa”, “Exemplo”,
+“Checagem” (com resposta dobrada) e “Dúvidas que costumam aparecer”; cada exercício tem “Critério de pronto” e 3 dicas;
+cada exercício tem sua solução no gabarito; cada prova tem questões com “Não sei”; nada de “TODO”, “é fácil” ou “óbvio”.
 
 Formato do currículo (JSON):
   {"materia": "TypeScript", "horas_por_dia": 4, "topicos": [
@@ -31,6 +35,14 @@ TETO_REV = 0.15              # a revisão nunca passa de 15% do dia
 FOLGA_ACIMA = 1.10           # um dia pode passar até 10% do orçamento para não cortar um bloco ao meio
 BLOCO_MAX = 90
 PALAVRAS_POR_MIN = 150       # leitura de estudo (com pausa para entender), não leitura corrida
+# o que mandaria quem estuda sair do pacote (aplicado ao texto sem acento e em minúsculas, linha a linha)
+SAI_DO_PACOTE = (
+    (re.compile(r"https?://|www\."), "link para a internet"),
+    (re.compile(r"\b(pergunt\w*|pec\w+|consult\w*|fal\w+ com|volt\w+ a[o]?|recorr\w+)\b[^.\n]{0,25}\b(claude|chatgpt|assistente virtual|inteligencia artificial)\b"), "manda perguntar ao Claude/assistente"),
+    (re.compile(r"\b(pesquis\w+|busqu\w+|procur\w+)\b[^.\n]{0,40}\b(internet|web|google|online|na rede|site|documentacao|youtube)\b"), "manda pesquisar na internet"),
+    (re.compile(r"\b(consult\w+|acess\w+|visit\w+|ve(ja|r)|le(ia|r)|abr\w+|confir\w+)\b[^.\n]{0,30}\b(documentacao oficial|a documentacao|internet|na web|online|site oficial|pagina oficial|youtube|stack ?overflow|wikipedia)\b"), "manda consultar fora do pacote"),
+    (re.compile(r"\b(pacote|apostila|ver|quiz|fila|boletim|render|selftest)\.py\b|\bclaude code\b"), "cita ferramenta da skill ou o Claude Code"),
+)
 RE_SECAO = re.compile(r"^##\s+(\d+)\.\s+(.+?)\s+\((\d+)\s*min\)\s*$")
 
 
@@ -40,6 +52,24 @@ def _utf8():
             s.reconfigure(encoding="utf-8")
         except Exception:
             pass
+
+
+def achar(pasta, *nomes):
+    """Primeiro arquivo que existe entre os nomes dados (o nome novo vem antes do antigo: 01-plano.md, plano.md)."""
+    for n in nomes:
+        if (pasta / n).is_file():
+            return pasta / n
+    return None
+
+
+def numero_do_dia(arq):
+    m = re.search(r"dia-(\d+)", arq.name)
+    return int(m.group(1)) if m else 0
+
+
+def dias_da_pasta(pasta, sub):
+    """dia-*.md de dias/ ou gabaritos/, em ordem numérica (dia-9 antes de dia-10, mesmo sem zeros à esquerda)."""
+    return sorted((pasta / sub).glob("dia-*.md"), key=lambda a: (numero_do_dia(a), a.name)) if (pasta / sub).is_dir() else []
 
 
 def sem_acento(s):
@@ -276,19 +306,103 @@ def tipo_da_secao(titulo):
     return "outro"
 
 
+def sai_do_pacote(corpo, rotulo=""):
+    """Linhas que mandariam quem estuda para fora do pacote (fora de blocos de código, onde link e comando podem ser a matéria)."""
+    achados, em_codigo = [], False
+    for n, l in enumerate(corpo.split("\n"), 1):
+        if l.lstrip().startswith("```"):
+            em_codigo = not em_codigo
+            continue
+        if em_codigo:
+            continue
+        s = sem_acento(l)
+        for rx, motivo in SAI_DO_PACOTE:
+            if rx.search(s):
+                achados.append(f"{rotulo}linha {n}: {motivo} (“{l.strip()[:70]}”); escreva aqui dentro o que seria buscado fora")
+                break
+    return achados[:5]
+
+
+VICIOS = (
+    (re.compile(r"\b(todo|tbd|lorem|xxx|a completar|a definir|a preencher)\b|\[\s*\.\.\.\s*\]"), "texto provisório"),
+    (re.compile(r"\b(e facil|e simples|facil demais|obvio|obviamente|trivial|claramente)\b"), "palavra que desanima ou condescende (“é fácil”, “óbvio”…)"),
+)
+RE_EXERC = re.compile(r"(?m)^###\s+Exerc[ií]cio\s+(\d+)", re.I)
+
+
+def vicios(corpo):
+    achados, em_codigo = [], False
+    for n, l in enumerate(corpo.split("\n"), 1):
+        if l.lstrip().startswith("```"):
+            em_codigo = not em_codigo
+            continue
+        if em_codigo:
+            continue
+        s = sem_acento(l)
+        for rx, motivo in VICIOS:
+            if rx.search(s):
+                achados.append(f"linha {n}: {motivo} (“{l.strip()[:60]}”)")
+    return achados[:6]
+
+
+def qualidade_secao(s):
+    """Estrutura didática de uma seção (o que dá para medir por código). Devolve (problemas, números dos exercícios)."""
+    p, exs = [], []
+    txt, t, ref = s["texto"], sem_acento(s["texto"]), f"seção {s['n']} (“{s['titulo']}”)"
+    heads = [sem_acento(l) for l in txt.split("\n") if l.startswith("###")]
+    if s["tipo"] == "ler":
+        for chave, nome in (("por que", "Por que isso importa"), ("exemplo", "Exemplo"), ("checagem", "Checagem"), ("duvidas que costumam", "Dúvidas que costumam aparecer")):
+            if not any(chave in h for h in heads):
+                p.append(f"{ref}: falta a subseção “### {nome}” (substitui o que o professor diria ao vivo)")
+        if "<details" not in txt:
+            p.append(f"{ref}: a checagem precisa da resposta dobrada em <details>, para eu conferir sozinho")
+    elif s["tipo"] in ("exercicios", "desafio"):
+        marcas = list(RE_EXERC.finditer(txt))
+        blocos = [txt[m.start(): marcas[i + 1].start() if i + 1 < len(marcas) else len(txt)] for i, m in enumerate(marcas)]
+        if s["tipo"] == "exercicios":
+            if not blocos:
+                p.append(f"{ref}: sem “### Exercício N” (um título por exercício)")
+            if "se travar" not in t:
+                p.append(f"{ref}: falta o “Se travar” (o que fazer, em ordem, quando eu não souber)")
+        else:
+            blocos = blocos or [txt]
+        for m, b in zip(marcas or [None], blocos):
+            rot = f"exercício {m.group(1)} da {ref}" if m else ref
+            if len(re.findall(r"<summary>\s*dica", b, re.I)) < 3:
+                p.append(f"{rot}: menos de 3 dicas dobradas (<summary>Dica 1</summary>…)")
+            if "criterio de pronto" not in sem_acento(b):
+                p.append(f"{rot}: sem “Critério de pronto”")
+            if m:
+                exs.append(int(m.group(1)))
+    elif s["tipo"] == "projeto":
+        if "criterio de pronto" not in t:
+            p.append(f"{ref}: o passo do projeto não diz o “Critério de pronto”")
+    elif s["tipo"] == "prova":
+        n = len(re.findall(r"(?m)^###\s+Quest[aã]o\s+\d+", txt))
+        if n < 5:
+            p.append(f"{ref}: só {n} questão(ões) com título “### Questão N” (use de 8 a 15)")
+        if t.count("nao sei") < n:
+            p.append(f"{ref}: toda questão precisa da alternativa “Não sei”")
+    elif s["tipo"] == "revisao":
+        if "<details" not in txt:
+            p.append(f"{ref}: as perguntas da revisão precisam da resposta dobrada")
+    return p, exs
+
+
 def conferir_dia(arq, orcamento, pasta):
     txt = arq.read_text(encoding="utf-8-sig", errors="replace").replace("\r\n", "\n")
     meta, corpo = frontmatter(txt)
-    probs, secs, atual = [], [], None
+    probs, secs, atual, exercicios = [], [], None, []
     for l in corpo.split("\n"):
         m = RE_SECAO.match(l)
         if m:
-            atual = {"n": int(m.group(1)), "titulo": m.group(2), "min": int(m.group(3)), "palavras": 0, "tipo": tipo_da_secao(m.group(2))}
+            atual = {"n": int(m.group(1)), "titulo": m.group(2), "min": int(m.group(3)), "palavras": 0, "tipo": tipo_da_secao(m.group(2)), "texto": ""}
             secs.append(atual)
         elif l.startswith("## "):
             atual = None
         elif atual is not None:
             atual["palavras"] += len(re.findall(r"\w+", l))
+            atual["texto"] += l + "\n"
     total = sum(s["min"] for s in secs)
     fechamento = meta.get("fechamento", "").lower() in ("sim", "true", "1")
     if not secs:
@@ -304,17 +418,36 @@ def conferir_dia(arq, orcamento, pasta):
             probs.append(f"seção {s['n']} (“{s['titulo']}”): {s['palavras']} palavras levam ~{round(s['palavras'] / PALAVRAS_POR_MIN)} min, mas declara {s['min']} min; corte texto ou aumente o tempo")
         if s["tipo"] == "ler" and s["palavras"] < 40:
             probs.append(f"seção {s['n']} (“{s['titulo']}”): quase sem texto ({s['palavras']} palavras) para um bloco de leitura")
+        pq, ex = qualidade_secao(s)
+        probs += pq
+        exercicios += ex
     pratica = any(s["tipo"] in ("exercicios", "desafio", "projeto", "prova") for s in secs)
-    num = re.search(r"dia-(\d+)", arq.name)
-    if pratica and num and not (pasta / "gabaritos" / f"dia-{num.group(1)}.md").is_file():
-        probs.append(f"tem exercício, mas falta gabaritos/dia-{num.group(1)}.md")
-    if pratica and not re.search(r"crit[ée]rio de pronto", corpo, re.I):
-        probs.append("os exercícios não dizem o 'Critério de pronto' (o que conseguir/observar ao acertar)")
+    gab = pasta / "gabaritos" / arq.name
+    if not gab.is_file():
+        gab = next((g for g in dias_da_pasta(pasta, "gabaritos") if numero_do_dia(g) == numero_do_dia(arq)), None)
+    if pratica and gab is None:
+        probs.append(f"tem exercício, mas falta gabaritos/{arq.name} (o gabarito tem o mesmo nome do dia)")
+    elif pratica:
+        g = sem_acento(gab.read_text(encoding="utf-8-sig", errors="replace"))
+        for k in sorted(set(exercicios)):
+            if f"exercicio {k}" not in g:
+                probs.append(f"o gabarito não resolve o exercício {k}")
+        if exercicios and "se voce errou" not in g:
+            probs.append("o gabarito não diz “Se você errou assim: …” (o erro comum de cada exercício)")
+        if any(s["tipo"] == "prova" for s in secs) and "pontuacao" not in g:
+            probs.append("o gabarito da prova não traz a “Pontuação” (acertos, % e o que fazer abaixo de 80%)")
+    if secs and not fechamento and "voce vai conseguir" not in sem_acento(corpo):
+        probs.append("o dia não diz “Hoje você vai conseguir: …” no começo (o objetivo do dia)")
+    probs += [f"{v}" for v in vicios(corpo)]
     if re.search(r"(?<![\\$\w])\$[^$\n]+\$", corpo) or "```mermaid" in corpo:
         probs.append("tem fórmula LaTeX ($…$) ou bloco mermaid: não aparece sem internet; escreva a fórmula em texto/Unicode e use imagem em anexos/")
     for alvo in re.findall(r"!\[[^\]]*\]\(([^)\s]+)\)", corpo):
         if not re.match(r"^[a-z]+:", alvo) and not (arq.parent / alvo).resolve().is_file():
             probs.append(f"imagem não encontrada: {alvo}")
+    probs += sai_do_pacote(corpo)
+    for alvo in re.findall(r"(?<!!)\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)", corpo):
+        if not re.match(r"^[a-z]+:", alvo) and not (arq.parent / alvo).resolve().exists():
+            probs.append(f"link quebrado: {alvo}")
     return {"arquivo": arq.name, "minutos": total, "palavras": sum(s["palavras"] for s in secs), "problemas": probs}
 
 
@@ -323,29 +456,41 @@ def conferir(args):
         print(__doc__)
         return 2
     pasta = pathlib.Path(args[0]).expanduser().resolve()
-    plano = pasta / "plano.md"
-    if not plano.is_file():
-        print(f"ERRO: {plano} não existe (a pasta do pacote precisa de plano.md com 'horas_por_dia' no frontmatter)")
+    plano = achar(pasta, "01-plano.md", "plano.md")
+    if plano is None:
+        print(f"ERRO: {pasta / '01-plano.md'} não existe (a pasta do pacote precisa de 01-plano.md com 'horas_por_dia' no frontmatter)")
         return 2
     meta, _ = frontmatter(plano.read_text(encoding="utf-8-sig", errors="replace").replace("\r\n", "\n"))
     try:
         orcamento = round(float(meta["horas_por_dia"].replace(",", ".")) * 60)
     except (KeyError, ValueError):
-        print("ERRO: plano.md sem 'horas_por_dia: N' no frontmatter")
+        print(f"ERRO: {plano.name} sem 'horas_por_dia: N' no frontmatter")
         return 2
-    arqs = sorted((pasta / "dias").glob("dia-*.md")) if (pasta / "dias").is_dir() else []
+    arqs = dias_da_pasta(pasta, "dias")
     if not arqs:
-        print("ERRO: nenhum dias/dia-NN.md encontrado")
+        print("ERRO: nenhum dias/dia-NN-assunto.md encontrado")
         return 2
     res = [conferir_dia(a, orcamento, pasta) for a in arqs]
+    leia = achar(pasta, "00-LEIA-ME.md", "LEIA-ME.md") or pasta / "00-LEIA-ME.md"
+    for rotulo, arq in [(leia.name, leia)] + [(f"gabaritos/{g.name}", g) for g in dias_da_pasta(pasta, "gabaritos")]:
+        if arq.is_file():
+            corpo = frontmatter(arq.read_text(encoding="utf-8-sig", errors="replace").replace("\r\n", "\n"))[1]
+            res.append({"arquivo": rotulo, "minutos": 0, "palavras": len(re.findall(r"\w+", corpo)), "problemas": sai_do_pacote(corpo) + vicios(corpo)})
+        elif arq is leia:
+            res.append({"arquivo": rotulo, "minutos": 0, "palavras": 0, "problemas": ["não existe: é por ele que se começa o pacote"]})
     ruins = 0
     for r in res:
         marca = "OK  " if not r["problemas"] else "FALHA"
         ruins += bool(r["problemas"])
-        print(f"{marca} {r['arquivo']}: {r['minutos']} min, {r['palavras']} palavras")
+        print(f"{marca} {r['arquivo']}: " + (f"{r['minutos']} min, " if r["minutos"] else "") + f"{r['palavras']} palavras")
         for p in r["problemas"]:
             print(f"     - {p}")
-    print(f"RESUMO: {len(res)} dia(s) conferido(s), {ruins} com problema; orçamento {orcamento} min/dia")
+    nums = sorted(numero_do_dia(a) for a in arqs)
+    faltam = [n for n in range(1, nums[-1] + 1) if n not in nums]
+    if faltam:
+        ruins += 1
+        print("FALHA sequência: faltam os dias " + ", ".join(str(n) for n in faltam[:20]) + " (montagem interrompida? continue com “gerar mais dias”)")
+    print(f"RESUMO: {len(arqs)} dia(s) e {len(res) - len(arqs)} outro(s) arquivo(s) conferido(s), {ruins} com problema; orçamento {orcamento} min/dia")
     return 1 if ruins else 0
 
 

@@ -93,7 +93,7 @@ Estudos/                                ← raiz dos estudos (uma pasta comum)
 │   ├── anexos/                         ← 🤖 imagens e diagramas que entram nas notas (`![](anexos/arquivo.svg)`)
 │   ├── fontes/                         ← 🤖 transcrições de aulas em vídeo (pista, não fonte para ensinar)
 │   ├── _boletim-[matéria].md           ← 🤖 boletim: provas (com a média), exercícios e sessões, gerado por `boletim.py`
-│   ├── pacote/                         ← 🤖 pacote de estudo autônomo (só se eu pedir `"pacote"`; `references/pacote.md`): LEIA-ME, plano, dias/, gabaritos/, anexos/, pdf/ — e `acompanhamento.md`, que é MEU
+│   ├── pacote/                         ← 🤖 pacote de estudo autônomo (o modo padrão ao estudar algo; `references/pacote.md`): 00-LEIA-ME, 01-plano, dias/, gabaritos/, resumos/, anexos/, pdf/ — e `02-acompanhamento.md`, que é MEU
 │   │
 │   ├── pratica/                        ← ✍️ 100% MEU
 │   │   ├── projeto/                    ←    o projeto de prática (em código: versionado com git)
@@ -125,7 +125,7 @@ Estudos/                                ← raiz dos estudos (uma pasta comum)
 | `exercicios/` | exercícios e desafios em nota: `AAAA-MM-DD-[tópico]-[parte]-[nome].md` (só o Claude grava, a meu pedido; criada com o primeiro) |
 | `provas/` | relatório de prova: `AAAA-MM-DD-[tópico]-[parte]-[nome da prova].md` (só o Claude grava, a meu pedido; criada com o primeiro) |
 | `anexos/` | imagens e diagramas: `AAAA-MM-DD-[nome].svg` ou `.png` (só o Claude grava; criada com o primeiro anexo) |
-| `pacote/` | pacote de estudo autônomo: `LEIA-ME.md`, `plano.md`, `curriculo.json`, `dias/dia-NN.md`, `gabaritos/dia-NN.md`, `anexos/`, `pdf/`, `acompanhamento.md` (só o Claude grava, a meu pedido; `acompanhamento.md` é meu depois de criado) |
+| `pacote/` | pacote de estudo autônomo: `00-LEIA-ME.md`, `01-plano.md`, `02-acompanhamento.md`, `03-glossario.md`, `dias/dia-NN-assunto.md`, `gabaritos/dia-NN-assunto.md` (mesmo nome do dia), `resumos/parte-N-nome.md`, `anexos/`, `pdf/`, `_interno/curriculo.json` (só o Claude grava, a meu pedido; `02-acompanhamento.md` é meu depois de criado) |
 | `fontes/` | transcrições de vídeo: `AAAA-MM-DD-[título].md` (só o Claude grava; criada com a primeira) |
 | `pratica/projeto/` | o projeto de prática (uma só pasta, cresce a trilha inteira) |
 | `pratica/treinos/t[N]-[parte]/` | exercícios soltos, uma subpasta por parte (ex.: `t1-1a/`) |
@@ -173,7 +173,7 @@ Em ambientes sem acesso ao meu disco (o chat do claude.ai, por exemplo) **não h
 | · `progresso.md` — posição e **próximo passo** (é aqui que olho quando não sei o que fazer) | |
 | · `conhecimento.md` — conceitos, glossário, fila de revisão | |
 | · `conquistas.md` — dashboard e changelog | |
-| `pacote/` inteiro (exceto `acompanhamento.md`, que é meu) | `pacote/acompanhamento.md` — o que fiz, confiança, notas e dúvidas |
+| `pacote/` inteiro (exceto `02-acompanhamento.md`, que é meu) | `pacote/02-acompanhamento.md` — o que fiz, confiança, notas e dúvidas |
 | `_painel-[matéria].md`, `_boletim-[matéria].md`, as notas de `sessoes/`, `exercicios/`, `provas/` e os arquivos de `anexos/` | |
 | (a **resposta** a um exercício de `exercicios/` é minha: vai em `pratica/treinos/t[N]-[parte]/`) | |
 

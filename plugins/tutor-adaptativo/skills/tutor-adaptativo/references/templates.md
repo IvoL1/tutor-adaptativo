@@ -2,7 +2,7 @@
 
 > Use ao gerar `CLAUDE.md`, README da pasta de estudos, painel, `trilha.md`, `progresso.md`, `conhecimento.md`, `conquistas.md`, a nota da sessão ou o Cartão de retomada.
 
-> Os modelos do **pacote de estudo autônomo** (`curriculo.json`, `plano.md`, `LEIA-ME.md`, `dias/dia-NN.md`, `gabaritos/dia-NN.md`, `acompanhamento.md`) estão em `references/pacote.md` → "Modelos dos arquivos".
+> Os modelos do **pacote de estudo autônomo** (`_interno/curriculo.json`, `01-plano.md`, `00-LEIA-ME.md`, `dias/dia-NN-assunto.md`, `gabaritos/dia-NN-assunto.md`, `02-acompanhamento.md`) estão em `references/pacote.md` → "Modelos dos arquivos".
 
 > **Nesta referência:**
 > **1. Convenções dos arquivos (valem para TODO arquivo gerado)**

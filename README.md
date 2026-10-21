@@ -1,11 +1,11 @@
 # Tutor Adaptativo
 
-Skill para o Claude Code que ensina **qualquer matéria**, de dois jeitos:
+Skill para o Claude Code que **gera material de estudo completo e fechado para qualquer matéria**: você recebe uma pasta (Markdown) e estuda sozinho, **sem o Claude, sem terminal e sem internet**, sem consultar nada fora dela. Há dois modos; o primeiro é o padrão:
 
 | Modo | Como é | Precisa de internet? |
 |---|---|---|
-| **Ao vivo** | O Claude ensina em conversa: descobre seu nível, monta o plano, ensina uma ideia por vez e corrige na hora. | Só para pesquisar fontes |
-| **Pacote autônomo** | Você diz a matéria e **quantas horas por dia tem**. O Claude monta todo o material em dias que fecham essas horas e você estuda **sozinho**, em Markdown ou PDF. | Só na montagem. Depois, **não** |
+| **Pacote autônomo (padrão)** | Você diz a matéria e **quantas horas por dia tem**. O Claude monta **a matéria inteira, de uma vez**, em dias que fecham essas horas, e entrega a pasta. Ele não pede aprovação, não pergunta se deve continuar e não pede nada depois. | Só na montagem, e é opcional (sem internet o pacote sai marcado como "não verificado"). Depois, **não** |
+| **Ao vivo (opcional)** | Só se você pedir ("ao vivo"): o Claude ensina em conversa, descobre seu nível, ensina uma ideia por vez e corrige na hora. | Só para pesquisar fontes |
 
 ## Instalar
 
@@ -23,25 +23,29 @@ Abra o terminal numa pasta de estudos (ex.: `Documents\Estudos`), rode `claude` 
 | Você escreve | O que acontece |
 |---|---|
 | `pacote de TypeScript, 4 horas por dia` | Monta o pacote de estudo autônomo |
-| `quero estudar inglês do zero` | Começa a aula ao vivo (entrevista, sondagem, plano) |
+| `quero estudar inglês do zero` | Pergunta só as horas por dia e monta o pacote inteiro |
+| `quero estudar inglês do zero, ao vivo` | Começa a aula ao vivo (entrevista, sondagem, plano) |
 | `retomar` | Continua de onde parou |
-| `gerar mais dias` | Escreve os próximos dias do pacote |
+| `gerar mais dias` | Só se uma montagem foi interrompida: continua até o fim |
 | `dica` · `travei` · `quiz` · `prova` · `boletim` | Dica, ajuda ao travar, quiz, prova, notas |
 
 Todos os comandos estão em `plugins/tutor-adaptativo/skills/tutor-adaptativo/SKILL.md`.
 
 ## O que o pacote entrega
 
-O Claude mostra o cronograma e **até onde a matéria chega com o seu tempo**. Com o seu "ok", escreve `Estudos/<matéria>/pacote/`:
+O Claude calcula o cronograma (e **até onde a matéria chega com o seu tempo**), escreve tudo e entrega `Estudos/<matéria>/pacote/`, sem pedir aprovação no meio:
 
 ```text
 pacote/
-├── LEIA-ME.md          como começar
-├── plano.md            ordem de estudo, cronograma e fontes
-├── dias/dia-01.md …    o dia completo (soma as suas horas)
-├── gabaritos/…         respostas, separadas
-├── pdf/                para imprimir
-└── acompanhamento.md   seu: o que fez, notas, dúvidas
+├── 00-LEIA-ME.md       comece aqui (diz o que ter instalado)
+├── 01-plano.md         ordem de estudo, cronograma e fontes
+├── 02-acompanhamento.md  seu: o que fez, notas, dúvidas
+├── 03-glossario.md     todo termo novo, com o dia em que aparece
+├── dias/dia-01-tipos-basicos.md …   o dia completo (soma as suas horas)
+├── gabaritos/…         respostas, com o mesmo nome do dia, separadas
+├── resumos/…           uma página por parte, para revisar
+├── anexos/             imagens e diagramas
+└── _interno/           dados do cronograma (não precisa abrir)
 ```
 
 Exemplo real do cronograma (4 h por dia):
@@ -66,11 +70,11 @@ A ordem respeita os pré-requisitos, a dificuldade sobe em degraus, a revisão e
 |---|---|---|
 | **Claude Code** | Rodar a skill | Obrigatório |
 | **Python 3.8+** (no Windows, comando `py`) | Cálculo do cronograma, conferência de tempo, quiz | A skill faz à mão e avisa |
-| **Chrome ou Edge** | PDF automático e diagramas | Gera `.html`; abra e use Ctrl+P → Salvar como PDF |
+| **Chrome ou Edge** | Só para diagramas e para o PDF opcional (`apostila.py`) | O pacote é Markdown; converta para PDF como preferir |
 | Qualquer navegador | Ler as notas bonitas (`ver.py`) | Abra os `.md` num editor de texto |
 | Internet | Montar o pacote com fonte oficial e atual | Sem ela, o pacote é marcado como "não verificado" |
 
-**Para estudar um pacote já pronto, basta um leitor de PDF ou editor de texto.**
+**Para estudar um pacote já pronto, basta um editor de texto ou leitor de Markdown (e, se quiser, converter para PDF).**
 
 ## Detalhes
 

@@ -366,19 +366,54 @@ def testa_pacote():
     (pk / "dias").mkdir(parents=True)
     (pk / "gabaritos").mkdir()
     (pk / "plano.md").write_text("---\nhoras_por_dia: 1\n---\n# Plano\n", encoding="utf-8")
-    texto = " ".join(["palavra"] * 300)
-    bom = f"---\ndia: 1\nminutos: 60\n---\n# Dia 1\n\n## Roteiro\n| 1 | 20 | Ler |\n\n## 1. Ler — Tipos (20 min)\n\n{texto}\n\n## 2. Exercícios — Praticar (40 min)\n\n**Critério de pronto:** roda.\n"
-    (pk / "dias" / "dia-01.md").write_text(bom, encoding="utf-8")
-    (pk / "gabaritos" / "dia-01.md").write_text("# Gabarito\n", encoding="utf-8")
+    (pk / "plano.md").rename(pk / "01-plano.md")  # nome novo; o antigo (plano.md) também é aceito
+    (pk / "00-LEIA-ME.md").write_text("# Leia-me\n\nEste pacote é completo.\n", encoding="utf-8")
+    texto = ("### Por que isso importa\n\n" + " ".join(["palavra"] * 150) + "\n\n### Exemplo\n\nVeja.\n\n### Checagem\n\nQual?\n\n<details><summary>Resposta</summary>Esta.</details>\n\n"
+             "### Dúvidas que costumam aparecer\n\n**E se eu errar?** Releia.")
+    dicas = "<details><summary>Dica 1</summary>a</details>\n<details><summary>Dica 2</summary>b</details>\n<details><summary>Dica 3</summary>c</details>\n"
+    bom = (f"---\ndia: 1\nminutos: 60\n---\n# Dia 1\n\n> Hoje você vai conseguir: tipar.\n\n## Roteiro\n| 1 | 20 | Ler |\n\n## 1. Ler — Tipos (20 min)\n\n{texto}\n\n"
+           f"## 2. Exercícios — Praticar (40 min)\n\n**Se travar:** releia.\n\n### Exercício 1 — um\n\nFaça.\n\n**Critério de pronto:** roda.\n\n{dicas}")
+    (pk / "dias" / "dia-01-tipos.md").write_text(bom, encoding="utf-8")
+    gabom = "# Gabarito\n\n## Exercício 1\n**Resposta:** x\n**Se você errou assim:** y\n"
+    (pk / "gabaritos" / "dia-01-tipos.md").write_text(gabom, encoding="utf-8")
     cod, saida = rodar(pacote.main, ["conferir", str(pk)])
-    ok(cod == 0 and "OK   dia-01.md: 60 min" in saida, "conferir aceita um dia que fecha o tempo")
+    ok(cod == 0 and "OK   dia-01-tipos.md: 60 min" in saida, "conferir aceita um dia que fecha o tempo (nome dia-NN-assunto)")
+    (pk / "dias" / "dia-03-pulo.md").write_text(bom, encoding="utf-8")
+    (pk / "gabaritos" / "dia-03-pulo.md").write_text(gabom, encoding="utf-8")
+    saida = rodar(pacote.main, ["conferir", str(pk)])[1]
+    ok("faltam os dias 2" in saida, "conferir acusa dia que falta na sequência")
+    (pk / "dias" / "dia-03-pulo.md").unlink()
+    (pk / "gabaritos" / "dia-03-pulo.md").unlink()
+    (pk / "dias" / "dia-04-link.md").write_text(bom + "\n[ir](dia-99-nao-existe.md)\n", encoding="utf-8")
+    (pk / "gabaritos" / "dia-04-link.md").write_text(gabom, encoding="utf-8")
+    saida = rodar(pacote.main, ["conferir", str(pk)])[1]
+    ok("link quebrado: dia-99-nao-existe.md" in saida, "conferir acusa link quebrado entre os arquivos")
+    (pk / "dias" / "dia-04-link.md").unlink()
+    (pk / "gabaritos" / "dia-04-link.md").unlink()
+    fora = bom.replace("Veja.", "Veja. Se não entender, pesquise na internet ou pergunte ao Claude. Veja https://exemplo.com e rode pacote.py.\n\n```\nhttps://ok.com\n```")
+    (pk / "dias" / "dia-03.md").write_text(fora, encoding="utf-8")
+    (pk / "gabaritos" / "dia-03.md").write_text(gabom, encoding="utf-8")
+    cod, saida = rodar(pacote.main, ["conferir", str(pk)])
+    ok(cod == 1 and "link para a internet" in saida and "linha" in saida and "https://ok.com" not in saida, "conferir acusa o que manda sair do pacote (e ignora bloco de código)")
+    (pk / "dias" / "dia-03.md").write_text(bom.replace("<details><summary>Dica 3</summary>c</details>", "").replace("### Dúvidas que costumam aparecer", "### Outra coisa"), encoding="utf-8")
+    saida = rodar(pacote.main, ["conferir", str(pk)])[1]
+    ok("falta a subseção “### Dúvidas que costumam aparecer”" in saida and "menos de 3 dicas" in saida, "conferir acusa leitura sem dúvidas antecipadas e exercício com menos de 3 dicas")
+    (pk / "dias" / "dia-03.md").write_text(bom.replace("Veja.", "Isso é fácil, TODO completar.").replace("> Hoje você vai conseguir: tipar.", "").replace("Faça.", "Faça.\n\n### Exercício 2 — dois\n\nOutro.\n\n**Critério de pronto:** ok.\n\n" + dicas), encoding="utf-8")
+    saida = rodar(pacote.main, ["conferir", str(pk)])[1]
+    ok("texto provisório" in saida and "desanima" in saida and "Hoje você vai conseguir" in saida and "não resolve o exercício 2" in saida, "conferir acusa texto provisório, “é fácil”, falta de objetivo do dia e exercício sem solução no gabarito")
+    prova = bom.replace("## 2. Exercícios — Praticar (40 min)", "## 2. Prova — Fim (40 min)").split("**Se travar:**")[0] + "### Questão 1\n\nQual?\nA) x B) y\n"
+    (pk / "dias" / "dia-03.md").write_text(prova, encoding="utf-8")
+    saida = rodar(pacote.main, ["conferir", str(pk)])[1]
+    ok("só 1 questão" in saida and "alternativa “Não sei”" in saida and "Pontuação" in saida, "conferir acusa prova com poucas questões, sem “Não sei” e sem pontuação no gabarito")
+    (pk / "dias" / "dia-03.md").unlink()
+    (pk / "gabaritos" / "dia-03.md").unlink()
     longo = bom.replace(texto, " ".join(["palavra"] * 5000)).replace("minutos: 60", "minutos: 50")
-    (pk / "dias" / "dia-02.md").write_text(longo + "\nFórmula $x^2$ e ![f](nada.svg)\n", encoding="utf-8")
+    (pk / "dias" / "dia-02-longo.md").write_text(longo + "\nFórmula $x^2$ e ![f](nada.svg)\n", encoding="utf-8")
     cod, saida = rodar(pacote.main, ["conferir", str(pk)])
-    ok(cod == 1 and "frontmatter diz 50" in saida and "palavras levam" in saida and "gabaritos/dia-02.md" in saida, "conferir acusa minutos, leitura longa e gabarito ausente")
+    ok(cod == 1 and "frontmatter diz 50" in saida and "palavras levam" in saida and "gabaritos/dia-02-longo.md" in saida, "conferir acusa minutos, leitura longa e gabarito ausente")
     ok("LaTeX" in saida and "imagem não encontrada: nada.svg" in saida, "conferir acusa fórmula LaTeX e imagem que falta")
     curto = bom.replace("(40 min)", "(10 min)").replace("minutos: 60", "minutos: 30")
-    (pk / "dias" / "dia-02.md").write_text(curto, encoding="utf-8")
+    (pk / "dias" / "dia-02-longo.md").write_text(curto, encoding="utf-8")
     ok("abaixo do orçamento" in rodar(pacote.main, ["conferir", str(pk)])[1], "conferir acusa dia abaixo do orçamento")
 
 
@@ -402,6 +437,7 @@ def testa_apostila():
         apostila.render.navegador = antigo
     r = json.loads(saida)
     ok(cod == 0 and r["formato"] == "html" and (pk / "pdf" / "dia-01.html").is_file() and (pk / "pdf" / "gabarito-dia-01.html").is_file(), "apostila --pacote sem navegador grava .html para imprimir")
+    ok((pk / "pdf" / "apostila-completa.html").is_file() and (pk / "pdf" / "gabaritos-completo.html").is_file(), "apostila --pacote gera também a apostila completa e os gabaritos juntos")
     ok((pk / "dias" / "dia-01.md").read_text(encoding="utf-8").startswith("# Dia 1"), "apostila não altera os .md")
     apostila.render.navegador = lambda: None
     try:

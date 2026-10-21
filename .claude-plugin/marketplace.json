@@ -1,6 +1,6 @@
 {
   "name": "tutor-adaptativo",
-  "description": "Sistema pessoal de estudo ao vivo e adaptativo, para qualquer matéria",
+  "description": "Gera material de estudo completo e fechado para qualquer matéria (estudar sem o Claude, sem terminal e sem internet); aula ao vivo opcional",
   "owner": {
     "name": "Ivo"
   },
@@ -8,7 +8,7 @@
     {
       "name": "tutor-adaptativo",
       "source": "./plugins/tutor-adaptativo",
-      "description": "Skill de estudo ao vivo (sondagem, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada), caderno de estudos em Markdown comum com boletim e leitor no navegador, catálogo de visuais (Mermaid, SVG, gráficos), dois subagentes, estilo de resposta opcional e testes automáticos"
+      "description": "Skill de estudo: pacote autônomo completo por padrão e aula ao vivo opcional (sondagem, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada), caderno de estudos em Markdown comum com boletim e leitor no navegador, catálogo de visuais (Mermaid, SVG, gráficos), dois subagentes, estilo de resposta opcional e testes automáticos"
     }
   ]
 }

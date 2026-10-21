@@ -3,7 +3,9 @@
 """Apostila em PDF (e HTML) do pacote de estudo, 100% offline. Só biblioteca padrão; usa o Chrome ou o Edge já instalados.
 
   apostila.py SAIDA.pdf ARQ1.md [ARQ2.md ...]     junta as notas, na ordem dada, num PDF (SAIDA.html com --html)
-  apostila.py --pacote PASTA_DO_PACOTE            gera pdf/plano.pdf, pdf/dia-NN.pdf e pdf/gabarito-dia-NN.pdf (ou .html, sem Chrome/Edge)
+  apostila.py --pacote PASTA_DO_PACOTE            gera pdf/plano.pdf, pdf/dia-NN-assunto.pdf, pdf/gabarito-dia-NN-assunto.pdf e as apostilas
+                                                  completas pdf/apostila-completa.pdf (LEIA-ME, plano e todos os dias) e
+                                                  pdf/gabaritos-completo.pdf (ou .html, sem Chrome/Edge)
 
 Não precisa de internet: o PDF não carrega nada de fora (fórmulas e diagramas devem estar em texto ou em imagens locais,
 como o `pacote.py conferir` cobra). As dicas dobráveis (<details>) saem abertas no papel. Escreve só o PDF/HTML pedido
@@ -14,6 +16,7 @@ import html, json, os, pathlib, re, shutil, sys, tempfile
 
 AQUI = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
+import pacote as _pacote  # noqa: E402  (achar, dias_da_pasta)
 import render  # noqa: E402  (navegador, _lancar, _encerrar, _esperar_png)
 import ver     # noqa: E402  (conversor de Markdown)
 
@@ -72,14 +75,25 @@ def para_pdf(html_txt, saida, nav):
 def pacote(pasta, nav):
     pasta = pathlib.Path(pasta).expanduser().resolve()
     trabalhos = []
-    if (pasta / "plano.md").is_file():
-        trabalhos.append(("plano.pdf", [pasta / "plano.md"]))
-    for a in sorted((pasta / "dias").glob("dia-*.md")):
+    plano = _pacote.achar(pasta, "01-plano.md", "plano.md")
+    leia = _pacote.achar(pasta, "00-LEIA-ME.md", "LEIA-ME.md")
+    dias = _pacote.dias_da_pasta(pasta, "dias")
+    gabs = _pacote.dias_da_pasta(pasta, "gabaritos")
+    resumos = sorted((pasta / "resumos").glob("*.md")) if (pasta / "resumos").is_dir() else []
+    glossario = _pacote.achar(pasta, "03-glossario.md", "glossario.md")
+    if plano:
+        trabalhos.append(("plano.pdf", [plano]))
+    for a in dias:
         trabalhos.append((a.stem + ".pdf", [a]))
-    for a in sorted((pasta / "gabaritos").glob("dia-*.md")):
+    for a in gabs:
         trabalhos.append(("gabarito-" + a.stem + ".pdf", [a]))
+    ini = [x for x in (leia, plano) if x]
+    if dias:
+        trabalhos.append(("apostila-completa.pdf", ini + dias + resumos + ([glossario] if glossario else [])))
+    if gabs:
+        trabalhos.append(("gabaritos-completo.pdf", gabs))
     if not trabalhos:
-        return {"ok": False, "erro": "nada para converter: faltam plano.md, dias/ e gabaritos/"}
+        return {"ok": False, "erro": "nada para converter: faltam 01-plano.md, dias/ e gabaritos/"}
     feitos, falhas = [], []
     for nome, arqs in trabalhos:
         alvo = pasta / "pdf" / nome

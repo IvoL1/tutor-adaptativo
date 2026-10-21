@@ -1,8 +1,8 @@
 {
   "name": "tutor-adaptativo",
   "displayName": "Tutor Adaptativo",
-  "description": "Sistema pessoal de estudo para qualquer matéria, ao vivo e adaptativo ou em pacote autônomo (monta todo o material em dias que fecham as horas diárias, na ordem de pré-requisitos, em Markdown e PDF para estudar sem o Claude e sem internet): sondagem do nível, plano com mapa de dependências, aula em ciclos, quizzes corrigidos por código, repetição espaçada, protocolo antifrustração, caderno de estudos em arquivos Markdown comuns (uma pasta por matéria, com exercícios, provas, correções e boletim com a média calculada por código), leitor no navegador, catálogo de visuais (Mermaid, SVG, gráficos), subagentes e testes automáticos.",
-  "version": "7.0.0",
+  "description": "Sistema pessoal de estudo para qualquer matéria. Padrão: gera um pacote de estudo COMPLETO e fechado (aulas, exercícios com dicas, gabaritos, provas e revisões, em dias que fecham as horas diárias, na ordem de pré-requisitos, em Markdown) para estudar sem o Claude, sem terminal e sem internet. Opcional: aula ao vivo e adaptativa (sondagem, plano, ciclos, quizzes corrigidos por código, repetição espaçada, protocolo antifrustração), caderno de estudos em Markdown comum, boletim, leitor no navegador, catálogo de visuais, subagentes e testes automáticos.",
+  "version": "8.0.0",
   "author": {
     "name": "Ivo"
   },
